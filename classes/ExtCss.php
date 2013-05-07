@@ -166,7 +166,7 @@ class ExtCss extends \Frontend
 			{
 				$objFile = \FilesModel::findByPk($objFiles->src);
 
-				if(!file_exists(TL_ROOT .'/'. $objFile->path)) continue;
+				if(!file_exists($objFile->path)) continue;
 
 				$css .= file_get_contents($objFile->path) . "\n";
 
