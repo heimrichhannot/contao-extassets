@@ -1,29 +1,70 @@
+@
+color
+:
+ 
+blue
+;
 
-@color: blue;
 
-(~"something @{color}"), world {
+
+(~"
+something
+ 
+@{
+color
+}
+"),
+world {
 	color: blue;
 }
 
-.div {
-	@color: red;
-	(3434) {
-		height: 100px;
-	}
-
-	(~"cool @{color}") {
-		height: 4000px;
-	}
+.div { @
+	color: red; (3434) {
+	height: 100px;
 }
 
-.heck(@a) { color: @a+10 }
-
-.spanX (@index) when (@index > 0) {
-	(~".span@{index}") { .heck(@index) }
-	.spanX(@index - 1);
+(~"
+cool
+ 
+@{
+color
 }
-.spanX (0) {}
+")
+{
+height
+:
+ 
+4000
+px
+;
 
-.spanX (5);
+	
+}
+}
+.heck (@a) {
+	color: @a +10
+}
 
-
+.spanX  (@index ) when  (@index> 0) { (~".span @{index
+	
+}
+")
+{
+.heck
+(@index)
+ 
+}
+.spanX
+(@index
+ 
+-
+1);
+}
+.spanX
+ 
+(0)
+{
+}
+.spanX
+ 
+(5);

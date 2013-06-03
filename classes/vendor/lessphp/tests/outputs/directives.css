@@ -1,15 +1,19 @@
 @charset "utf-8";
-@-moz-document url-prefix() {
-  div {
-    color: red;
-  }
+
+@
+-moz-document url-prefix () {div { color:red;
+	
+}
+
 }
 @page :left {
-  margin-left: 4cm;
+	margin-left: 4cm;
 }
+
 @page :right {
-  margin-left: 3cm;
+	margin-left: 3cm;
 }
+
 @page {
-  margin: 2cm;
+	margin: 2cm;
 }

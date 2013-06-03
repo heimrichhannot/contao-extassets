@@ -1,77 +1,65 @@
+//
+simple arity
 
-// simple arity
-
-.hello(@a) {
+.hello (@a) {
 	color: one;
 }
 
-.hello(@a, @b) {
+.hello (@a, @b ) {
 	color: two;
 }
 
-.hello(@a, @b, @c) {
+.hello (@a, @b, @c ) {
 	color: three;
 }
 
-
-.world(@a, @b, @c) {
+.world (@a, @b, @c ) {
 	color: three;
 }
 
-.world(@a, @b) {
+.world (@a, @b ) {
 	color: two;
 }
 
-.world(@a) {
+.world (@a) {
 	color: one;
 }
 
-.one {
-	.hello(1);
-	.world(1);
+.one { .hello (1); .world (1);
+	
 }
 
-.two {
-	.hello(1, 1);
-	.world(1, 1);
+.two { .hello (1, 1); .world (1, 1);
+	
 }
 
-.three {
-	.hello(1, 1, 1);
-	.world(1, 1, 1);
+.three { .hello (1, 1, 1); .world (1, 1, 1);
+	
 }
 
+//
+arity with default values
 
-// arity with default values
-
-.foo(@a, @b: cool) {
+.foo (@a, @b: cool ) {
 	color: two;
 }
 
-.foo(@a, @b: cool, @c: yeah) {
+.foo (@a, @b: cool, @c: yeah ) {
 	color: three;
 }
 
-
-.baz(@a, @b, @c: yeah) {
+.baz (@a, @b, @c: yeah ) {
 	color: three;
 }
 
-.baz(@a, @b: cool) {
+.baz (@a, @b: cool ) {
 	color: two;
 }
 
-
-.multi-foo {
-	.foo(1);
-	.foo(1, 1);
-	.foo(1,1,1);
+.multi-foo { .foo (1); .foo (1, 1); .foo (1,1,1);
+	
 }
 
-.multi-baz {
-	.baz(1);
-	.baz(1, 1);
-	.baz(1,1,1);
+.multi-baz { .baz (1); .baz (1, 1); .baz (1,1,1);
+	
 }
-
-

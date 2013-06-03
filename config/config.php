@@ -21,8 +21,8 @@
 
 $GLOBALS['BE_MOD']['design']['extcss'] = array
 (
-	'tables'       => array('tl_extcss', 'tl_extcss_file', 'tl_files'),
-	'icon'         => 'system/modules/extassets/assets/extcss/icon.png',
+		'tables'       => array('tl_extcss', 'tl_extcss_file', 'tl_files'),
+		'icon'         => 'system/modules/extassets/assets/extcss/icon.png',
 );
 
 $GLOBALS['BE_MOD']['design']['extjs'] = array

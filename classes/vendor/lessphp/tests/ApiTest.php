@@ -84,32 +84,32 @@ EOD;
 		$this->less = new lessc(__DIR__ . "/inputs/hi.less");
 		$out = $this->less->parse(array("hello" => "10px"));
 		$this->assertEquals(trim($out), trim('
-div:before {
-  content: "hi!";
-}'));
+				div:before {
+				content: "hi!";
+	}'));
 
 	}
 
 	public function testInjectVars() {
 		$out = $this->less->parse(".magic { color: @color;  width: @base - 200; }",
-			array(
-				'color' => 'red',
-				'base' => '960px'
-			));
-	
+				array(
+						'color' => 'red',
+						'base' => '960px'
+				));
+
 		$this->assertEquals(trim($out), trim("
-.magic {
-  color: red;
-  width: 760px;
-}"));
+				.magic {
+				color: red;
+				width: 760px;
+	}"));
 
 	}
 
 	public function testDisableImport() {
 		$this->less->importDisabled = true;
 		$this->assertEquals(
-			"/* import disabled */",
-			$this->compile("@import 'file3';"));
+				"/* import disabled */",
+				$this->compile("@import 'file3';"));
 	}
 
 	public function testUserFunction() {
@@ -119,9 +119,9 @@ div:before {
 		});
 
 		$this->assertEquals(
-			$this->compile("result: add-two(10, 20);"),
-			"result: 30;");
-		
+				$this->compile("result: add-two(10, 20);"),
+				"result: 30;");
+
 		return $this->less;
 	}
 
@@ -132,53 +132,53 @@ div:before {
 		$less->unregisterFunction("add-two");
 
 		$this->assertEquals(
-			$this->compile("result: add-two(10, 20);"),
-			"result: add-two(10,20);");
+				$this->compile("result: add-two(10, 20);"),
+				"result: add-two(10,20);");
 	}
 
 
 
 	public function testFormatters() {
 		$src = "
-			div, pre {
-				color: blue;
-				span, .big, hello.world {
-					height: 20px;
-					color:#ffffff + #000;
-				}
-			}";
+		div, pre {
+		color: blue;
+		span, .big, hello.world {
+		height: 20px;
+		color:#ffffff + #000;
+	}
+	}";
 
 		$this->less->setFormatter("compressed");
 		$this->assertEquals(
-			$this->compile($src), "div,pre{color:blue;}div span,div .big,div hello.world,pre span,pre .big,pre hello.world{height:20px;color:#fff;}");
+				$this->compile($src), "div,pre{color:blue;}div span,div .big,div hello.world,pre span,pre .big,pre hello.world{height:20px;color:#fff;}");
 
 		// TODO: fix the output order of tags
 		$this->less->setFormatter("lessjs");
 		$this->assertEquals(
-			$this->compile($src),
-"div,
-pre {
-  color: blue;
-}
-div span,
-div .big,
-div hello.world,
-pre span,
-pre .big,
-pre hello.world {
-  height: 20px;
-  color: #ffffff;
-}");
+				$this->compile($src),
+				"div,
+				pre {
+				color: blue;
+	}
+				div span,
+				div .big,
+				div hello.world,
+				pre span,
+				pre .big,
+				pre hello.world {
+				height: 20px;
+				color: #ffffff;
+	}");
 
 		$this->less->setFormatter("classic");
 		$this->assertEquals(
-			$this->compile($src),
-trim("div, pre { color:blue; }
-div span, div .big, div hello.world, pre span, pre .big, pre hello.world {
-  height:20px;
-  color:#ffffff;
-}
-"));
+				$this->compile($src),
+				trim("div, pre { color:blue; }
+						div span, div .big, div hello.world, pre span, pre .big, pre hello.world {
+						height:20px;
+						color:#ffffff;
+	}
+						"));
 
 	}
 

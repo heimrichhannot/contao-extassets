@@ -19,12 +19,12 @@ $dc = &$GLOBALS['TL_DCA']['tl_layout'];
 
 $dc['fields']['extcss'] = array
 (
-	'label'                   => &$GLOBALS['TL_LANG']['tl_layout']['extcss'],
-	'exclude'                 => true,
-	'inputType'               => 'checkboxWizard',
-	'foreignKey'              => 'tl_extcss.title',
-	'eval'                    => array('multiple'=>true),
-	'sql'                     => "varchar(255) NOT NULL default ''",
+		'label'                   => &$GLOBALS['TL_LANG']['tl_layout']['extcss'],
+		'exclude'                 => true,
+		'inputType'               => 'checkboxWizard',
+		'foreignKey'              => 'tl_extcss.title',
+		'eval'                    => array('multiple'=>true),
+		'sql'                     => "varchar(255) NOT NULL default ''",
 );
 
 $dc['fields']['extjs'] = array

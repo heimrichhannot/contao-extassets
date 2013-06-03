@@ -221,9 +221,9 @@ class ExtCss extends \Frontend
 
 	/*
 	 * TODO:
-	 * - install via runonce
-	 * - refactor css compiling in custom method (together with parseExtCss)
-	 */
+	* - install via runonce
+	* - refactor css compiling in custom method (together with parseExtCss)
+	*/
 	public function addTwitterBootstrap($arrCss, $objCss)
 	{
 		if($objCss->bootstrapResponsive)

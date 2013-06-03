@@ -14,7 +14,7 @@ class ExtAssets extends \Frontend
 		{
 			case self::$twitter:
 				$path = 'assets/bootstrap';
-			break;
+				break;
 			default:
 				return false;
 		}

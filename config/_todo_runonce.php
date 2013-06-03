@@ -16,7 +16,7 @@ class ExtAssetsRunOnce extends Controller
 {
 	public function __construct()
 	{
-	  parent::__construct();
+		parent::__construct();
 		$this->import('Files');
 	}
 

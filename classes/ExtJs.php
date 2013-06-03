@@ -72,7 +72,7 @@ class ExtJs extends \Frontend
 		$objJs = ExtJsModel::findMultipleByIds(deserialize($objLayout->extjs));
 
 		if($objJs === null) return false;
-		
+
 		while($objJs->next())
 		{
 			$objFiles = ExtJsFileModel::findMultipleByPid($objJs->id);
