@@ -179,14 +179,26 @@ class ExtCss extends \Frontend
 
 			if($objCss->addBootstrap)
 			{
-				$in = "/assets/bootstrap/less/mixins.less";
+				$variables = "/assets/bootstrap/less/variables.less";
 
-				if(file_exists(TL_ROOT . $in))
+				if(file_exists(TL_ROOT . $variables))
 				{
-					$css .= file_get_contents(TL_ROOT . $in);
+					$css .= file_get_contents(TL_ROOT . $variables);
 				}
+
+				$mixins = "/assets/bootstrap/less/mixins.less";
+
+				if(file_exists(TL_ROOT . $mixins))
+				{
+					$css .= file_get_contents(TL_ROOT . $mixins);
+				}
+
+
 			}
 
+			print '<pre>';
+			print_r($css);
+			print '</pre>';
 
 			if($less)
 			{
