@@ -1,97 +1,88 @@
-.simple (@hi) when  (@hi ) {
+
+.simple(@hi) when (@hi) {
 	color: yellow;
 }
 
-.something (@hi) when  (@hi  = cool ) {
+
+.something(@hi) when (@hi = cool) {
 	color: red;
 }
 
-.another
-(@x)
- 
-when
- 
-(@
-x
->
-10)
-{
-color
-:
- 
-green
-;
-
-
+.another(@x) when (@x > 10) {
+	color: green;
 }
-.flipped
-(@x)
- 
-when
- 
-(@
-x
- 
-=<
-10)
-{
-color
-:
- 
-teal
-;
 
 
+.flipped(@x) when (@x =< 10) {
+	color: teal;
 }
-.yeah (@arg) when  (isnumber (@arg)) {
+
+.yeah(@arg) when (isnumber(@arg)) {
 	color: purple;
 }
 
-.yeah (@arg) when  (ispixel (@arg)) {
+
+.yeah(@arg) when (ispixel(@arg)) {
 	color: silver;
 }
 
-.hello (@arg) when not  (@arg ) {
+
+.hello(@arg) when not (@arg) {
 	color: orange;
 }
 
-dd { .simple (true); .simple (2344px);
-	
+dd {
+	.simple(true);
+	.simple(2344px);
 }
 
-b { .something (cool); .something (birthday);
-	
+b {
+	.something(cool);
+	.something(birthday);
 }
 
-img { .another (12); .another (2); .flipped (12); .flipped (2);
-	
+img {
+	.another(12);
+	.another(2);
+
+	.flipped(12);
+	.flipped(2);
 }
 
-body { .yeah ("world"); .yeah (232px); .yeah (232); .hello (true);
-	
+body {
+	.yeah("world");
+	.yeah(232px);
+	.yeah(232);
+
+	.hello(true);
 }
 
-.something (@x) when  (@x ) and  (@y ),not  (@x  = what ) {
+.something(@x) when (@x) and (@y), not (@x = what) {
 	color: blue;
 }
 
-div { @
-	y: true;
-	.
-	something
-	(true);
+div {
+	@y: true;
+	.something(true);
+
 }
 
-pre { .something (what);
-	
+pre {
+	.something(what);
 }
 
-.coloras (@g) when  (iscolor (@g)) {
-	color: true@g;
+
+.coloras(@g) when (iscolor(@g)) {
+	color: true @g;
 }
 
-link { .coloras (red); .coloras (10px); .coloras (ffjref); .coloras
-	(#fff); .coloras (#fffddd); .coloras (rgb(0,0,0)); .coloras
-	(rgba(0,0,0, .34));
-	
+link {
+	.coloras(red);
+	.coloras(10px);
+	.coloras(ffjref);
+	.coloras(#fff);
+	.coloras(#fffddd);
+	.coloras(rgb(0,0,0));
+	.coloras(rgba(0,0,0, .34));
 }
+

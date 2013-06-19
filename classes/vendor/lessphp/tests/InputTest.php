@@ -33,7 +33,7 @@ class InputTest extends PHPUnit_Framework_TestCase {
 
 		if (!is_readable($outFname)) {
 			$this->fail("$outFname is missing, ".
-					"consider building tests with BUILD=true");
+				"consider building tests with BUILD=true");
 		}
 
 		$input = file_get_contents($inFname);
@@ -43,10 +43,8 @@ class InputTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function fileNameProvider() {
-		return array_map(function($a) {
-			return array($a);
-		},
-		self::findInputNames());
+		return array_map(function($a) { return array($a); },
+			self::findInputNames());
 	}
 
 	// only run when env is set

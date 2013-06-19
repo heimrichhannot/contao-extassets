@@ -1,92 +1,33 @@
-@
-cool-hello:  "yes ";
- @cool-yes:  "okay ";
- @var:  "hello ";
+
+@cool-hello: "yes";
+@cool-yes: "okay";
+@var: "hello";
 
 div {
 	color: ~"@{cool-hello}";
 	color: ~"@{cool-@{var}}";
 	color: ~"@{cool-@{cool-@{var}}}";
 }
-//
-interpolation
- 
-in
- 
-selectors
 
+// interpolation in selectors
 
+@hello: 10;
+@world: "yeah";
 
-@
-hello
-:
- 
-10;
-@
-world
-:
- 
-"
-yeah
-";
-
-
-
-@{
-hello
+@{hello}@{world} {
+	color: blue;
 }
-@{
-world
+
+@{hello} {
+	color: blue;
 }
-{
-color
-:
- 
-blue
-;
+
+hello world @{hello} {
+	color: red;
+}
+
+#@{world} {
+	color: "hello @{hello}";
+}
 
 
-}
-@{
-hello
-}
-{
-color
-:
- 
-blue
-;
-
-
-}
-hello
- 
-world
- 
-@{
-hello
-}
-{
-color
-:
- 
-red
-;
-
-
-}
-#@{
-world
-}
-{
-color
-:
- 
-"
-hello
- 
-@{
-hello
-}
-";
-}
