@@ -164,6 +164,8 @@ class ExtCss extends \Frontend
 
 			if($objCss->addBootstrap)
 			{
+				$less = true;
+
 				$variables = "/assets/bootstrap/less/variables.less";
 
 				if(file_exists(TL_ROOT . $variables))
@@ -192,8 +194,6 @@ class ExtCss extends \Frontend
 
 			// TODO: Refactor Css Generation
 			$target = '/assets/css/' . $objCss->title . '.css';
-
-
 
 			if($less)
 			{
