@@ -162,21 +162,6 @@ class ExtCss extends \Frontend
 
 			if($objFiles === null) continue;
 
-			while($objFiles->next())
-			{
-				$objFile = \FilesModel::findByPk($objFiles->src);
-
-				if(!file_exists($objFile->path)) continue;
-
-				$css .= file_get_contents($objFile->path) . "\n";
-
-				if($objFile->extension == 'less') $less = true;
-			}
-
-			// TODO: Refactor Css Generation
-			$target = '/assets/css/' . $objCss->title . '.css';
-
-
 			if($objCss->addBootstrap)
 			{
 				$variables = "/assets/bootstrap/less/variables.less";
@@ -192,13 +177,23 @@ class ExtCss extends \Frontend
 				{
 					$css .= file_get_contents(TL_ROOT . $mixins);
 				}
-
-
 			}
 
-			print '<pre>';
-			print_r($css);
-			print '</pre>';
+			while($objFiles->next())
+			{
+				$objFile = \FilesModel::findByPk($objFiles->src);
+
+				if(!file_exists($objFile->path)) continue;
+
+				$css .= file_get_contents($objFile->path) . "\n";
+
+				if($objFile->extension == 'less') $less = true;
+			}
+
+			// TODO: Refactor Css Generation
+			$target = '/assets/css/' . $objCss->title . '.css';
+
+
 
 			if($less)
 			{
