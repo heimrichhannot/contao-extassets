@@ -168,14 +168,14 @@ class ExtCss extends \Frontend
 
 				if(file_exists(TL_ROOT . $variables))
 				{
-					$css .= file_get_contents(TL_ROOT . $variables);
+					$css .= file_get_contents(TL_ROOT . $variables) . "\n";
 				}
 
 				$mixins = "/assets/bootstrap/less/mixins.less";
 
 				if(file_exists(TL_ROOT . $mixins))
 				{
-					$css .= file_get_contents(TL_ROOT . $mixins);
+					$css .= file_get_contents(TL_ROOT . $mixins) . "\n";
 				}
 			}
 
