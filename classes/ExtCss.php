@@ -176,6 +176,18 @@ class ExtCss extends \Frontend
 			// TODO: Refactor Css Generation
 			$target = '/assets/css/' . $objCss->title . '.css';
 
+
+			if($objCss->addBootstrap)
+			{
+				$in = "/assets/bootstrap/less/mixins.less";
+
+				if(file_exists(TL_ROOT . $in))
+				{
+					$css .= file_get_contents(TL_ROOT . $in);
+				}
+			}
+
+
 			if($less)
 			{
 				$less = new \lessc();
