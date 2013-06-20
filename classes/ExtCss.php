@@ -180,9 +180,10 @@ class ExtCss extends \Frontend
 
 					if($this->fileExists($objFile->path))
 					{
-						// store variables for responsive layout
-						$variables = $this->getFileContent($objFile->path) . "\n";
-						$css .= $variables;
+						// store variables in new file for bootstrap import
+						$css .= $this->getFileContent($objFile->path) . "\n";
+						$variablesName = 'variables-' . $objCss->title . '.less';
+						$this->filePutContent('assets/bootstrap/less/' . $variablesName, $css);
 					}
 				}
 
@@ -245,7 +246,7 @@ class ExtCss extends \Frontend
 
 		if($objCss->addBootstrap)
 		{
-			$arrCss = $this->addTwitterBootstrap($arrCss, $objCss, $variables);
+			$arrCss = $this->addTwitterBootstrap($arrCss, $objCss, $variablesName);
 		}
 
 		$GLOBALS['TL_USER_CSS']	= (is_array($GLOBALS['TL_USER_CSS']) ? $GLOBALS['TL_USER_CSS'] : array()) + $arrCss;
@@ -256,7 +257,7 @@ class ExtCss extends \Frontend
 	* - install via runonce
 	* - refactor css compiling in custom method (together with parseExtCss)
 	*/
-	public function addTwitterBootstrap($arrCss, $objCss, $variables)
+	public function addTwitterBootstrap($arrCss, $objCss, $variablesName='')
 	{
 		if($objCss->bootstrapResponsive)
 		{
@@ -291,12 +292,12 @@ class ExtCss extends \Frontend
 						}
 					}
 
-					$newIn = "assets/bootstrap/less/bootstrap-responsive-" . $objCss->title .".css";
+					$newIn = "assets/bootstrap/less/bootstrap-responsive-" . $objCss->title .".less";
 
 					// overwrite variables with custom variables
-					if(strlen($variables) > 0)
+					if($variablesName)
 					{
-						$inCss = str_replace('@import "variables.less";', '@import "variables.less";' . "\n" . $variables, $inCss);
+						$inCss = str_replace('variables.less', $variablesName, $inCss);
 					}
 
 					if($this->filePutContent($newIn, $inCss) !== false)
@@ -312,19 +313,20 @@ class ExtCss extends \Frontend
 		$in = "assets/bootstrap/less/bootstrap.less";
 		$out = "assets/css/bootstrap.css";
 
-		// overwrite variables with custom variables
-		if(strlen($variables) > 0)
-		{
-			$newIn = "assets/bootstrap/less/bootstrap-" . $objCss->title .".css";
 
+		// overwrite variables with custom variables
+		if($variablesName)
+		{
 			$inCss = $this->getFileContent($in);
-			$inCss = str_replace('@import "variables.less";', '@import "variables.less";' . "\n" . $variables, $inCss);
+			$inCss = str_replace('variables.less', $variablesName, $inCss);
+			$newIn = "assets/bootstrap/less/bootstrap-" . $objCss->title .".less";
 
 			if($this->filePutContent($newIn, $inCss) !== false)
 			{
 				$in = $newIn;
 			}
 		}
+
 
 		$arrCss = $this->addVendorAsset($arrCss, $in ,$out);
 
