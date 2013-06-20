@@ -180,7 +180,9 @@ class ExtCss extends \Frontend
 
 					if($this->fileExists($objFile->path))
 					{
-						$css .= $this->getFileContent($objFile->path) . "\n";
+						// store variables for responsive layout
+						$variables = $this->getFileContent($objFile->path) . "\n";
+						$css .= $variables;
 					}
 				}
 
@@ -243,7 +245,7 @@ class ExtCss extends \Frontend
 
 		if($objCss->addBootstrap)
 		{
-			$arrCss = $this->addTwitterBootstrap($arrCss, $objCss);
+			$arrCss = $this->addTwitterBootstrap($arrCss, $objCss, $variables);
 		}
 
 		$GLOBALS['TL_USER_CSS']	= (is_array($GLOBALS['TL_USER_CSS']) ? $GLOBALS['TL_USER_CSS'] : array()) + $arrCss;
@@ -254,7 +256,7 @@ class ExtCss extends \Frontend
 	* - install via runonce
 	* - refactor css compiling in custom method (together with parseExtCss)
 	*/
-	public function addTwitterBootstrap($arrCss, $objCss)
+	public function addTwitterBootstrap($arrCss, $objCss, $variables)
 	{
 		if($objCss->bootstrapResponsive)
 		{
@@ -290,6 +292,13 @@ class ExtCss extends \Frontend
 					}
 
 					$newIn = "assets/bootstrap/less/bootstrap-responsive-" . $objCss->title .".css";
+
+					// overwrite variables with custom variables
+					if(strlen($variables) > 0)
+					{
+						$inCss = str_replace('@import "variables.less";', '@import "variables.less";' . "\n" . $variables, $inCss);
+					}
+
 					if($this->filePutContent($newIn, $inCss) !== false)
 					{
 						$in = $newIn;
@@ -302,6 +311,21 @@ class ExtCss extends \Frontend
 
 		$in = "assets/bootstrap/less/bootstrap.less";
 		$out = "assets/css/bootstrap.css";
+
+		// overwrite variables with custom variables
+		if(strlen($variables) > 0)
+		{
+			$newIn = "assets/bootstrap/less/bootstrap-" . $objCss->title .".css";
+
+			$inCss = $this->getFileContent($in);
+			$inCss = str_replace('@import "variables.less";', '@import "variables.less";' . "\n" . $variables, $inCss);
+
+			if($this->filePutContent($newIn, $inCss) !== false)
+			{
+				$in = $newIn;
+			}
+		}
+
 		$arrCss = $this->addVendorAsset($arrCss, $in ,$out);
 
 		return $arrCss;
