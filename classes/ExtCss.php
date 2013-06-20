@@ -173,6 +173,17 @@ class ExtCss extends \Frontend
 					$css .= file_get_contents(TL_ROOT . $variables) . "\n";
 				}
 
+				// overwrite bootstrap variables by custom
+				if($objCss->bootstrapVariablesSRC)
+				{
+					$objFile = \FilesModel::findByPk($objCss->bootstrapVariablesSRC);
+
+					if(file_exists($objFile->path))
+					{
+						$css .= file_get_contents($objFile->path) . "\n";
+					}
+				}
+
 				$mixins = "/assets/bootstrap/less/mixins.less";
 
 				if(file_exists(TL_ROOT . $mixins))
@@ -194,6 +205,14 @@ class ExtCss extends \Frontend
 
 			// TODO: Refactor Css Generation
 			$target = '/assets/css/' . $objCss->title . '.css';
+
+			ob_start();
+			print "\n";
+			print_r($css);
+			file_put_contents(TL_ROOT . '/debug.txt', ob_get_contents());
+			ob_end_clean();
+
+
 
 			if($less)
 			{

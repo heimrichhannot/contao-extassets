@@ -17,6 +17,8 @@
 $GLOBALS['TL_LANG']['tl_extcss']['title'] = array('Titel', 'Bitte geben Sie einen Titel an.');
 $GLOBALS['TL_LANG']['tl_extcss']['addBootstrap'] = array('Twitter Bootstrap aktivieren', 'Fügen Sie der CSS Gruppe Twitter Bootstrap hinzu.');
 $GLOBALS['TL_LANG']['tl_extcss']['bootstrapResponsive'] = array('Responsive', 'Laden Sie die Twitter Bootstrap Responsive CSS Dateien.');
+$GLOBALS['TL_LANG']['tl_extcss']['bootstrapVariablesSRC'] = array('Variablen Quelle', 'Falls vorhanden, werden die Bootstap Variablen aus variables.less mit den Variablen dieser Datei überschrieben.');
+
 
 /**
  * Legends
