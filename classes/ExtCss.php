@@ -182,8 +182,8 @@ class ExtCss extends \Frontend
 					{
 						// store variables in new file for bootstrap import
 						$css .= $this->getFileContent($objFile->path) . "\n";
-						$variablesName = 'variables-' . $objCss->title . '.less';
-						$this->filePutContent('assets/bootstrap/less/' . $variablesName, $css);
+						$newVariables = 'variables-' . $objCss->title . '.less';
+						$this->filePutContent('assets/bootstrap/less/' . $newVariables, $css);
 					}
 				}
 
@@ -246,7 +246,7 @@ class ExtCss extends \Frontend
 
 		if($objCss->addBootstrap)
 		{
-			$arrCss = $this->addTwitterBootstrap($arrCss, $objCss, $variablesName);
+			$arrCss = $this->addTwitterBootstrap($arrCss, $objCss, $newVariables);
 		}
 
 		$GLOBALS['TL_USER_CSS']	= (is_array($GLOBALS['TL_USER_CSS']) ? $GLOBALS['TL_USER_CSS'] : array()) + $arrCss;
@@ -257,7 +257,7 @@ class ExtCss extends \Frontend
 	* - install via runonce
 	* - refactor css compiling in custom method (together with parseExtCss)
 	*/
-	public function addTwitterBootstrap($arrCss, $objCss, $variablesName='')
+	public function addTwitterBootstrap($arrCss, $objCss, $variablesSRC='')
 	{
 		if($objCss->bootstrapResponsive)
 		{
@@ -265,6 +265,13 @@ class ExtCss extends \Frontend
 			$out = "assets/css/bootstrap-responsive.css";
 
 			$arrDevices = deserialize($objCss->bootstrapResponsiveDevices);
+
+			$inCss = $this->getFileContent($in);
+
+			if($variablesSRC)
+			{
+				$inCss = str_replace('variables.less', $variablesSRC, $inCss);
+			}
 
 			if(is_array($arrDevices) && !empty($arrDevices))
 			{
@@ -274,31 +281,23 @@ class ExtCss extends \Frontend
 
 				if(is_array($arrRemove) && !empty($arrRemove))
 				{
-					$inCss = $this->getFileContent($in);
-
 					foreach($arrRemove as $device)
 					{
 						switch($device)
 						{
 							case 'large':
-								$inCss = str_replace('@import "responsive-1200px-min.less";', '', $inCss);
+								$inCss = str_replace('@import "responsive-1200px-min.less";', '//@import "responsive-1200px-min.less";', $inCss);
 							break;
 							case 'tablet':
-								$inCss = str_replace('@import "responsive-768px-979px.less";', '', $inCss);
+								$inCss = str_replace('@import "responsive-768px-979px.less";', '//@import "responsive-768px-979px.less";', $inCss);
 							break;
 							case 'phone':
-								$inCss = str_replace('@import "responsive-767px-max.less";', '', $inCss);
+								$inCss = str_replace('@import "responsive-767px-max.less";', '//@import "responsive-767px-max.less";', $inCss);
 							break;
 						}
 					}
 
 					$newIn = "assets/bootstrap/less/bootstrap-responsive-" . $objCss->title .".less";
-
-					// overwrite variables with custom variables
-					if($variablesName)
-					{
-						$inCss = str_replace('variables.less', $variablesName, $inCss);
-					}
 
 					if($this->filePutContent($newIn, $inCss) !== false)
 					{
@@ -315,10 +314,10 @@ class ExtCss extends \Frontend
 
 
 		// overwrite variables with custom variables
-		if($variablesName)
+		if($variablesSRC)
 		{
 			$inCss = $this->getFileContent($in);
-			$inCss = str_replace('variables.less', $variablesName, $inCss);
+			$inCss = str_replace('variables.less', $variablesSRC, $inCss);
 			$newIn = "assets/bootstrap/less/bootstrap-" . $objCss->title .".less";
 
 			if($this->filePutContent($newIn, $inCss) !== false)
