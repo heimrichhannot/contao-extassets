@@ -206,14 +206,6 @@ class ExtCss extends \Frontend
 			// TODO: Refactor Css Generation
 			$target = '/assets/css/' . $objCss->title . '.css';
 
-			ob_start();
-			print "\n";
-			print_r($css);
-			file_put_contents(TL_ROOT . '/debug.txt', ob_get_contents());
-			ob_end_clean();
-
-
-
 			if($less)
 			{
 				$less = new \lessc();
