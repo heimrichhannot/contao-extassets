@@ -96,7 +96,7 @@ $GLOBALS['TL_DCA']['tl_extcss'] = array
 			// Subpalettes
 			'subpalettes' => array
 			(
-				'addBootstrap'							=> 'bootstrapResponsive,bootstrapVariablesSRC'
+				'addBootstrap'							=> 'bootstrapResponsive,bootstrapResponsiveDevices,bootstrapVariablesSRC'
 			),
 			// Fields
 			'fields' => array
@@ -132,6 +132,16 @@ $GLOBALS['TL_DCA']['tl_extcss'] = array
 					'default'									=> true,
 					'eval'                    => array('tl_class'=>'clr'),
 					'sql'											=> "char(1) NOT NULL default ''",
+				),
+				'bootstrapResponsiveDevices' => array(
+					'label'                   => &$GLOBALS['TL_LANG']['tl_extcss']['bootstrapResponsiveDevices'],
+					'exclude'                 => true,
+					'inputType'               => 'checkbox',
+					'default'									=> true,
+					'options'									=> array('large', 'tablet', 'phone'),
+					'reference'								=> &$GLOBALS['TL_LANG']['tl_extcss']['devices'],
+					'eval'                    => array('tl_class'=>'clr', 'multiple' => true),
+					'sql'											=> "blob default NULL",
 				),
 				'bootstrapVariablesSRC'	=> array(
 					'label'                   => &$GLOBALS['TL_LANG']['tl_extcss']['bootstrapVariablesSRC'],

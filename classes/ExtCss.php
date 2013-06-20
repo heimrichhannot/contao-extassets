@@ -166,11 +166,11 @@ class ExtCss extends \Frontend
 			{
 				$less = true;
 
-				$variables = "/assets/bootstrap/less/variables.less";
+				$variables = "assets/bootstrap/less/variables.less";
 
-				if(file_exists(TL_ROOT . $variables))
+				if($this->fileExists($variables))
 				{
-					$css .= file_get_contents(TL_ROOT . $variables) . "\n";
+					$css .= file_get_contents(TL_ROOT .'/' . $variables) . "\n";
 				}
 
 				// overwrite bootstrap variables by custom
@@ -178,17 +178,17 @@ class ExtCss extends \Frontend
 				{
 					$objFile = \FilesModel::findByPk($objCss->bootstrapVariablesSRC);
 
-					if(file_exists($objFile->path))
+					if($this->fileExists($objFile->path))
 					{
-						$css .= file_get_contents($objFile->path) . "\n";
+						$css .= $this->getFileContent($objFile->path) . "\n";
 					}
 				}
 
-				$mixins = "/assets/bootstrap/less/mixins.less";
+				$mixins = "assets/bootstrap/less/mixins.less";
 
-				if(file_exists(TL_ROOT . $mixins))
+				if($this->fileExists($mixins))
 				{
-					$css .= file_get_contents(TL_ROOT . $mixins) . "\n";
+					$css .= $this->getFileContent($mixins) . "\n";
 				}
 			}
 
@@ -196,15 +196,15 @@ class ExtCss extends \Frontend
 			{
 				$objFile = \FilesModel::findByPk($objFiles->src);
 
-				if(!file_exists($objFile->path)) continue;
+				if(!$this->fileExists($objFile->path)) continue;
 
-				$css .= file_get_contents($objFile->path) . "\n";
+				$css .= $this->getFileContent($objFile->path) . "\n";
 
 				if($objFile->extension == 'less') $less = true;
 			}
 
 			// TODO: Refactor Css Generation
-			$target = '/assets/css/' . $objCss->title . '.css';
+			$target = 'assets/css/' . $objCss->title . '.css';
 
 			if($less)
 			{
@@ -215,7 +215,7 @@ class ExtCss extends \Frontend
 			$rewrite = true;
 			$version = md5($css);
 
-			if(file_exists(TL_ROOT . $target))
+			if($this->fileExists($target))
 			{
 				$targetFile = new \File($target);
 				$rewrite = !($version == $targetFile->hash);
@@ -223,7 +223,7 @@ class ExtCss extends \Frontend
 
 			if($rewrite)
 			{
-				file_put_contents(TL_ROOT . $target, $css);
+				file_put_contents(TL_ROOT . '/' . $target, $css);
 			}
 
 			// TODO: add css minimizer option for extcss group
@@ -258,13 +258,50 @@ class ExtCss extends \Frontend
 	{
 		if($objCss->bootstrapResponsive)
 		{
-			$in = "/assets/bootstrap/less/responsive.less";
-			$out = "/assets/css/bootstrap-responsive.css";
+			$in = "assets/bootstrap/less/responsive.less";
+			$out = "assets/css/bootstrap-responsive.css";
+
+			$arrDevices = deserialize($objCss->bootstrapResponsiveDevices);
+
+			if(is_array($arrDevices) && !empty($arrDevices))
+			{
+				$arrOptions = $GLOBALS['TL_DCA']['tl_extcss']['fields']['bootstrapResponsiveDevices']['options'];
+
+				$arrRemove = array_diff($arrOptions, $arrDevices);
+
+				if(is_array($arrRemove) && !empty($arrRemove))
+				{
+					$inCss = $this->getFileContent($in);
+
+					foreach($arrRemove as $device)
+					{
+						switch($device)
+						{
+							case 'large':
+								$inCss = str_replace('@import "responsive-1200px-min.less";', '', $inCss);
+							break;
+							case 'tablet':
+								$inCss = str_replace('@import "responsive-768px-979px.less";', '', $inCss);
+							break;
+							case 'phone':
+								$inCss = str_replace('@import "responsive-767px-max.less";', '', $inCss);
+							break;
+						}
+					}
+
+					$newIn = "assets/bootstrap/less/bootstrap-responsive-" . $objCss->title .".css";
+					if($this->filePutContent($newIn, $inCss) !== false)
+					{
+						$in = $newIn;
+					}
+				}
+			}
+
 			$arrCss = $this->addVendorAsset($arrCss, $in ,$out);
 		}
 
-		$in = "/assets/bootstrap/less/bootstrap.less";
-		$out = "/assets/css/bootstrap.css";
+		$in = "assets/bootstrap/less/bootstrap.less";
+		$out = "assets/css/bootstrap.css";
 		$arrCss = $this->addVendorAsset($arrCss, $in ,$out);
 
 		return $arrCss;
@@ -272,9 +309,9 @@ class ExtCss extends \Frontend
 
 	protected function addVendorAsset($arrCss, $in, $out)
 	{
-		if(!file_exists(TL_ROOT . $in)) return $arrCss;
+		if(!$this->fileExists($in)) return $arrCss;
 
-		$less = \lessc::ccompile(TL_ROOT . $in, TL_ROOT . $out);
+		$less = \lessc::ccompile(TL_ROOT . '/' . $in, TL_ROOT . '/' . $out);
 
 		$objOut = new \File($out);
 
@@ -286,4 +323,18 @@ class ExtCss extends \Frontend
 		return $arrCss;
 	}
 
+	protected function fileExists($src)
+	{
+		return file_exists(TL_ROOT . '/' . $src);
+	}
+
+	protected function getFileContent($src)
+	{
+		return file_get_contents(TL_ROOT . '/' . $src);
+	}
+
+	protected function filePutContent($out, $content)
+	{
+		return file_put_contents(TL_ROOT . '/' . $out, $content);
+	}
 }
