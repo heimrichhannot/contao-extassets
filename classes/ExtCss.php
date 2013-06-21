@@ -182,8 +182,13 @@ class ExtCss extends \Frontend
 					{
 						// store variables in new file for bootstrap import
 						$css .= $this->getFileContent($objFile->path) . "\n";
+
+						$version = md5($css);
+
 						$newVariables = 'variables-' . $objCss->title . '.less';
-						$this->filePutContent('assets/bootstrap/less/' . $newVariables, $css);
+						$newVariablesSRC = 'assets/bootstrap/less/' . $newVariables;
+
+						$this->filePutContent($newVariablesSRC, $css);
 					}
 				}
 
@@ -226,7 +231,7 @@ class ExtCss extends \Frontend
 
 			if($rewrite)
 			{
-				file_put_contents(TL_ROOT . '/' . $target, $css);
+				$this->filePutContent($target, $css);
 			}
 
 			// TODO: add css minimizer option for extcss group
