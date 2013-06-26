@@ -24,7 +24,7 @@ use FrontendTemplate;
 use ExtCssModel;
 use ExtCssFileModel;
 
-require TL_ROOT . "/system/modules/extassets/classes/vendor/lessphp/lessc.inc.php";
+//require TL_ROOT . "/system/modules/extassets/classes/vendor/lessphp/lessc.inc.php";
 
 /**
  * Class ExtCss
@@ -156,215 +156,20 @@ class ExtCss extends \Frontend
 
 		while($objCss->next())
 		{
-			$less = false;
+			$combiner = new ExtCssCombiner($objCss->current());
 
-			$objFiles = ExtCssFileModel::findMultipleByPid($objCss->id);
+			$arrCss = $combiner->getUserCss();
 
-			if($objFiles === null) continue;
-
-			if($objCss->addBootstrap)
+			// HOOK: add custom css
+			if (isset($GLOBALS['TL_HOOKS']['parseExtCss']) && is_array($GLOBALS['TL_HOOKS']['parseExtCss']))
 			{
-				$less = true;
-
-				$variables = "assets/bootstrap/less/variables.less";
-
-				if($this->fileExists($variables))
+				foreach ($GLOBALS['TL_HOOKS']['parseExtCss'] as $callback)
 				{
-					$css .= file_get_contents(TL_ROOT .'/' . $variables) . "\n";
-				}
-
-				// overwrite bootstrap variables by custom
-				if($objCss->bootstrapVariablesSRC)
-				{
-					$objFile = \FilesModel::findByPk($objCss->bootstrapVariablesSRC);
-
-					if($this->fileExists($objFile->path))
-					{
-						// store variables in new file for bootstrap import
-						$css .= $this->getFileContent($objFile->path) . "\n";
-
-						$version = md5($css);
-
-						$newVariables = 'variables-' . $objCss->title . '.less';
-						$newVariablesSRC = 'assets/bootstrap/less/' . $newVariables;
-
-						$this->filePutContent($newVariablesSRC, $css);
-					}
-				}
-
-				$mixins = "assets/bootstrap/less/mixins.less";
-
-				if($this->fileExists($mixins))
-				{
-					$css .= $this->getFileContent($mixins) . "\n";
+					$arrCss = static::importStatic($callback[0])->$callback[1]($arrCss);
 				}
 			}
 
-			while($objFiles->next())
-			{
-				$objFile = \FilesModel::findByPk($objFiles->src);
-
-				if(!$this->fileExists($objFile->path)) continue;
-
-				$css .= $this->getFileContent($objFile->path) . "\n";
-
-				if($objFile->extension == 'less') $less = true;
-			}
-
-			// TODO: Refactor Css Generation
-			$target = 'assets/css/' . $objCss->title . '.css';
-
-			if($less)
-			{
-				$less = new \lessc();
-				$css = $less->compile($css, $objCss->title);
-			}
-
-			$rewrite = true;
-			$version = md5($css);
-
-			if($this->fileExists($target))
-			{
-				$targetFile = new \File($target);
-				$rewrite = !($version == $targetFile->hash);
-			}
-
-			if($rewrite)
-			{
-				$this->filePutContent($target, $css);
-			}
-
-			// TODO: add css minimizer option for extcss group
-			$mode = $GLOBALS['TL_CONFIG']['bypassCache'] ? 'none' : 'static';
-
-			$arrCss[] = "$target|screen|$mode|$version";
+			$GLOBALS['TL_USER_CSS']	= (is_array($GLOBALS['TL_USER_CSS']) ? $GLOBALS['TL_USER_CSS'] : array()) + $arrCss;
 		}
-
-		// HOOK: add custom css
-		if (isset($GLOBALS['TL_HOOKS']['parseExtCss']) && is_array($GLOBALS['TL_HOOKS']['parseExtCss']))
-		{
-			foreach ($GLOBALS['TL_HOOKS']['parseExtCss'] as $callback)
-			{
-				$arrCss = static::importStatic($callback[0])->$callback[1]($arrCss);
-			}
-		}
-
-		if($objCss->addBootstrap)
-		{
-			$arrCss = $this->addTwitterBootstrap($arrCss, $objCss, $newVariables);
-		}
-
-		$GLOBALS['TL_USER_CSS']	= (is_array($GLOBALS['TL_USER_CSS']) ? $GLOBALS['TL_USER_CSS'] : array()) + $arrCss;
-	}
-
-	/*
-	 * TODO:
-	* - install via runonce
-	* - refactor css compiling in custom method (together with parseExtCss)
-	*/
-	public function addTwitterBootstrap($arrCss, $objCss, $variablesSRC='')
-	{
-		if($objCss->bootstrapResponsive)
-		{
-			$in = "assets/bootstrap/less/responsive.less";
-			$out = "assets/css/bootstrap-responsive.css";
-
-			$arrDevices = deserialize($objCss->bootstrapResponsiveDevices);
-
-			$inCss = $this->getFileContent($in);
-
-			if($variablesSRC)
-			{
-				$inCss = str_replace('variables.less', $variablesSRC, $inCss);
-			}
-
-			if(is_array($arrDevices) && !empty($arrDevices))
-			{
-				$arrOptions = $GLOBALS['TL_DCA']['tl_extcss']['fields']['bootstrapResponsiveDevices']['options'];
-
-				$arrRemove = array_diff($arrOptions, $arrDevices);
-
-				if(is_array($arrRemove) && !empty($arrRemove))
-				{
-					foreach($arrRemove as $device)
-					{
-						switch($device)
-						{
-							case 'large':
-								$inCss = str_replace('@import "responsive-1200px-min.less";', '//@import "responsive-1200px-min.less";', $inCss);
-							break;
-							case 'tablet':
-								$inCss = str_replace('@import "responsive-768px-979px.less";', '//@import "responsive-768px-979px.less";', $inCss);
-							break;
-							case 'phone':
-								$inCss = str_replace('@import "responsive-767px-max.less";', '//@import "responsive-767px-max.less";', $inCss);
-							break;
-						}
-					}
-
-					$newIn = "assets/bootstrap/less/bootstrap-responsive-" . $objCss->title .".less";
-
-					if($this->filePutContent($newIn, $inCss) !== false)
-					{
-						$in = $newIn;
-					}
-				}
-			}
-
-			$arrCss = $this->addVendorAsset($arrCss, $in ,$out);
-		}
-
-		$in = "assets/bootstrap/less/bootstrap.less";
-		$out = "assets/css/bootstrap.css";
-
-
-		// overwrite variables with custom variables
-		if($variablesSRC)
-		{
-			$inCss = $this->getFileContent($in);
-			$inCss = str_replace('variables.less', $variablesSRC, $inCss);
-			$newIn = "assets/bootstrap/less/bootstrap-" . $objCss->title .".less";
-
-			if($this->filePutContent($newIn, $inCss) !== false)
-			{
-				$in = $newIn;
-			}
-		}
-
-
-		$arrCss = $this->addVendorAsset($arrCss, $in ,$out);
-
-		return $arrCss;
-	}
-
-	protected function addVendorAsset($arrCss, $in, $out)
-	{
-		if(!$this->fileExists($in)) return $arrCss;
-
-		$less = \lessc::ccompile(TL_ROOT . '/' . $in, TL_ROOT . '/' . $out);
-
-		$objOut = new \File($out);
-
-		// TODO: add css minimizer option for extcss group
-		$mode = $GLOBALS['TL_CONFIG']['bypassCache'] ? 'none' : 'static';
-
-		array_unshift($arrCss, "$out|screen|$mode|$objOut->hash");
-
-		return $arrCss;
-	}
-
-	protected function fileExists($src)
-	{
-		return file_exists(TL_ROOT . '/' . $src);
-	}
-
-	protected function getFileContent($src)
-	{
-		return file_get_contents(TL_ROOT . '/' . $src);
-	}
-
-	protected function filePutContent($out, $content)
-	{
-		return file_put_contents(TL_ROOT . '/' . $out, $content);
 	}
 }
