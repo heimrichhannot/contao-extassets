@@ -153,7 +153,7 @@ class ExtCss extends \Frontend
 		$objCss = ExtCssModel::findMultipleByIds(deserialize($objLayout->extcss));
 
 		if($objCss === null) return false;
-		
+
 		while($objCss->next())
 		{
 			$combiner = new ExtCssCombiner($objCss->current());
@@ -169,7 +169,7 @@ class ExtCss extends \Frontend
 				}
 			}
 
-			$GLOBALS['TL_USER_CSS']	= (is_array($GLOBALS['TL_USER_CSS']) ? $GLOBALS['TL_USER_CSS'] : array()) + $arrCss;
+			$GLOBALS['TL_USER_CSS'] = array_merge(is_array($GLOBALS['TL_USER_CSS']) ? $GLOBALS['TL_USER_CSS'] : array(), $arrCss);
 		}
 	}
 }

@@ -19,6 +19,8 @@ class ExtCssCombiner extends \Frontend
 
 	protected static $bootstrapDir = 'assets/bootstrap/less/';
 
+	protected $arrData = array();
+
 	protected $arrCss = array();
 
 	protected $arrReturn = array();
@@ -27,6 +29,7 @@ class ExtCssCombiner extends \Frontend
 
 	protected $variablesSrc;
 
+
 	public $debug = false;
 
 	public function __construct(ExtCssModel $objCss)
@@ -34,6 +37,7 @@ class ExtCssCombiner extends \Frontend
 		parent::__construct();
 		$this->loadDataContainer('tl_extcss');
 		$this->arrData = $objCss->row();
+
 		$this->mode = $GLOBALS['TL_CONFIG']['bypassCache'] ? 'none' : 'static';
 
 		$this->checkModelUpdate();
@@ -228,10 +232,10 @@ class ExtCssCombiner extends \Frontend
 					}
 
 				}
-				
+
 				$objTarget->write($strCss);
 				$objTarget->close();
-				
+
 
 				\lessc::ccompile(TL_ROOT . '/' . $objTarget->value, TL_ROOT . '/' . $objOutput->value);
 				$objOutput = new \File($objOutput->value);
