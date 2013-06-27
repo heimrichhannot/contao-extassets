@@ -29,15 +29,23 @@ class ExtCssCombiner extends \Frontend
 
 	protected $variablesSrc;
 
+	public static $userCssKey = 'usercss';
+
+	public static $bootstrapCssKey = 'bootstrap';
+
+	public static $bootstrapResponsiveCssKey = 'bootstrap-responsive';
+
 	public $debug = false;
 
-	public function __construct(ExtCssModel $objCss)
+	public function __construct(ExtCssModel $objCss, $arrReturn = array())
 	{
 		parent::__construct();
 		$this->loadDataContainer('tl_extcss');
 		$this->arrData = $objCss->row();
 
 		$this->mode = $GLOBALS['TL_CONFIG']['bypassCache'] ? 'none' : 'static';
+
+		$this->arrReturn = $arrReturn;
 
 		$this->checkModelUpdate();
 
@@ -78,7 +86,13 @@ class ExtCssCombiner extends \Frontend
 			$objFile->write($strCss);
 		}
 
-		$arrReturn[] = sprintf('%s|screen|%s|%s', $objFile->value, $this->mode, $objFile->hash);
+		$arrReturn[self::$userCssKey][] = array
+		(
+			'src'	=> $objFile->value,
+			'type'	=> 'screen',
+			'mode'	=> $this->mode,
+			'hash'	=> $objFile->hash,
+		);
 
 		return $arrReturn;
 	}
@@ -130,7 +144,13 @@ class ExtCssCombiner extends \Frontend
 			$objOut = new \File($objOut->value);
 		}
 
-		$this->arrReturn[] = sprintf('%s|screen|%s|%s', $objOut->value, $this->mode, $objOut->hash);
+		$this->arrReturn[self::$bootstrapCssKey][] = array
+		(
+			'src'	=> $objOut->value,
+			'type'	=> 'screen',
+			'mode'	=> $this->mode,
+			'hash'	=> $objOut->hash,
+		);
 	}
 
 	/**
@@ -252,7 +272,13 @@ class ExtCssCombiner extends \Frontend
 			}
 		}
 
-		$this->arrReturn[] = sprintf('%s|screen|%s|%s', $objOutput->value, $this->mode, $objOutput->hash);
+		$this->arrReturn[self::$bootstrapResponsiveCssKey][] = array
+		(
+				'src'	=> $objOutput->value,
+				'type'	=> 'screen',
+				'mode'	=> $this->mode,
+				'hash'	=> $objOutput->hash,
+		);
 	}
 
 	/**

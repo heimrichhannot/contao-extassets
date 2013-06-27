@@ -154,13 +154,15 @@ class ExtCss extends \Frontend
 
 		if($objCss === null) return false;
 
+		$arrReturn = array();
+
 		while($objCss->next())
 		{
 			$start = time();
 
-			$combiner = new ExtCssCombiner($objCss->current());
+			$combiner = new ExtCssCombiner($objCss->current(), $arrReturn);
 
-			$arrCss = $combiner->getUserCss();
+			$arrReturn = $combiner->getUserCss();
 
 			// HOOK: add custom css
 			if (isset($GLOBALS['TL_HOOKS']['parseExtCss']) && is_array($GLOBALS['TL_HOOKS']['parseExtCss']))
@@ -170,8 +172,38 @@ class ExtCss extends \Frontend
 					$arrCss = static::importStatic($callback[0])->$callback[1]($arrCss);
 				}
 			}
-
-			$GLOBALS['TL_USER_CSS'] = array_merge(is_array($GLOBALS['TL_USER_CSS']) ? $GLOBALS['TL_USER_CSS'] : array(), $arrCss);
 		}
+
+		$arrUserCss = array();
+
+		// at first collect bootstrap to prevent overwrite of usercss
+		if(isset($arrReturn[ExtCssCombiner::$bootstrapCssKey]) && is_array($arrReturn[ExtCssCombiner::$bootstrapCssKey]))
+		{
+			foreach($arrReturn[ExtCssCombiner::$bootstrapCssKey] as $arrCss)
+			{
+				$arrUserCss[] = sprintf('%s|%s|%s|%s', $arrCss['src'], $arrCss['type'], $arrCss['mode'], $arrCss['hash']);
+			}
+		}
+
+		// collect bootstrap responsive css
+		if(isset($arrReturn[ExtCssCombiner::$bootstrapResponsiveCssKey]) && is_array($arrReturn[ExtCssCombiner::$bootstrapResponsiveCssKey]))
+		{
+			foreach($arrReturn[ExtCssCombiner::$bootstrapResponsiveCssKey] as $arrCss)
+			{
+				$arrUserCss[] = sprintf('%s|%s|%s|%s', $arrCss['src'], $arrCss['type'], $arrCss['mode'], $arrCss['hash']);
+			}
+		}
+
+		// collect all usercss
+		if(isset($arrReturn[ExtCssCombiner::$userCssKey]) && is_array($arrReturn[ExtCssCombiner::$userCssKey]))
+		{
+			foreach($arrReturn[ExtCssCombiner::$userCssKey] as $arrCss)
+			{
+				$arrUserCss[] = sprintf('%s|%s|%s|%s', $arrCss['src'], $arrCss['type'], $arrCss['mode'], $arrCss['hash']);
+			}
+		}
+
+		$GLOBALS['TL_USER_CSS'] = array_merge(is_array($GLOBALS['TL_USER_CSS']) ? $GLOBALS['TL_USER_CSS'] : array(), $arrUserCss);
+
 	}
 }
