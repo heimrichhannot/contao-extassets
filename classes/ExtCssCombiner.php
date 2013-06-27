@@ -162,6 +162,8 @@ class ExtCssCombiner extends \Frontend
 					$this->rewriteBootstrap = true;
 					$this->arrCss['variables'] .= "\n" . $objFile->getContent();
 					$objHash->write($objFile->hash);
+				} else {
+					$this->arrCss['variables'] .= "\n" . $objFile->getContent();
 				}
 			}
 		}

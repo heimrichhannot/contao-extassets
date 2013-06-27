@@ -153,7 +153,7 @@ class ExtCss extends \Frontend
 		$objCss = ExtCssModel::findMultipleByIds(deserialize($objLayout->extcss));
 
 		if($objCss === null) return false;
-
+		
 		while($objCss->next())
 		{
 			$combiner = new ExtCssCombiner($objCss->current());
