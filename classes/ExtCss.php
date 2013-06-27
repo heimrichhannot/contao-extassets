@@ -156,6 +156,8 @@ class ExtCss extends \Frontend
 
 		while($objCss->next())
 		{
+			$start = time();
+
 			$combiner = new ExtCssCombiner($objCss->current());
 
 			$arrCss = $combiner->getUserCss();

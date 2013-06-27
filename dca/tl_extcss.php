@@ -90,13 +90,13 @@ $GLOBALS['TL_DCA']['tl_extcss'] = array
 			// Palettes
 			'palettes' => array
 			(
-				'__selector__'							=> array('addBootstrap'),
+				'__selector__'				=> array('addBootstrap'),
 				'default'                   => '{title_legend},title;{bootstrap_legend},addBootstrap;'
 			),
 			// Subpalettes
 			'subpalettes' => array
 			(
-				'addBootstrap'							=> 'bootstrapResponsive,bootstrapResponsiveDevices,bootstrapVariablesSRC'
+				'addBootstrap'				=> 'bootstrapResponsive,bootstrapResponsiveDevices,bootstrapVariablesSRC'
 			),
 			// Fields
 			'fields' => array

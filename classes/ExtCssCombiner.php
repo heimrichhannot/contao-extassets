@@ -29,7 +29,6 @@ class ExtCssCombiner extends \Frontend
 
 	protected $variablesSrc;
 
-
 	public $debug = false;
 
 	public function __construct(ExtCssModel $objCss)
@@ -58,6 +57,7 @@ class ExtCssCombiner extends \Frontend
 
 			if($this->bootstrapResponsive)
 			{
+				$this->addBootstrapUtilities();
 				$this->addBootstrapResponsive();
 			}
 		}
@@ -191,6 +191,16 @@ class ExtCssCombiner extends \Frontend
 		}
 	}
 
+
+	protected function addBootstrapUtilities()
+	{
+		$objFile = new \File($this->getBootstrapSrc('responsive-utilities.less'));
+
+		if($objFile->size > 0)
+		{
+			$this->arrCss['responsive-utilities'] = $objFile->getContent();
+		}
+	}
 
 	protected function addBootstrapResponsive()
 	{
