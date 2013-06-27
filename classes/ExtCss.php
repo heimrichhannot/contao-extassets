@@ -201,6 +201,19 @@ class ExtCss extends \Frontend
 				$arrHashs[] = $arrCss['hash'];
 			}
 		}
+		
+		// add font awesome if checked
+		if(isset($arrReturn[ExtCssCombiner::$fontAwesomeCssKey]) && is_array($arrReturn[ExtCssCombiner::$fontAwesomeCssKey]))
+		{
+			$arrHashs = array();
+
+			foreach($arrReturn[ExtCssCombiner::$fontAwesomeCssKey] as $arrCss)
+			{
+				if(in_array($arrCss['hash'], $arrHashs)) continue;
+				$arrUserCss[] = sprintf('%s|%s|%s|%s', $arrCss['src'], $arrCss['type'], $arrCss['mode'], $arrCss['hash']);
+				$arrHashs[] = $arrCss['hash'];
+			}
+		}
 
 		// collect all usercss
 		if(isset($arrReturn[ExtCssCombiner::$userCssKey]) && is_array($arrReturn[ExtCssCombiner::$userCssKey]))

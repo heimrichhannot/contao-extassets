@@ -18,6 +18,8 @@ class ExtCssCombiner extends \Frontend
 	protected static $cssDir = 'assets/css/';
 
 	protected static $bootstrapDir = 'assets/bootstrap/less/';
+	
+	protected static $fontAwesomeDir = 'assets/font-awesome/less/';
 
 	protected $arrData = array();
 
@@ -34,6 +36,8 @@ class ExtCssCombiner extends \Frontend
 	public static $bootstrapCssKey = 'bootstrap';
 
 	public static $bootstrapResponsiveCssKey = 'bootstrap-responsive';
+	
+	public static $fontAwesomeCssKey = 'font-awesome';
 
 	public $debug = false;
 
@@ -68,6 +72,11 @@ class ExtCssCombiner extends \Frontend
 				$this->addBootstrapUtilities();
 				$this->addBootstrapResponsive();
 			}
+		}
+		
+		if($this->addFontAwesome)
+		{
+			$this->addFontAwesome();
 		}
 
 		$this->addCssFiles();
@@ -281,6 +290,26 @@ class ExtCssCombiner extends \Frontend
 		);
 	}
 
+	protected function addFontAwesome()
+	{
+		$objFile = new \File($this->getFontAwesomeSrc('font-awesome.less'));
+		$objOut = new \File($this->getSrc('font-awesome.css'), true);
+		
+		if(!$objOut->exists())
+		{
+			$strCss = \lessc::ccompile(TL_ROOT . '/' . $objFile->value, TL_ROOT . '/' . $objOut->value);
+			$objOut = new \File($objOut->value);
+		}
+
+		$this->arrReturn[self::$fontAwesomeCssKey][] = array
+		(
+			'src'	=> $objOut->value,
+			'type'	=> 'screen',
+			'mode'	=> $this->mode,
+			'hash'	=> $objOut->hash,
+		);
+	}
+
 	/**
 	 * If ExtCss Model has changed set:
 	 * - $this->rewrite
@@ -325,6 +354,11 @@ class ExtCssCombiner extends \Frontend
 	protected function getBootstrapSrc($src)
 	{
 		return self::$bootstrapDir . $src;
+	}
+	
+	protected function getFontAwesomeSrc($src)
+	{
+		return self::$fontAwesomeDir . $src;
 	}
 
 }

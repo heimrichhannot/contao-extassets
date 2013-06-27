@@ -91,7 +91,7 @@ $GLOBALS['TL_DCA']['tl_extcss'] = array
 			'palettes' => array
 			(
 				'__selector__'				=> array('addBootstrap'),
-				'default'                   => '{title_legend},title;{bootstrap_legend},addBootstrap;'
+				'default'                   => '{title_legend},title;{bootstrap_legend},addBootstrap;{font_awesome_legend},addFontAwesome;'
 			),
 			// Subpalettes
 			'subpalettes' => array
@@ -149,6 +149,13 @@ $GLOBALS['TL_DCA']['tl_extcss'] = array
 					'inputType'               => 'fileTree',
 					'eval'                    => array('fieldType'=>'radio', 'filesOnly'=>true, 'extensions'=>'css, less'),
 					'sql'                     => "varchar(255) NOT NULL default ''"
+				),
+				'addFontAwesome' => array(
+					'label'                   => &$GLOBALS['TL_LANG']['tl_extcss']['addFontAwesome'],
+					'exclude'                 => true,
+					'inputType'               => 'checkbox',
+					'default'                 => true,
+					'sql'                     => "char(1) NOT NULL default ''",
 				),
 			)
 );
