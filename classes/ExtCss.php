@@ -179,18 +179,26 @@ class ExtCss extends \Frontend
 		// at first collect bootstrap to prevent overwrite of usercss
 		if(isset($arrReturn[ExtCssCombiner::$bootstrapCssKey]) && is_array($arrReturn[ExtCssCombiner::$bootstrapCssKey]))
 		{
+			$arrHashs = array();
+
 			foreach($arrReturn[ExtCssCombiner::$bootstrapCssKey] as $arrCss)
 			{
+				if(in_array($arrCss['hash'], $arrHashs)) continue;
 				$arrUserCss[] = sprintf('%s|%s|%s|%s', $arrCss['src'], $arrCss['type'], $arrCss['mode'], $arrCss['hash']);
+				$arrHashs[] = $arrCss['hash'];
 			}
 		}
 
 		// collect bootstrap responsive css
 		if(isset($arrReturn[ExtCssCombiner::$bootstrapResponsiveCssKey]) && is_array($arrReturn[ExtCssCombiner::$bootstrapResponsiveCssKey]))
 		{
+			$arrHashs = array();
+
 			foreach($arrReturn[ExtCssCombiner::$bootstrapResponsiveCssKey] as $arrCss)
 			{
+				if(in_array($arrCss['hash'], $arrHashs)) continue;
 				$arrUserCss[] = sprintf('%s|%s|%s|%s', $arrCss['src'], $arrCss['type'], $arrCss['mode'], $arrCss['hash']);
+				$arrHashs[] = $arrCss['hash'];
 			}
 		}
 
