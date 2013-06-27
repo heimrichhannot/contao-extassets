@@ -176,6 +176,8 @@ class ExtCss extends \Frontend
 
 		$arrUserCss = array();
 
+
+		// TODO: Refactor equal logic…
 		// at first collect bootstrap to prevent overwrite of usercss
 		if(isset($arrReturn[ExtCssCombiner::$bootstrapCssKey]) && is_array($arrReturn[ExtCssCombiner::$bootstrapCssKey]))
 		{
