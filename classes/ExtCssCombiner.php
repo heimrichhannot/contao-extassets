@@ -47,9 +47,9 @@ class ExtCssCombiner extends \Frontend
 
 		if($this->addBootstrap)
 		{
-			$this->addBootstrap();
 			$this->addBootstrapVariables();
 			$this->addBootstrapMixins();
+			$this->addBootstrap();
 
 			if($this->bootstrapResponsive)
 			{
@@ -112,15 +112,20 @@ class ExtCssCombiner extends \Frontend
 	protected function addBootstrap()
 	{
 		$objFile = new \File($this->getBootstrapSrc('bootstrap.less'));
-		$objTarget = new \File($this->getSrc('bootstrap.css'), true); // check only if file exists, bootstrap will handle file creation
+		$objTarget = new \File($this->getBootstrapSrc('bootstrap-' . $this->title .  '.less'));
+		$objOut = new \File($this->getSrc('bootstrap-' . $this->title .  '.css'), true);
 
-		if($this->rewriteBootstrap || !$objTarget->exists())
+		if($this->rewriteBootstrap || !$objOut->exists())
 		{
-			$strCss = \lessc::ccompile(TL_ROOT . '/' . $objFile->value, TL_ROOT . '/' . $objTarget->value);
-			$objTarget = new \File($objTarget->value);
+			$strCss = $objFile->getContent();
+			$strCss = str_replace('variables.less', $this->variablesSrc, $strCss);
+			$objTarget->write($strCss);
+
+			$strCss = \lessc::ccompile(TL_ROOT . '/' . $objTarget->value, TL_ROOT . '/' . $objOut->value);
+			$objOut = new \File($objOut->value);
 		}
 
-		$this->arrReturn[] = sprintf('%s|screen|%s|%s', $objTarget->value, $this->mode, $objTarget->hash);
+		$this->arrReturn[] = sprintf('%s|screen|%s|%s', $objOut->value, $this->mode, $objOut->hash);
 	}
 
 	/**
@@ -130,6 +135,7 @@ class ExtCssCombiner extends \Frontend
 	protected function addBootstrapVariables()
 	{
 		$objFile = new \File($this->getBootstrapSrc('variables.less'));
+		$objTarget = new \File($this->getBootstrapSrc($this->variablesSrc));
 
 		if($objFile->size > 0)
 		{
@@ -145,25 +151,23 @@ class ExtCssCombiner extends \Frontend
 			{
 				$objFile = new \File($objFileModel->path);
 				$objHash = new ExtHashFile($objFileModel->path);
-				$objTarget = new \File($this->getBootstrapSrc($this->variablesSrc));
+
 
 				$strHash = $objHash->getHash();
 
 				if($this->isFileUpdated($objFile, $strHash))
 				{
+					$this->rewrite = true;
 					$this->rewriteBootstrap = true;
+					$this->arrCss['variables'] .= "\n" . $objFile->getContent();
 					$objHash->write($objFile->hash);
-					$objTarget->write($this->arrCss['variables']);
 				}
-
-				$this->arrCss['variables'] .= "\n" . $objFile->getContent();
 			}
+		}
 
-
-			if($this->rewriteBootstrap)
-			{
-				$objTarget->write($arrCss['variables']);
-			}
+		if($this->rewriteBootstrap)
+		{
+			$objTarget->write($this->arrCss['variables']);
 		}
 	}
 
@@ -186,13 +190,13 @@ class ExtCssCombiner extends \Frontend
 		$objFile = new \File($this->getBootstrapSrc('responsive.less'));
 		$strTarget = 'bootstrap-responsive-' . $this->title . '.less';
 		$objTarget = new \File($this->getBootstrapSrc($strTarget));
-		$objOutput = new \File($this->getSrc('bootstrap-responsive-' . $this->title . '.css'));
+		$objOutput = new \File($this->getSrc('bootstrap-responsive-' . $this->title . '.css'), true);
 
 		$arrDevices = deserialize($this->bootstrapResponsiveDevices);
 
 		$strCss = $objFile->getContent();
 
-		if($this->rewriteBootstrap || $objTarget->size == 0)
+		if($this->rewriteBootstrap || $objOutput->size == 0)
 		{
 			$strCss = str_replace('variables.less', $this->variablesSrc, $strCss);
 
@@ -221,6 +225,7 @@ class ExtCssCombiner extends \Frontend
 					}
 
 					$objTarget->write($strCss);
+					$objTarget->close();
 
 					$strCss = \lessc::ccompile(TL_ROOT . '/' . $objTarget->value, TL_ROOT . '/' . $objOutput->value);
 
@@ -255,7 +260,7 @@ class ExtCssCombiner extends \Frontend
 
 	protected function isFileUpdated(\File $objFile, $strHash)
 	{
-		return($objFile->size > 0 & (empty($strHash) || $objFile->hash != $strHash));
+		return($objFile->size > 0 && ($this->rewrite || $this->rewriteBootstrap || empty($strHash) || $objFile->hash != $strHash));
 	}
 
 	public function __get($strKey)
