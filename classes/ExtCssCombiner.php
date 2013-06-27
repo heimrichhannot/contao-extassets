@@ -27,11 +27,12 @@ class ExtCssCombiner extends \Frontend
 
 	protected $variablesSrc;
 
-	public $debug = false;
+	public $debug = true;
 
 	public function __construct(ExtCssModel $objCss)
 	{
 		parent::__construct();
+		$this->loadDataContainer('tl_extcss');
 		$this->arrData = $objCss->row();
 		$this->mode = $GLOBALS['TL_CONFIG']['bypassCache'] ? 'none' : 'static';
 
