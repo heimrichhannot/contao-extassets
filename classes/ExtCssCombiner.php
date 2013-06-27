@@ -27,7 +27,7 @@ class ExtCssCombiner extends \Frontend
 
 	protected $variablesSrc;
 
-	public $debug = true;
+	public $debug = false;
 
 	public function __construct(ExtCssModel $objCss)
 	{
@@ -225,13 +225,14 @@ class ExtCssCombiner extends \Frontend
 						}
 					}
 
-					$objTarget->write($strCss);
-					$objTarget->close();
-
-					$strCss = \lessc::ccompile(TL_ROOT . '/' . $objTarget->value, TL_ROOT . '/' . $objOutput->value);
-
-					$objOutput = new \File($objOutput->value);
 				}
+				
+				$objTarget->write($strCss);
+				$objTarget->close();
+				
+
+				\lessc::ccompile(TL_ROOT . '/' . $objTarget->value, TL_ROOT . '/' . $objOutput->value);
+				$objOutput = new \File($objOutput->value);
 			}
 		}
 
