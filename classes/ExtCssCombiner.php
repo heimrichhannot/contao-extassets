@@ -19,8 +19,6 @@ class ExtCssCombiner extends \Frontend
 
 	protected static $bootstrapDir = 'assets/bootstrap/less/';
 
-	protected static $hashExtension = 'md5';
-
 	protected $arrCss = array();
 
 	protected $arrReturn = array();
