@@ -65,6 +65,7 @@ class ExtCssCombiner extends \Frontend
 		{
 			$this->addBootstrapVariables();
 			$this->addBootstrapMixins();
+			$this->addBootstrapAlerts();
 			$this->addBootstrap();
 
 			if($this->bootstrapResponsive)
@@ -217,6 +218,19 @@ class ExtCssCombiner extends \Frontend
 		if($objFile->size > 0)
 		{
 			$this->arrCss['mixins'] = $objFile->getContent();
+		}
+	}
+	
+	/**
+	 * alerts.less must not be changed, no hash check
+	 */
+	protected function addBootstrapAlerts()
+	{
+		$objFile = new \File($this->getBootstrapSrc('alerts.less'));
+
+		if($objFile->size > 0)
+		{
+			$this->arrCss['alerts'] = $objFile->getContent();
 		}
 	}
 
