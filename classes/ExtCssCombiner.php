@@ -151,7 +151,12 @@ class ExtCssCombiner extends \Frontend
 		if($this->rewriteBootstrap || !$objOut->exists())
 		{
 			$strCss = $objFile->getContent();
-			$strCss = str_replace('variables.less', $this->variablesSrc, $strCss);
+
+			if($this->bootstrapVariablesSRC)
+			{
+				$strCss = str_replace('variables.less', $this->variablesSrc, $strCss);
+			}
+
 			$objTarget->write($strCss);
 
 			$strCss = \lessc::ccompile(TL_ROOT . '/' . $objTarget->value, TL_ROOT . '/' . $objOut->value);
@@ -181,28 +186,27 @@ class ExtCssCombiner extends \Frontend
 			$this->arrCss['variables'] = $objFile->getContent();
 		}
 
+		if(!$this->bootstrapVariablesSRC) return false;
+
 		// overwrite bootstrap variables with custom variables
-		if($this->bootstrapVariablesSRC)
+		$objFileModel = \FilesModel::findByPk($this->bootstrapVariablesSRC);
+
+		if($objFileModel !== false)
 		{
-			$objFileModel = \FilesModel::findByPk($this->bootstrapVariablesSRC);
+			$objFile = new \File($objFileModel->path);
+			$objHash = new ExtHashFile($objFileModel->path);
 
-			if($objFileModel !== false)
+
+			$strHash = $objHash->getHash();
+
+			if($this->isFileUpdated($objFile, $strHash))
 			{
-				$objFile = new \File($objFileModel->path);
-				$objHash = new ExtHashFile($objFileModel->path);
-
-
-				$strHash = $objHash->getHash();
-
-				if($this->isFileUpdated($objFile, $strHash))
-				{
-					$this->rewrite = true;
-					$this->rewriteBootstrap = true;
-					$this->arrCss['variables'] .= "\n" . $objFile->getContent();
-					$objHash->write($objFile->hash);
-				} else {
-					$this->arrCss['variables'] .= "\n" . $objFile->getContent();
-				}
+				$this->rewrite = true;
+				$this->rewriteBootstrap = true;
+				$this->arrCss['variables'] .= "\n" . $objFile->getContent();
+				$objHash->write($objFile->hash);
+			} else {
+				$this->arrCss['variables'] .= "\n" . $objFile->getContent();
 			}
 		}
 
@@ -262,7 +266,11 @@ class ExtCssCombiner extends \Frontend
 
 		if($this->rewriteBootstrap || $objOutput->size == 0)
 		{
+			if($this->bootstrapVariablesSRC)
+			{
+
 			$strCss = str_replace('variables.less', $this->variablesSrc, $strCss);
+			}
 
 			if(is_array($arrDevices) && !empty($arrDevices))
 			{
@@ -320,7 +328,7 @@ class ExtCssCombiner extends \Frontend
 			$this->arrCss['variables-fontawesome'] = str_replace("../font", self::$fontAwesomeFontDir, $this->arrCss['variables-fontawesome']);
 		}
 
-		if(!$objTarget->exists())
+		if(!$objTarget->exists() || $objTarget->size == 0)
 		{
 			\File::putContent($this->getFontAwesomeSrc($this->variablesSrc), $this->arrCss['variables-fontawesome']);
 		}
@@ -342,7 +350,7 @@ class ExtCssCombiner extends \Frontend
 		$objTarget = new \File($this->getFontAwesomeSrc('font-awesome-' . $this->title .  '.less'));
 		$objOut = new \File($this->getSrc('font-awesome-' . $this->title .  '.css'), true);
 
-		if(!$objOut->exists())
+		if(!$objOut->exists() || $objTarget->size == 0 || $objOut->size == 0 )
 		{
 			$strCss = $objFile->getContent();
 			$strCss = str_replace('variables.less', $this->variablesSrc, $strCss);
