@@ -142,20 +142,9 @@ class ExtCss extends \Frontend
 
 		if($objCss === null) return false;
 
-		$framework = $objLayout->framework;
+		$blnXhtml = ($objPage->outputFormat == 'xhtml');
 
-		if(!is_array($framework))
-		{
-			$framework = array();
-		}
-
-		if(!in_array('layout.css', $framework))
-		{
-			array_insert($framework, 0, 'layout.css');
-		}
-
-		$objLayout->framework = $framework;
-
+		$GLOBALS['TL_HEAD'][] = '<meta name="viewport" content="width=device-width,initial-scale=1.0"' . ($blnXhtml ? ' />' : '>') . "\n";
 	}
 
 
