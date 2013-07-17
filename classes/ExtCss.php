@@ -128,6 +128,37 @@ class ExtCss extends \Frontend
 		static::getInstance()->blnLiveMode = !$designerMode;
 	}
 
+
+
+	/**
+	 * Add viewport if bootstrap responsive is enabled
+	 * @param PageModel $objPage
+	 * @param LayoutModel $objLayout
+	 * @param PageRegular $objThis
+	 */
+	public function hookGetPageLayout($objPage, &$objLayout, $objThis)
+	{
+		$objCss = ExtCssModel::findMultipleResponsiveByIds(deserialize($objLayout->extcss));
+
+		if($objCss === null) return false;
+
+		$framework = $objLayout->framework;
+
+		if(!is_array($framework))
+		{
+			$framework = array();
+		}
+
+		if(!in_array('layout.css', $framework))
+		{
+			array_insert($framework, 0, 'layout.css');
+		}
+
+		$objLayout->framework = $framework;
+
+	}
+
+
 	public function hookReplaceDynamicScriptTags($strBuffer)
 	{
 		global $objPage;
@@ -203,7 +234,7 @@ class ExtCss extends \Frontend
 				$arrHashs[] = $arrCss['hash'];
 			}
 		}
-		
+
 		// add font awesome if checked
 		if(isset($arrReturn[ExtCssCombiner::$fontAwesomeCssKey]) && is_array($arrReturn[ExtCssCombiner::$fontAwesomeCssKey]))
 		{

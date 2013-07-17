@@ -27,6 +27,7 @@ $GLOBALS['TL_LANG']['tl_extcss']['addFontAwesome'] = array('Font Awesome aktivie
  */
 $GLOBALS['TL_LANG']['tl_extcss']['title_legend'] = 'Titel';
 $GLOBALS['TL_LANG']['tl_extcss']['bootstrap_legend'] = 'Twitter Bootstrap';
+$GLOBALS['TL_LANG']['tl_extcss']['bootstrap_responsive_legend'] = 'Twitter Bootstrap Responsive';
 $GLOBALS['TL_LANG']['tl_extcss']['font_awesome_legend'] = 'Font Awesome';
 
 /**

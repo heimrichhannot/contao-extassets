@@ -42,6 +42,7 @@ $GLOBALS['TL_MIME']['less'] = array('text/css', 'iconCSS.gif');
  */
 $GLOBALS['TL_HOOKS']['replaceDynamicScriptTags'][] = array('ExtAssets\ExtCss', 'hookReplaceDynamicScriptTags');
 $GLOBALS['TL_HOOKS']['replaceDynamicScriptTags'][] = array('ExtAssets\ExtJs', 'hookReplaceDynamicScriptTags');
+$GLOBALS['TL_HOOKS']['getPageLayout'][] = array('ExtAssets\ExtCss', 'hookGetPageLayout');
 
 /**
  * Models

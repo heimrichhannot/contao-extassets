@@ -90,13 +90,14 @@ $GLOBALS['TL_DCA']['tl_extcss'] = array
 			// Palettes
 			'palettes' => array
 			(
-				'__selector__'				=> array('addBootstrap'),
-				'default'                   => '{title_legend},title;{bootstrap_legend},addBootstrap;{font_awesome_legend},addFontAwesome;'
+				'__selector__'				=> array('addBootstrap', 'bootstrapResponsive'),
+				'default'                   => '{title_legend},title;{bootstrap_legend},addBootstrap;{bootstrap_responsive_legend},bootstrapResponsive;{font_awesome_legend},addFontAwesome;'
 			),
 			// Subpalettes
 			'subpalettes' => array
 			(
-				'addBootstrap'				=> 'bootstrapResponsive,bootstrapResponsiveDevices,bootstrapVariablesSRC'
+				'addBootstrap'				=> 'bootstrapVariablesSRC',
+				'bootstrapResponsive'		=> 'bootstrapResponsiveDevices',
 			),
 			// Fields
 			'fields' => array
@@ -121,16 +122,16 @@ $GLOBALS['TL_DCA']['tl_extcss'] = array
 					'label'                   => &$GLOBALS['TL_LANG']['tl_extcss']['addBootstrap'],
 					'exclude'                 => true,
 					'inputType'               => 'checkbox',
-					'default'									=> true,
+					'default'				  => true,
 					'eval'                    => array('submitOnChange'=>true),
-					'sql'											=> "char(1) NOT NULL default ''",
+					'sql'					  => "char(1) NOT NULL default ''",
 				),
 				'bootstrapResponsive' => array(
 					'label'                   => &$GLOBALS['TL_LANG']['tl_extcss']['bootstrapResponsive'],
 					'exclude'                 => true,
 					'inputType'               => 'checkbox',
-					'default'									=> true,
-					'eval'                    => array('tl_class'=>'clr'),
+					'default'				  => true,
+					'eval'                    => array('submitOnChange'=>true, 'tl_class'=>'clr'),
 					'sql'											=> "char(1) NOT NULL default ''",
 				),
 				'bootstrapResponsiveDevices' => array(

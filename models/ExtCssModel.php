@@ -50,4 +50,23 @@ class ExtCssModel extends \Model
 		return static::findBy(array("$t.id IN(" . implode(',', array_map('intval', $arrIds)) . ")"), null, $arrOptions);
 	}
 
+	public static function findMultipleResponsiveByIds($arrIds, array $arrOptions=array())
+	{
+		if (!is_array($arrIds) || empty($arrIds))
+		{
+			return null;
+		}
+
+		$t = static::$strTable;
+
+		if (!isset($arrOptions['order']))
+		{
+			$arrOptions['order'] = \Database::getInstance()->findInSet("$t.id", $arrIds);
+		}
+
+		$arrOptions['column'] = array('bootstrapResponsive=1', 'LENGTH(bootstrapResponsiveDevices) > 0');
+
+
+		return static::findBy(array("$t.id IN(" . implode(',', array_map('intval', $arrIds)) . ")"), null, $arrOptions);
+	}
 }
