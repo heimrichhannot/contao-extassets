@@ -121,8 +121,38 @@ class ExtJs extends \Frontend
 			$arrJs = $this->addTwitterBootstrap($arrJs);
 		}
 
+		global $objPage;
+
+		$blnXhtml = ($objPage->outputFormat == 'xhtml');
+
+		// Add the internal scripts
+		if (!empty($arrJs) && is_array($arrJs))
+		{
+			$objCombiner = new \Combiner();
+
+			foreach (array_unique($arrJs) as $javascript)
+			{
+				list($javascript, $mode) = explode('|', $javascript);
+
+				if ($mode == 'static')
+				{
+					$objCombiner->add($javascript, filemtime(TL_ROOT . '/' . $javascript));
+				}
+				else
+				{
+					$arrScripts[] = '<script' . ($blnXhtml ? ' type="text/javascript"' : '') . ' src="' . static::addStaticUrlTo($javascript) . '"></script>' . "\n";
+				}
+			}
+
+			// Create the aggregated script and add it before the non-static scripts (see #4890)
+			if ($objCombiner->hasEntries())
+			{
+				$arrScripts = '<script' . ($blnXhtml ? ' type="text/javascript"' : '') . ' src="' . $objCombiner->getCombinedFile() . '"></script>' . "\n" . $strScripts;
+			}
+		}
+
 		// inject extjs before other plugins, otherwise bootstrap may not work
-		$GLOBALS['TL_JAVASCRIPT']	= is_array($GLOBALS['TL_JAVASCRIPT']) ? array_merge($arrJs, $GLOBALS['TL_JAVASCRIPT']) : $arrJs;
+		$GLOBALS['TL_JQUERY'] = is_array($GLOBALS['TL_JQUERY']) ? array_merge($arrScripts, $GLOBALS['TL_JQUERY']) : $arrScripts;
 	}
 
 	/*
