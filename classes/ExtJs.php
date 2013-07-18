@@ -102,7 +102,7 @@ class ExtJs extends \Frontend
 			}
 
 			// TODO: add css minimizer option for extcss group
-			$mode = $GLOBALS['TL_CONFIG']['bypassCache'] ? 'none' : 'static';
+			$mode = $GLOBALS['TL_CONFIG']['gzipScripts'] ? 'none' : 'static';
 
 			$arrJs[] = "$target|$mode";
 		}
@@ -147,7 +147,7 @@ class ExtJs extends \Frontend
 			// Create the aggregated script and add it before the non-static scripts (see #4890)
 			if ($objCombiner->hasEntries())
 			{
-				$arrScripts = '<script' . ($blnXhtml ? ' type="text/javascript"' : '') . ' src="' . $objCombiner->getCombinedFile() . '"></script>' . "\n" . $strScripts;
+				$arrScripts[] = '<script' . ($blnXhtml ? ' type="text/javascript"' : '') . ' src="' . $objCombiner->getCombinedFile() . '"></script>' . "\n" . $strScripts;
 			}
 		}
 
