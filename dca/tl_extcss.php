@@ -141,7 +141,7 @@ $GLOBALS['TL_DCA']['tl_extcss'] = array
 					'default'									=> true,
 					'options'									=> array('large', 'tablet', 'phone'),
 					'reference'								=> &$GLOBALS['TL_LANG']['tl_extcss']['devices'],
-					'eval'                    => array('tl_class'=>'clr', 'multiple' => true, 'mandatory' => true),
+					'eval'                    => array('tl_class'=>'clr', 'multiple' => true),
 					'sql'											=> "blob NULL",
 				),
 				'bootstrapVariablesSRC'	=> array(
