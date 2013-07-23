@@ -77,6 +77,8 @@ class ExtJs extends \Frontend
 		{
 			$objFiles = ExtJsFileModel::findMultipleByPid($objJs->id);
 
+			if($objFiles === null) continue;
+
 			while($objFiles->next())
 			{
 				$objFile = \FilesModel::findByPk($objFiles->src);
