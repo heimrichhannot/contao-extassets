@@ -25,7 +25,7 @@ use ExtJsModel;
 use ExtJsFileModel;
 
 
-class ExtJs extends \Frontend
+class ExtJs extends ExtAssets
 {
 
 	/**
@@ -124,7 +124,6 @@ class ExtJs extends \Frontend
 		}
 
 		// inject extjs before other plugins, otherwise bootstrap may not work
-
 		$GLOBALS['TL_JAVASCRIPT'] = is_array($GLOBALS['TL_JAVASCRIPT']) ? array_merge($GLOBALS['TL_JAVASCRIPT'], $arrJs) : $arrJs;
 	}
 
@@ -134,9 +133,9 @@ class ExtJs extends \Frontend
 	*/
 	public function addTwitterBootstrap($arrJs)
 	{
-		$in = "/assets/bootstrap/js/bootstrap.js";
+		$in = BOOTSTRAPJSDIR . 'bootstrap.js';
 
-		if(!file_exists(TL_ROOT . $in)) return $arrJs;
+		if(!file_exists(TL_ROOT . '/' . $in)) return $arrJs;
 
 		// TODO: add css minimizer option for extcss group
 		$mode = $GLOBALS['TL_CONFIG']['bypassCache'] ? 'none' : 'static';

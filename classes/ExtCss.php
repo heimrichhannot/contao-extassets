@@ -33,7 +33,7 @@ use ExtCssFileModel;
  * @author     r.kaltofen@heimrich-hannot.de
  * @package    Devtools
  */
-class ExtCss extends \Frontend
+class ExtCss extends ExtAssets
 {
 
 	/**
@@ -84,11 +84,6 @@ class ExtCss extends \Frontend
 	 */
 	protected $arrVariables = null;
 
-	protected function __construct()
-	{
-		parent::__construct();
-	}
-
 	/**
 	 * Get productive mode status.
 	 */
@@ -138,7 +133,7 @@ class ExtCss extends \Frontend
 	 */
 	public function hookGetPageLayout($objPage, &$objLayout, $objThis)
 	{
-		$objCss = ExtCssModel::findMultipleResponsiveByIds(deserialize($objLayout->extcss));
+		$objCss = ExtCssModel::findMultipleBootstrapByIds(deserialize($objLayout->extcss));
 
 		if($objCss === null) return false;
 
@@ -147,6 +142,23 @@ class ExtCss extends \Frontend
 		$GLOBALS['TL_HEAD'][] = '<meta name="viewport" content="width=device-width,initial-scale=1.0"' . ($blnXhtml ? ' />' : '>') . "\n";
 	}
 
+	/**
+	 * Update all Ext Css Files
+	 * @return boolean
+	 */
+	public function updateExtCss()
+	{
+		$objCss = ExtCssModel::findAll();
+
+		if($objCss === null) return false;
+
+		while($objCss->next())
+		{
+			$combiner = new ExtCssCombiner($objCss->current(), $arrReturn);
+
+			$arrReturn = $combiner->getUserCss();
+		}
+	}
 
 	public function hookReplaceDynamicScriptTags($strBuffer)
 	{
@@ -204,19 +216,6 @@ class ExtCss extends \Frontend
 			$arrHashs = array();
 
 			foreach($arrReturn[ExtCssCombiner::$bootstrapCssKey] as $arrCss)
-			{
-				if(in_array($arrCss['hash'], $arrHashs)) continue;
-				$arrUserCss[] = sprintf('%s|%s|%s|%s', $arrCss['src'], $arrCss['type'], $arrCss['mode'], $arrCss['hash']);
-				$arrHashs[] = $arrCss['hash'];
-			}
-		}
-
-		// collect bootstrap responsive css
-		if(isset($arrReturn[ExtCssCombiner::$bootstrapResponsiveCssKey]) && is_array($arrReturn[ExtCssCombiner::$bootstrapResponsiveCssKey]))
-		{
-			$arrHashs = array();
-
-			foreach($arrReturn[ExtCssCombiner::$bootstrapResponsiveCssKey] as $arrCss)
 			{
 				if(in_array($arrCss['hash'], $arrHashs)) continue;
 				$arrUserCss[] = sprintf('%s|%s|%s|%s', $arrCss['src'], $arrCss['type'], $arrCss['mode'], $arrCss['hash']);

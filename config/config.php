@@ -11,6 +11,21 @@
  * @copyright Heimrich & Hannot GmbH
  */
 
+/**
+ * Custom Variables
+ */
+define('CSSDIR', 'assets/css/');
+
+define('BOOTSTRAPVERSION', 'master');
+define('BOOTSTRAPDIR', 'assets/bootstrap/');
+define('BOOTSTRAPLESSDIR', 'assets/bootstrap/less/');
+define('BOOTSTRAPLESSCUSTOMDIR', 'assets/bootstrap/less/custom/');
+define('BOOTSTRAPJSDIR', 'assets/bootstrap/dist/js/');
+
+define('FONTAWESOMEVERSION', 'master');
+define('FONTAWESOMEDIR', 'assets/font-awesome/');
+define('FONTAWESOMELESSDIR', 'assets/font-awesome/less/');
+define('FONTAWESOMEFONTDIR', 'assets/font-awesome/font/');
 
 /**
  * BACK END MODULES
@@ -52,7 +67,13 @@ $GLOBALS['TL_MODELS']['tl_extcss_file'] = 'ExtAssets\ExtCssFileModel';
 $GLOBALS['TL_MODELS']['tl_extjs'] = 'ExtAssets\ExtJsModel';
 $GLOBALS['TL_MODELS']['tl_extjs_file'] = 'ExtAssets\ExtJsFileModel';
 
-
+/**
+ * PurgeData
+ */
+$GLOBALS['TL_PURGE']['folders']['less'] = array(
+	'affected'		=> array(BOOTSTRAPLESSCUSTOMDIR),
+	'callback'		=> array('ExtAssets\ExtAutomator', 'purgeLessCache'),
+);
 
 /**
  * FRONT END MODULES
