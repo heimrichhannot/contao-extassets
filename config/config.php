@@ -25,6 +25,7 @@ define('BOOTSTRAPJSDIR', 'assets/bootstrap/dist/js/');
 define('FONTAWESOMEVERSION', 'master');
 define('FONTAWESOMEDIR', 'assets/font-awesome/');
 define('FONTAWESOMELESSDIR', 'assets/font-awesome/less/');
+define('FONTAWESOMELESSCUSTOMDIR', 'assets/font-awesome/less/custom/');
 define('FONTAWESOMEFONTDIR', 'assets/font-awesome/font/');
 
 /**

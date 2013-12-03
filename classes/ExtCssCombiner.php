@@ -241,7 +241,7 @@ class ExtCssCombiner extends \Frontend
 	protected function addFontAwesomeVariables()
 	{
 		$objFile = new \File($this->getFontAwesomeSrc('variables.less'));
-		$objTarget = new \File($this->getFontAwesomeSrc($this->variablesSrc), true);
+		$objTarget = new \File($this->getFontAwesomeCustomSrc($this->variablesSrc), true);
 
 		if($objFile->size > 0)
 		{
@@ -252,7 +252,7 @@ class ExtCssCombiner extends \Frontend
 
 		if(!$objTarget->exists() || $objTarget->size == 0)
 		{
-			\File::putContent($this->getFontAwesomeSrc($this->variablesSrc), $this->arrCss['variables-fontawesome']);
+			\File::putContent($this->getFontAwesomeCustomSrc($this->variablesSrc), $this->arrCss['variables-fontawesome']);
 		}
 	}
 
@@ -269,15 +269,21 @@ class ExtCssCombiner extends \Frontend
 	protected function addFontAwesome()
 	{
 		$objFile = new \File($this->getFontAwesomeSrc('font-awesome.less'));
-		$objTarget = new \File($this->getFontAwesomeSrc('font-awesome-' . $this->title .  '.less'));
+		$objTarget = new \File($this->getFontAwesomeCustomSrc('font-awesome-' . $this->title .  '.less'));
 		$objOut = new \File($this->getSrc('font-awesome-' . $this->title .  '.css'), true);
 
 		if(!$objOut->exists() || $objTarget->size == 0 || $objOut->size == 0 )
 		{
 			$strCss = $objFile->getContent();
-			$strCss = str_replace('variables.less', $this->variablesSrc, $strCss);
+			
+			$strCss = str_replace('@import "', '@import "../', $strCss);
+			
+			$strCss = str_replace('../variables.less', $this->variablesSrc, $strCss);
+			
 			$objTarget->write($strCss);
-
+			$objTarget->close();
+				
+			
 			$strCss = \lessc::ccompile(TL_ROOT . '/' . $objTarget->value, TL_ROOT . '/' . $objOut->value);
 			$objOut = new \File($objOut->value);
 		}
@@ -345,6 +351,11 @@ class ExtCssCombiner extends \Frontend
 	protected function getFontAwesomeSrc($src)
 	{
 		return FONTAWESOMELESSDIR . $src;
+	}
+	
+	protected function getFontAwesomeCustomSrc($src)
+	{
+		return FONTAWESOMELESSCUSTOMDIR . $src;
 	}
 
 }
