@@ -124,7 +124,7 @@ class ExtJs extends ExtAssets
 		}
 
 		// inject extjs before other plugins, otherwise bootstrap may not work
-		$GLOBALS['TL_JAVASCRIPT'] = is_array($GLOBALS['TL_JAVASCRIPT']) ? array_merge($GLOBALS['TL_JAVASCRIPT'], $arrJs) : $arrJs;
+		$GLOBALS['TL_JAVASCRIPT'] = is_array($GLOBALS['TL_JAVASCRIPT']) ? array_merge($arrJs, $GLOBALS['TL_JAVASCRIPT']) : $arrJs;
 	}
 
 	/*
