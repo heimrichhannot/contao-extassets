@@ -251,7 +251,7 @@ class ExtCss extends ExtAssets
 		}
 		else
 		{
-			$GLOBALS['TL_JAVASCRIPT'] = array_merge($arrUserCss, is_array($GLOBALS['TL_USER_CSS']) ? $GLOBALS['TL_USER_CSS'] : array());
+			$GLOBALS['TL_USER_CSS'] = array_merge($arrUserCss, is_array($GLOBALS['TL_USER_CSS']) ? $GLOBALS['TL_USER_CSS'] : array());
 		}
 		
 		
