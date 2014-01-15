@@ -245,7 +245,16 @@ class ExtCss extends ExtAssets
 			}
 		}
 
-		$GLOBALS['TL_USER_CSS'] = array_merge(is_array($GLOBALS['TL_USER_CSS']) ? $GLOBALS['TL_USER_CSS'] : array(), $arrUserCss);
+		if($GLOBALS['TL_CONFIG']['bypassCache'])
+		{
+			$GLOBALS['TL_USER_CSS'] = array_merge(is_array($GLOBALS['TL_USER_CSS']) ? $GLOBALS['TL_USER_CSS'] : array(), $arrUserCss);
+		}
+		else
+		{
+			$GLOBALS['TL_JAVASCRIPT'] = array_merge($arrUserCss, is_array($GLOBALS['TL_USER_CSS']) ? $GLOBALS['TL_USER_CSS'] : array());
+		}
+		
+		
 
 	}
 }
