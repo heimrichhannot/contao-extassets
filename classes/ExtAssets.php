@@ -29,7 +29,7 @@ class ExtAssets extends \Frontend
 			if ($res === TRUE)
 			{
 				$zip->extractTo(TL_ROOT . '/assets');
-				$objFolder = new \Folder('assets/bootstrap-' . BOOTSTRAPVERSION);
+				$objFolder = new \Folder('assets/' . $zip->getNameIndex(0)); // get font-aweseome folder name inside zip archive
 				$objFolder->renameTo(rtrim(BOOTSTRAPDIR, '/'));
 			}
 		}
@@ -41,7 +41,7 @@ class ExtAssets extends \Frontend
 
 			// Store the index.html file
 			$objFile = new \File('templates/index.html', true);
-			$objFile->copyTo($dir . '/index.html');
+			$objFile->copyTo(BOOTSTRAPLESSCUSTOMDIR . '/index.html');
 		}
 	}
 
@@ -60,7 +60,7 @@ class ExtAssets extends \Frontend
 			if ($res === TRUE)
 			{
 				$zip->extractTo(TL_ROOT . '/assets');
-				$objFolder = new \Folder('assets/Font-Awesome-' . FONTAWESOMEVERSION);
+				$objFolder = new \Folder('assets/' . $zip->getNameIndex(0)); // get font-aweseome folder name inside zip archive
 				$objFolder->renameTo(rtrim(FONTAWESOMEDIR, '/'));
 			}
 		}
