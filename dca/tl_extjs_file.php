@@ -131,7 +131,7 @@ $GLOBALS['TL_DCA']['tl_extjs_file'] = array
 								'exclude'                 => true,
 								'inputType'               => 'fileTree',
 								'eval'                    => array('fieldType'=>'radio', 'filesOnly'=>true, 'mandatory'=>true, 'extensions'=>'js'),
-								'sql'                     => "varchar(255) NOT NULL default ''"
+								'sql'                     => "binary(16) NULL"
 								)
 								)
 								);
@@ -152,13 +152,10 @@ $GLOBALS['TL_DCA']['tl_extjs_file'] = array
 									 */
 									public function listJsFiles($arrRow)
 									{
-										// Get the file
-										$objFiles = $this->Database->prepare("SELECT id, type, name, path FROM tl_files WHERE id=?")
-										->limit(1)
-										->execute($arrRow['src']);
-
+										$objFiles = FilesModel::findById($arrRow['src']);
+									
 										// Return if there is no result
-										if ($objFiles->numRows < 1)
+										if ($objFiles === null)
 										{
 											return '';
 										}
