@@ -71,6 +71,7 @@ class ExtCssCombiner extends \Frontend
 		if($this->addFontAwesome)
 		{
 			$this->addFontAwesomeVariables();
+			$this->addFontAwesomeIcons();
 			$this->addFontAwesomeMixins();
 			$this->addFontAwesome();
 		}
@@ -247,7 +248,7 @@ class ExtCssCombiner extends \Frontend
 		{
 			$this->arrCss['variables-fontawesome'] = $objFile->getContent();
 			// change font path
-			$this->arrCss['variables-fontawesome'] = str_replace("../font", '/' . rtrim(FONTAWESOMEFONTDIR, '/'), $this->arrCss['variables-fontawesome']);
+			$this->arrCss['variables-fontawesome'] = str_replace("../fonts", '/' . rtrim(FONTAWESOMEFONTDIR, '/'), $this->arrCss['variables-fontawesome']);
 		}
 
 		if(!$objTarget->exists() || $objTarget->size == 0)
@@ -263,6 +264,19 @@ class ExtCssCombiner extends \Frontend
 		if($objFile->size > 0)
 		{
 			$this->arrCss['mixins-fontawesome'] = $objFile->getContent();
+		}
+	}
+	
+	/**
+	 * Font-Awesome 4.0 support for less icons
+	 */
+	protected function addFontAwesomeIcons()
+	{
+		$objFile = new \File($this->getFontAwesomeSrc('icons.less'));
+	
+		if($objFile->size > 0)
+		{
+			$this->arrCss['icons-fontawesome'] = $objFile->getContent();
 		}
 	}
 

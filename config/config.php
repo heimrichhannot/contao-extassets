@@ -26,7 +26,7 @@ define('FONTAWESOMEVERSION', 'v4.0.3');
 define('FONTAWESOMEDIR', 'assets/font-awesome/');
 define('FONTAWESOMELESSDIR', 'assets/font-awesome/less/');
 define('FONTAWESOMELESSCUSTOMDIR', 'assets/font-awesome/less/custom/');
-define('FONTAWESOMEFONTDIR', 'assets/font-awesome/font/');
+define('FONTAWESOMEFONTDIR', 'assets/font-awesome/fonts/');
 
 /**
  * BACK END MODULES

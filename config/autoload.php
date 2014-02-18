@@ -3,7 +3,7 @@
 /**
  * Contao Open Source CMS
  *
- * Copyright (c) 2005-2013 Leo Feyer
+ * Copyright (c) 2005-2014 Leo Feyer
  *
  * @package Extassets
  * @link    https://contao.org
@@ -35,9 +35,17 @@ ClassLoader::addClasses(array
 	'ExtAssets\ExtJs'           => 'system/modules/extassets/classes/ExtJs.php',
 	'ExtAssets\ExtAutomator'    => 'system/modules/extassets/classes/ExtAutomator.php',
 	'ExtAssets\ExtHashFile'     => 'system/modules/extassets/classes/ExtHashFile.php',
-	'InputTest'                 => 'system/modules/extassets/classes/vendor/lessphp/tests/InputTest.php',
-	'ApiTest'                   => 'system/modules/extassets/classes/vendor/lessphp/tests/ApiTest.php',
+	'Diff'                      => 'system/modules/extassets/classes/vendor/lessphp/test/php-diff/lib/Diff.php',
 	'ExtAssets\ExtCss'          => 'system/modules/extassets/classes/ExtCss.php',
 	'ExtAssets\ExtCssCombiner'  => 'system/modules/extassets/classes/ExtCssCombiner.php',
 	'ExtAssets\ExtAssets'       => 'system/modules/extassets/classes/ExtAssets.php',
+));
+
+
+/**
+ * Register the templates
+ */
+TemplateLoader::addFiles(array
+(
+	'fe_page' => 'system/modules/extassets/templates/frontend',
 ));
