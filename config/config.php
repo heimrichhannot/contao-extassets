@@ -16,13 +16,13 @@
  */
 define('CSSDIR', 'assets/css/');
 
-define('BOOTSTRAPVERSION', 'v3.0.0');
+define('BOOTSTRAPVERSION', 'v3.1.1');
 define('BOOTSTRAPDIR', 'assets/bootstrap/');
 define('BOOTSTRAPLESSDIR', 'assets/bootstrap/less/');
 define('BOOTSTRAPLESSCUSTOMDIR', 'assets/bootstrap/less/custom/');
 define('BOOTSTRAPJSDIR', 'assets/bootstrap/dist/js/');
 
-define('FONTAWESOMEVERSION', 'v3.2.1');
+define('FONTAWESOMEVERSION', 'v4.0.3');
 define('FONTAWESOMEDIR', 'assets/font-awesome/');
 define('FONTAWESOMELESSDIR', 'assets/font-awesome/less/');
 define('FONTAWESOMELESSCUSTOMDIR', 'assets/font-awesome/less/custom/');

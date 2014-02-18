@@ -1,25 +1,28 @@
 {
-    "name": "leafo/lessphp",
-    "type": "library",
-    "description": "lessphp is a compiler for LESS written in PHP.",
-    "homepage": "http://leafo.net/lessphp/",
-    "license": [
-      "MIT",
-      "GPL-3.0"
-    ],
-    "authors": [
-        {
-            "name": "Leaf Corcoran",
-            "email": "leafot@gmail.com",
-            "homepage": "http://leafo.net"
-        }
-    ],
-    "autoload": {
-        "classmap": ["lessc.inc.php"]
-    },
-    "extra": {
-        "branch-alias": {
-            "dev-master": "0.3-dev"
-        }
-    }
+	"name": "oyejorge/less.php",
+	"description": "PHP port of the Javascript version of LESS http://lesscss.org",
+	"keywords": [ "less", "css", "php", "stylesheet", "less.js", "lesscss" ],
+	"homepage": "http://lessphp.gpeasy.com",
+	"license": "Apache-2.0",
+	"authors": [
+		{
+			"name": "Josh Schmidt",
+			"homepage": "https://github.com/oyejorge"
+		},
+		{
+			"name": "Matt Agar",
+			"homepage": "https://github.com/agar"
+		},
+		{
+			"name": "Martin Jantošovič",
+			"homepage": "https://github.com/Mordred"
+		}
+	],
+	"require": {
+		"PHP" : ">=5.2"
+	},
+	"autoload": {
+		"psr-0": { "Less": "lib/" },
+		"classmap": ["lessc.inc.php"]
+	}
 }
