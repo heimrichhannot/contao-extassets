@@ -40,12 +40,3 @@ ClassLoader::addClasses(array
 	'ExtAssets\ExtCssCombiner'  => 'system/modules/extassets/classes/ExtCssCombiner.php',
 	'ExtAssets\ExtAssets'       => 'system/modules/extassets/classes/ExtAssets.php',
 ));
-
-
-/**
- * Register the templates
- */
-TemplateLoader::addFiles(array
-(
-	'fe_page' => 'system/modules/extassets/templates/frontend',
-));
