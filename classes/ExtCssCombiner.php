@@ -6,7 +6,7 @@ use Contao\File;
 use ExtCssFileModel;
 use ExtHashFile;
 
-require TL_ROOT . "/system/modules/extassets/classes/vendor/lessphp/lessc.inc.php";
+require_once TL_ROOT . "/system/modules/extassets/classes/vendor/lessphp/lessc.inc.php";
 
 class ExtCssCombiner extends \Frontend
 {
@@ -148,7 +148,8 @@ class ExtCssCombiner extends \Frontend
 			$objTarget->write($strCss);
 			$objTarget->close();
 
-			$strCss = \lessc::ccompile(TL_ROOT . '/' . $objTarget->value, TL_ROOT . '/' . $objOut->value);
+			$lessc = new \lessc();
+			$strCss = $lessc->compileFile(TL_ROOT . '/' . $objTarget->value, TL_ROOT . '/' . $objOut->value);
 
 			$objOut = new \File($objOut->value);
 		}
@@ -231,11 +232,11 @@ class ExtCssCombiner extends \Frontend
 
 	protected function addBootstrapUtilities()
 	{
-		$objFile = new \File($this->getBootstrapSrc('responsive-utilities.less'));
+		$objFile = new \File($this->getBootstrapSrc('utilities.less'));
 
 		if($objFile->size > 0)
 		{
-			$this->arrCss['responsive-utilities'] = $objFile->getContent();
+			$this->arrCss['utilities'] = $objFile->getContent();
 		}
 	}
 
@@ -298,7 +299,9 @@ class ExtCssCombiner extends \Frontend
 			$objTarget->close();
 				
 			
-			$strCss = \lessc::ccompile(TL_ROOT . '/' . $objTarget->value, TL_ROOT . '/' . $objOut->value);
+			$lessc = new \lessc();
+			$strCss = $lessc->compileFile(TL_ROOT . '/' . $objTarget->value, TL_ROOT . '/' . $objOut->value);
+
 			$objOut = new \File($objOut->value);
 		}
 
