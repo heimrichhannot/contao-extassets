@@ -1,7 +1,10 @@
 <!DOCTYPE html>
-<html lang="<?php echo $this->language; ?>">
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7" lang="<?php echo $this->language; ?>"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8" lang="<?php echo $this->language; ?>"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9" lang="<?php echo $this->language; ?>"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="<?php echo $this->language; ?>"> <!--<![endif]-->
 <head>
-
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta charset="<?php echo $this->charset; ?>">
 	<title><?php echo $this->pageTitle; ?> - <?php echo $this->mainTitle; ?></title>
 	<base href="<?php echo $this->base; ?>">
@@ -15,7 +18,7 @@
 	<?php echo $this->viewport; ?>
 	<?php echo $this->framework; ?>
 	<?php echo $this->stylesheets; ?>
-	<!--[if lt IE 9]><script src="<?php echo TL_ASSETS_URL; ?>assets/html5shiv/<?php echo HTML5SHIV; ?>/html5shiv.js"></script><![endif]-->
+	<script src="/system/modules/extassets/assets/extjs/vendor/modernizr-2.6.2.min.js"></script>
 
 </head>
 <body id="top" class="{{ua::class}}<?php if ($this->class): ?> <?php echo $this->class; ?><?php endif; ?>"<?php if ($this->onload): ?> onload="<?php echo $this->onload; ?>"<?php endif; ?>>
