@@ -16,7 +16,7 @@
  */
 define('CSSDIR', 'assets/css/');
 
-define('BOOTSTRAPVERSION', 'v3.0.0');
+define('BOOTSTRAPVERSION', 'v3.0.0'); // dont update unless https://github.com/leafo/lessphp/issues/491 and https://github.com/leafo/lessphp/issues/520 is fixed
 define('BOOTSTRAPDIR', 'assets/bootstrap/');
 define('BOOTSTRAPLESSDIR', 'assets/bootstrap/less/');
 define('BOOTSTRAPLESSCUSTOMDIR', 'assets/bootstrap/less/custom/');

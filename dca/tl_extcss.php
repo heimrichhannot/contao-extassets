@@ -130,7 +130,7 @@ $GLOBALS['TL_DCA']['tl_extcss'] = array
 					'exclude'                 => true,
 					'inputType'               => 'fileTree',
 					'eval'                    => array('fieldType'=>'radio', 'filesOnly'=>true, 'extensions'=>'css, less'),
-					'sql'                     => "varchar(255) NOT NULL default ''"
+					'sql'                     => "binary(16) NULL"
 				),
 				'addFontAwesome' => array(
 					'label'                   => &$GLOBALS['TL_LANG']['tl_extcss']['addFontAwesome'],
