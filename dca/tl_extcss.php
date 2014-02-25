@@ -30,7 +30,7 @@ $GLOBALS['TL_DCA']['tl_extcss'] = array
 						(
 								'id' => 'primary'
 						)
-				)
+				),
 		),
 
 		// List
@@ -91,7 +91,7 @@ $GLOBALS['TL_DCA']['tl_extcss'] = array
 			'palettes' => array
 			(
 				'__selector__'				=> array('addBootstrap'),
-				'default'                   => '{title_legend},title;{bootstrap_legend},addBootstrap;{font_awesome_legend},addFontAwesome;'
+				'default'                   => '{title_legend},title,observeFolderSRC;{bootstrap_legend},addBootstrap;{font_awesome_legend},addFontAwesome;'
 			),
 			// Subpalettes
 			'subpalettes' => array
@@ -138,6 +138,13 @@ $GLOBALS['TL_DCA']['tl_extcss'] = array
 					'inputType'               => 'checkbox',
 					'default'                 => true,
 					'sql'                     => "char(1) NOT NULL default ''",
+				),
+				'observeFolderSRC'	=> array(
+						'label'                   => &$GLOBALS['TL_LANG']['tl_extcss']['observeFolderSRC'],
+						'exclude'                 => true,
+						'inputType'               => 'fileTree',
+						'eval'                    => array('fieldType'=>'radio', 'filesOnly'=>false, 'extensions'=>'css, less'),
+						'sql'                     => "binary(16) NULL"
 				),
 			)
 );

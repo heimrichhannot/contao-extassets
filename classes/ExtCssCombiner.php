@@ -287,17 +287,15 @@ class ExtCssCombiner extends \Frontend
 		$objTarget = new \File($this->getFontAwesomeCustomSrc('font-awesome-' . $this->title .  '.less'));
 		$objOut = new \File($this->getSrc('font-awesome-' . $this->title .  '.css'), true);
 
-		if(!$objOut->exists() || $objTarget->size == 0 || $objOut->size == 0 )
+		if($this->rewrite || !$objOut->exists() || $objTarget->size == 0 || $objOut->size == 0 )
 		{
 			$strCss = $objFile->getContent();
 			
 			$strCss = str_replace('@import "', '@import "../', $strCss);
-			
-			$strCss = str_replace('../variables.less', $this->variablesSrc, $strCss);
+			$strCss = str_replace('../variables', $this->variablesSrc, $strCss);
 			
 			$objTarget->write($strCss);
 			$objTarget->close();
-				
 			
 			$lessc = new \lessc();
 			$strCss = $lessc->compileFile(TL_ROOT . '/' . $objTarget->value, TL_ROOT . '/' . $objOut->value);

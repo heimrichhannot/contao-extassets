@@ -17,14 +17,6 @@
  */
 namespace ExtAssets;
 
-use Contao\File;
-
-use Template;
-use FrontendTemplate;
-use ExtCssModel;
-use ExtCssFileModel;
-
-//require TL_ROOT . "/system/modules/extassets/classes/vendor/lessphp/lessc.inc.php";
 
 /**
  * Class ExtCss
@@ -123,6 +115,62 @@ class ExtCss extends ExtAssets
 		static::getInstance()->blnLiveMode = !$designerMode;
 	}
 
+	
+	public static function observeCssGroupFolder($groupId)
+	{
+		$objCss = ExtCssModel::findByPk($groupId);
+
+		if($objCss === null || $objCss->observeFolderSRC == '') return false;
+		
+		$objObserveModel = \FilesModel::findByUuid($objCss->observeFolderSRC);
+		
+		if($objObserveModel === null || !is_dir(TL_ROOT . '/' . $objObserveModel->path)) return false;
+		
+		$lastUpdate = filemtime(TL_ROOT . '/' . $objObserveModel->path);
+		
+		// check if folder content has updated
+		if($lastUpdate <= $objObserveModel->tstamp) return false;
+		
+		$objCssFiles = ExtCssFileModel::findBy(array('pid'), $dc->id);
+		
+		$objCssFilesModel = \FilesModel::findMultipleByUuids($objCssFiles->fetchEach('src'));
+		
+		$arrOldFileNames = $objCssFilesModel->fetchEach('name');
+		
+		$arrFileNames = scan(TL_ROOT . '/' . $objObserveModel->path);
+		
+		$arrDiff = array_diff($arrFileNames, $arrOldFileNames);
+		
+		// exclude bootstrap variables src
+		$objVariablesModel = \FilesModel::findByUuid($objCss->bootstrapVariablesSRC);
+
+		$variablesKey = array_search($objVariablesModel->name, $arrDiff);
+		
+		if($variablesKey !== false)
+		{
+			unset($arrDiff[$variablesKey]);
+		}
+		
+		if(!empty($arrDiff))
+		{
+			// add new files
+			foreach($arrDiff as $key => $name)
+			{
+				// create Files Model
+				$objFile = new \File($objObserveModel->path . '/' . $name);
+				$objFile->close();
+				
+				$objFileModel = new \ExtCssFileModel();
+				$objFileModel->pid = $groupId;
+				$objFileModel->tstamp = time();
+				$objFileModel->sorting = 4294967295;
+				$objFileModel->src = $objFile->getModel()->uuid;
+				$objFileModel->save();
+			}
+		}
+		
+		return true;
+	}
 
 
 	/**
