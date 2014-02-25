@@ -17,6 +17,9 @@
  */
 namespace ExtAssets;
 
+if(!class_exists('ExtCssFileModel'))
+{
+	
 /**
  * Class ExtCssFileModel
  */
@@ -46,5 +49,7 @@ class ExtCssFileModel extends \Model
 
 		return static::findBy($arrColumns, $intId, $arrOptions);
 	}
+
+}
 
 }
