@@ -2,10 +2,6 @@
 
 namespace ExtAssets;
 
-use Contao\File;
-use ExtCssFileModel;
-use ExtHashFile;
-
 require_once TL_ROOT . "/system/modules/extassets/classes/vendor/lessphp/lessc.inc.php";
 
 class ExtCssCombiner extends \Frontend

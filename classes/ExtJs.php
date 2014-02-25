@@ -17,14 +17,6 @@
  */
 namespace ExtAssets;
 
-use Contao\File;
-
-use Template;
-use FrontendTemplate;
-use ExtJsModel;
-use ExtJsFileModel;
-
-
 class ExtJs extends ExtAssets
 {
 

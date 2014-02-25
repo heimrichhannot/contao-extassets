@@ -238,6 +238,8 @@ class ExtCss extends ExtAssets
 
 		while($objCss->next())
 		{
+			static::observeCssGroupFolder($objCss->id);
+			
 			$start = time();
 
 			$combiner = new ExtCssCombiner($objCss->current(), $arrReturn);
