@@ -17,7 +17,6 @@
  */
 namespace ExtAssets;
 
-
 /**
  * Class ExtCss
  *
@@ -211,7 +210,7 @@ class ExtCss extends ExtAssets
 	public function hookReplaceDynamicScriptTags($strBuffer)
 	{
 		global $objPage;
-
+		
 		if(!$objPage) return $strBuffer;
 
 		$objLayout = \LayoutModel::findByPk($objPage->layout);
@@ -303,8 +302,5 @@ class ExtCss extends ExtAssets
 		{
 			$GLOBALS['TL_USER_CSS'] = array_merge($arrUserCss, is_array($GLOBALS['TL_USER_CSS']) ? $GLOBALS['TL_USER_CSS'] : array());
 		}
-		
-		
-
 	}
 }

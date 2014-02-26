@@ -86,7 +86,7 @@ class ExtJs extends ExtAssets
 
 			if(file_exists(TL_ROOT . '/' . $target))
 			{
-				$targetFile = new File($target);
+				$targetFile = new \File($target);
 				$rewrite = !($version == $targetFile->hash);
 			}
 

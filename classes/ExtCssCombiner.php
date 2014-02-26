@@ -2,6 +2,7 @@
 
 namespace ExtAssets;
 
+use Contao\File;
 require_once TL_ROOT . "/system/modules/extassets/classes/vendor/lessphp/lessc.inc.php";
 
 class ExtCssCombiner extends \Frontend
@@ -71,6 +72,8 @@ class ExtCssCombiner extends \Frontend
 			$this->addFontAwesomeMixins();
 			$this->addFontAwesome();
 		}
+		
+		$this->transformUserLessFilesToCss();
 
 		$this->addCssFiles();
 	}
@@ -306,6 +309,37 @@ class ExtCssCombiner extends \Frontend
 				'mode'	=> $this->mode,
 				'hash'	=> $objOut->hash,
 		);
+	}
+	
+	protected function transformUserLessFilesToCss()
+	{
+		if(!is_array($GLOBALS['TL_USER_CSS']) || empty($GLOBALS['TL_USER_CSS'])) return false;
+			
+		foreach($GLOBALS['TL_USER_CSS'] as $key => $css)
+		{
+			$arrCss = trimsplit('|', $css);
+				
+			$objFile = new \File($arrCss[0]);
+			
+			if($this->addBootstrap)
+			{
+				$content .= $this->arrCss['variables'];
+				$content .= $this->arrCss['utilities'];
+				$content .= $this->arrCss['mixins'];
+			}
+			
+			$content .= $objFile->getContent();
+			
+			$arrCss[0] = 'assets/css/' . $objFile->name . '.css';
+			
+			$objTarget = new File($arrCss[0]);
+			
+			$lessc = new \lessc();
+			$objTarget->write($lessc->compile($content));
+			$objTarget->close();
+			
+			$GLOBALS['TL_USER_CSS'][$key] = implode('|', $arrCss);
+		}
 	}
 
 	/**
