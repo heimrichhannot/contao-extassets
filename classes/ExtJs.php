@@ -95,7 +95,6 @@ class ExtJs extends ExtAssets
 				file_put_contents(TL_ROOT . '/' . $target, $js);
 			}
 
-
 			$arrJs[] = "$target|none";
 		}
 
