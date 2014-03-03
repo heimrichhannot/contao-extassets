@@ -104,7 +104,7 @@ class ExtJs extends ExtAssets
 			}
 
 			// TODO: add css minimizer option for extcss group
-			$mode = $GLOBALS['TL_CONFIG']['gzipScripts'] ? 'none' : 'static';
+			$mode = $GLOBALS['TL_CONFIG']['gzipScripts'] ? 'static' : 'none';
 
 			$arrJs[] = "$target|$mode";
 		}
@@ -124,14 +124,7 @@ class ExtJs extends ExtAssets
 		}
 
 		// inject extjs before other plugins, otherwise bootstrap may not work
-		if($GLOBALS['TL_CONFIG']['bypassCache'])
-		{
-			$GLOBALS['TL_JAVASCRIPT'] = is_array($GLOBALS['TL_JAVASCRIPT']) ? array_merge($arrJs, $GLOBALS['TL_JAVASCRIPT']) : $arrJs;
-		}
-		else
-		{
-			$GLOBALS['TL_JAVASCRIPT'] = is_array($GLOBALS['TL_JAVASCRIPT']) ? array_merge($GLOBALS['TL_JAVASCRIPT'], $arrJs) : $arrJs;
-		}
+		$GLOBALS['TL_JAVASCRIPT'] = is_array($GLOBALS['TL_JAVASCRIPT']) ? array_merge($arrJs, $GLOBALS['TL_JAVASCRIPT']) : $arrJs;
 		
 	}
 
@@ -146,7 +139,7 @@ class ExtJs extends ExtAssets
 		if(!file_exists(TL_ROOT . '/' . $in)) return $arrJs;
 
 		// TODO: add css minimizer option for extcss group
-		$mode = $GLOBALS['TL_CONFIG']['bypassCache'] ? 'none' : 'static';
+		$mode = $GLOBALS['TL_CONFIG']['gzipScripts'] ? 'static' : 'none';
 
 		array_insert($arrJs, -1, "$in|$mode");
 
