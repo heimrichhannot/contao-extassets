@@ -59,6 +59,7 @@ class ExtCssCombiner extends \Frontend
 		if($this->addBootstrap)
 		{
 			$this->addBootstrapVariables();
+			$this->addFontAwesomeCore();
 			$this->addBootstrapMixins();
 			$this->addBootstrapAlerts();
 			$this->addBootstrap();
@@ -257,6 +258,16 @@ class ExtCssCombiner extends \Frontend
 		}
 	}
 
+	protected function addFontAwesomeCore()
+	{
+		$objFile = new \File($this->getFontAwesomeSrc('core.less'));
+	
+		if($objFile->size > 0)
+		{
+			$this->arrCss['core-fontawesome'] = $objFile->getContent();
+		}
+	}
+	
 	protected function addFontAwesomeMixins()
 	{
 		$objFile = new \File($this->getFontAwesomeSrc('mixins.less'));
