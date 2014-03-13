@@ -328,6 +328,8 @@ class ExtCssCombiner extends \Frontend
 			
 		foreach($GLOBALS['TL_USER_CSS'] as $key => $css)
 		{
+			$content = '';
+			
 			$arrCss = trimsplit('|', $css);
 				
 			$objFile = new \File($arrCss[0]);
