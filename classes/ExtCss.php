@@ -17,6 +17,7 @@
  */
 namespace ExtAssets;
 
+use Contao\FilesModel;
 /**
  * Class ExtCss
  *
@@ -114,6 +115,10 @@ class ExtCss extends ExtAssets
 		static::getInstance()->blnLiveMode = !$designerMode;
 	}
 
+	public static function cleanUpCssGroup($groupId)
+	{
+		// TODO: cleanup list, remove no longer existing files
+	}
 	
 	public static function observeCssGroupFolder($groupId)
 	{
@@ -150,6 +155,25 @@ class ExtCss extends ExtAssets
 			unset($arrDiff[$variablesKey]);
 		}
 		
+		// cleanup
+		foreach($arrOldFileNames as $key => $name)
+		{
+			if(file_exists(TL_ROOT . '/' . $objObserveModel->path . '/' . $name)) continue;
+			
+			$objRemoveFileModel = FilesModel::findBy('name', $name);
+			
+			if($objRemoveFileModel === null) continue;
+
+			$objRemoveFileModel->delete();
+			
+			$objRemoveExtCssFileModel = ExtCssFileModel::findBy('src', $objRemoveFileModel->uuid);
+			
+			if($objRemoveFileModel === null) continue;
+			
+			$objRemoveExtCssFileModel->delete();
+		}
+		
+		
 		if(!empty($arrDiff))
 		{
 			// add new files
@@ -157,6 +181,9 @@ class ExtCss extends ExtAssets
 			{
 				// create Files Model
 				$objFile = new \File($objObserveModel->path . '/' . $name);
+				
+				if (!in_array(strtolower($objFile->extension), array('css', 'less'))) continue;
+				
 				$objFile->close();
 				
 				$objFileModel = new \ExtCssFileModel();
