@@ -171,6 +171,8 @@ class ExtCss extends ExtAssets
 			if($objRemoveFileModel === null) continue;
 			
 			$objRemoveExtCssFileModel->delete();
+			
+			unset($arrDiff[$key]);
 		}
 		
 		
@@ -180,7 +182,7 @@ class ExtCss extends ExtAssets
 			foreach($arrDiff as $key => $name)
 			{
 				// create Files Model
-				$objFile = new \File($objObserveModel->path . '/' . $name);
+				$objFile = new \File($objObserveModel->path . '/' . $name, true);
 				
 				if (!in_array(strtolower($objFile->extension), array('css', 'less'))) continue;
 				
