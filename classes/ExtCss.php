@@ -182,7 +182,7 @@ class ExtCss extends ExtAssets
 			foreach($arrDiff as $key => $name)
 			{
 				// create Files Model
-				$objFile = new \File($objObserveModel->path . '/' . $name, true);
+				$objFile = new \File($objObserveModel->path . '/' . $name);
 				
 				if (!in_array(strtolower($objFile->extension), array('css', 'less'))) continue;
 				
