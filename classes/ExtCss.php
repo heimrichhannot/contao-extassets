@@ -155,27 +155,6 @@ class ExtCss extends ExtAssets
 			unset($arrDiff[$variablesKey]);
 		}
 		
-		// cleanup
-		foreach($arrOldFileNames as $key => $name)
-		{
-			if(file_exists(TL_ROOT . '/' . $objObserveModel->path . '/' . $name)) continue;
-			
-			$objRemoveFileModel = FilesModel::findBy('name', $name);
-			
-			if($objRemoveFileModel === null) continue;
-
-			$objRemoveFileModel->delete();
-			
-			$objRemoveExtCssFileModel = ExtCssFileModel::findBy('src', $objRemoveFileModel->uuid);
-			
-			if($objRemoveFileModel === null) continue;
-			
-			$objRemoveExtCssFileModel->delete();
-			
-			unset($arrDiff[$key]);
-		}
-		
-		
 		if(!empty($arrDiff))
 		{
 			// add new files

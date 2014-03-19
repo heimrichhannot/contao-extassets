@@ -154,13 +154,7 @@ class tl_extcss_file extends Backend
 		
 		$dca = &$GLOBALS['TL_DCA']['tl_extcss_file'];
 		
-		$observe = ExtCss::observeCssGroupFolder($dc->id);
-		
-		// if observing is enabled, disable item delete
-		if($observe)
-		{
-			unset($dca['list']['operations']['delete']);
-		}
+		ExtCss::observeCssGroupFolder($dc->id);
 	}
 	
 	/**
