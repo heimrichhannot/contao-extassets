@@ -3,6 +3,7 @@
 namespace ExtAssets;
 
 use Contao\File;
+use Contao\Environment;
 require_once TL_ROOT . "/system/modules/extassets/classes/vendor/lessphp/lessc.inc.php";
 
 class ExtCssCombiner extends \Frontend
@@ -31,7 +32,11 @@ class ExtCssCombiner extends \Frontend
 	public static $fontAwesomeCssKey = 'font-awesome';
 
 	protected $objUserCssFile; // Target File of combined less output
+	
+	public static $lessCacheDir;
 
+	protected $uriRoot;
+	
 	public $debug = false;
 
 	public function __construct(ExtCssModel $objCss, $arrReturn = array())
@@ -50,6 +55,10 @@ class ExtCssCombiner extends \Frontend
 
 		$this->objUserCssFile = new \File($this->getSrc($this->title . '.css'));;
 
+		static::$lessCacheDir = TL_ROOT . '/assets/css/lesscache';
+		
+		$this->uriRoot = (TL_ASSETS_URL ? TL_ASSETS_URL : Environment::get('url')) . '/assets/css/';
+		
 		if($this->debug)
 		{
 			$this->rewrite = true;
@@ -341,14 +350,18 @@ class ExtCssCombiner extends \Frontend
 				$content .= $this->arrCss['mixins'];
 			}
 			
-			$content .= $objFile->getContent();
 			
 			$arrCss[0] = 'assets/css/' . $objFile->name . '.css';
 			
 			$objTarget = new File($arrCss[0]);
 			
-			$lessc = new \lessc();
-			$objTarget->write($lessc->compile($content));
+			
+			$options = array('cache_dir'=> static::$lessCacheDir);
+			
+			$parser = new \Less_Parser($options);
+			$parser->parseFile($objFile->value, $this->uriRoot);
+			$parser->parse($content);
+			$objTarget->write($parser->getCss());
 			$objTarget->close();
 			
 			$GLOBALS['TL_USER_CSS'][$key] = implode('|', $arrCss);
