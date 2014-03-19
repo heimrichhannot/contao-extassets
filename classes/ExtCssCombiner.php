@@ -359,7 +359,7 @@ class ExtCssCombiner extends \Frontend
 			$options = array('cache_dir'=> static::$lessCacheDir);
 			
 			$parser = new \Less_Parser($options);
-			$parser->parseFile($objFile->value, $this->uriRoot);
+			$parser->parseFile(TL_ROOT . '/' . $objFile->value, $this->uriRoot);
 			$parser->parse($content);
 			$objTarget->write($parser->getCss());
 			$objTarget->close();
