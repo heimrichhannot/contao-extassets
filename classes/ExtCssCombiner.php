@@ -33,8 +33,6 @@ class ExtCssCombiner extends \Frontend
 
 	protected $objUserCssFile; // Target File of combined less output
 	
-	public static $lessCacheDir;
-
 	protected $uriRoot;
 	
 	public $debug = false;
@@ -55,8 +53,6 @@ class ExtCssCombiner extends \Frontend
 
 		$this->objUserCssFile = new \File($this->getSrc($this->title . '.css'));;
 
-		static::$lessCacheDir = TL_ROOT . '/assets/css/lesscache';
-		
 		$this->uriRoot = (TL_ASSETS_URL ? TL_ASSETS_URL : Environment::get('url')) . '/assets/css/';
 		
 		if($this->debug)
@@ -363,7 +359,7 @@ class ExtCssCombiner extends \Frontend
 				continue;
 			}
 			
-			$options = array('cache_dir'=> static::$lessCacheDir);
+			$options = array('cache_dir'=> TL_ROOT . '/' . LESSCSSCACHEDIR);
 			
 			$parser = new \Less_Parser($options);
 			$parser->parseFile(TL_ROOT . '/' . $objFile->value, $this->uriRoot);

@@ -28,6 +28,8 @@ define('FONTAWESOMELESSDIR', 'assets/font-awesome/less/');
 define('FONTAWESOMELESSCUSTOMDIR', 'assets/font-awesome/less/custom/');
 define('FONTAWESOMEFONTDIR', 'assets/font-awesome/fonts/');
 
+define('LESSCSSCACHEDIR', 'assets/css/lesscache/');
+
 /**
  * BACK END MODULES
  *
@@ -72,7 +74,7 @@ $GLOBALS['TL_MODELS']['tl_extjs_file'] = 'ExtAssets\ExtJsFileModel';
  * PurgeData
  */
 $GLOBALS['TL_PURGE']['folders']['less'] = array(
-	'affected'		=> array(BOOTSTRAPLESSCUSTOMDIR),
+	'affected'		=> array(BOOTSTRAPLESSCUSTOMDIR, FONTAWESOMELESSCUSTOMDIR, LESSCSSCACHEDIR, 'assets/css/'),
 	'callback'		=> array('ExtAssets\ExtAutomator', 'purgeLessCache'),
 );
 
