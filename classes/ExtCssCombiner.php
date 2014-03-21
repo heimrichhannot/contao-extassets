@@ -65,6 +65,8 @@ class ExtCssCombiner extends \Frontend
 			$this->rewriteBootstrap = true;
 		}
 
+		$start = microtime(true);
+		
 		if($this->addBootstrap)
 		{
 			$this->addBootstrapVariables();
@@ -340,7 +342,7 @@ class ExtCssCombiner extends \Frontend
 			$content = '';
 			
 			$arrCss = trimsplit('|', $css);
-				
+			
 			$objFile = new \File($arrCss[0]);
 			
 			if($this->addBootstrap)
@@ -355,6 +357,11 @@ class ExtCssCombiner extends \Frontend
 			
 			$objTarget = new File($arrCss[0]);
 			
+			if(!$this->isFileUpdated($objFile, $objTarget) && !$this->rewrite)
+			{
+				$GLOBALS['TL_USER_CSS'][$key] =  implode('|', $arrCss);
+				continue;
+			}
 			
 			$options = array('cache_dir'=> static::$lessCacheDir);
 			
