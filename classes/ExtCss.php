@@ -170,7 +170,7 @@ class ExtCss extends ExtAssets
 				$objFileModel = new \ExtCssFileModel();
 				$objFileModel->pid = $groupId;
 				$objFileModel->tstamp = time();
-				$objFileModel->sorting = 4294967295;
+				$objFileModel->sorting = ceil(4294967295 / 2);
 				$objFileModel->src = $objFile->getModel()->uuid;
 				$objFileModel->save();
 			}
@@ -273,6 +273,20 @@ class ExtCss extends ExtAssets
 			$arrHashs = array();
 
 			foreach($arrReturn[ExtCssCombiner::$bootstrapCssKey] as $arrCss)
+			{
+				if(in_array($arrCss['hash'], $arrHashs)) continue;
+				$arrUserCss[] = sprintf('%s|%s|%s|%s', $arrCss['src'], $arrCss['type'], $arrCss['mode'], $arrCss['hash']);
+				$arrHashs[] = $arrCss['hash'];
+			}
+		}
+		
+		// TODO: Refactor equal logic…
+		// at first collect bootstrap to prevent overwrite of usercss
+		if(isset($arrReturn[ExtCssCombiner::$bootstrapPrintCssKey]) && is_array($arrReturn[ExtCssCombiner::$bootstrapPrintCssKey]))
+		{
+			$arrHashs = array();
+		
+			foreach($arrReturn[ExtCssCombiner::$bootstrapPrintCssKey] as $arrCss)
 			{
 				if(in_array($arrCss['hash'], $arrHashs)) continue;
 				$arrUserCss[] = sprintf('%s|%s|%s|%s', $arrCss['src'], $arrCss['type'], $arrCss['mode'], $arrCss['hash']);

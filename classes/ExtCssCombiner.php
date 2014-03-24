@@ -26,6 +26,8 @@ class ExtCssCombiner extends \Frontend
 	public static $userCssKey = 'usercss';
 
 	public static $bootstrapCssKey = 'bootstrap';
+	
+	public static $bootstrapPrintCssKey = 'bootstrap-print';
 
 	public static $bootstrapResponsiveCssKey = 'bootstrap-responsive';
 
@@ -67,6 +69,7 @@ class ExtCssCombiner extends \Frontend
 		{
 			$this->addBootstrapVariables();
 			$this->addFontAwesomeCore();
+			$this->addBootstrapPrintCss();
 			$this->addBootstrapMixins();
 			$this->addBootstrapAlerts();
 			$this->addBootstrap();
@@ -247,6 +250,30 @@ class ExtCssCombiner extends \Frontend
 		}
 	}
 
+	protected function addBootstrapPrintCss()
+	{
+		$objFile = new \File($this->getBootstrapSrc('print.less'));
+		$objTarget = new \File($this->getSrc('bootstrap-print.css'));
+		
+		if($this->isFileUpdated($objFile, $objTarget) || $this->rewrite)
+		{
+			$options = array('cache_dir'=> TL_ROOT . '/' . LESSCSSCACHEDIR);
+				
+			$parser = new \Less_Parser($options);
+			$parser->parseFile(TL_ROOT . '/' . $objFile->value, $this->uriRoot);
+			$objTarget->write($parser->getCss());
+			$objTarget->close();
+		}
+
+		$this->arrReturn[self::$bootstrapPrintCssKey][] = array
+		(
+				'src'	=> $objTarget->value,
+				'type'	=> 'print',
+				'mode'	=> $this->mode,
+				'hash'	=> $objTarget->hash,
+		);
+	}
+	
 	protected function addFontAwesomeVariables()
 	{
 		$objFile = new \File($this->getFontAwesomeSrc('variables.less'));
