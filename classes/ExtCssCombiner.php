@@ -167,7 +167,7 @@ class ExtCssCombiner extends \Frontend
 		$this->arrReturn[self::$bootstrapCssKey][] = array
 		(
 			'src'	=> $objOut->value,
-			'type'	=> 'screen',
+			'type'	=> 'all', // 'all' is required for .hidden-print class, not 'screen'
 			'mode'	=> $this->mode,
 			'hash'	=> $objOut->hash,
 		);
