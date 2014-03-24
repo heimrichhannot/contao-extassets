@@ -22,23 +22,12 @@ class ExtAssetsRunOnce extends Controller
 
 	public function run()
 	{
-		$this->loadTwitterBootstrap();
+		$this->updateDB();
 	}
 
-	protected function loadTwitterBootstrap()
+	protected function updateDB()
 	{
-
-		if(!is_dir(ExtAssets::getAssetFolder(ExtAssets::$twitterBootstrap, true)))
-		{
-			$this->Files->mkdir(ExtAssets::getAssetFolder(ExtAssets::$twitterBootstrap));
-		}
-
-		// The assets/images folder must be writable for image*()
-		if (!is_writable(ExtAssets::getAssetFolder(ExtAssets::$twitterBootstrap, true)))
-		{
-			$this->Files->chmod(ExtAssets::getAssetFolder(ExtAssets::$twitterBootstrap), 0777);
-		}
-
+		\Database::getInstance()->prepare('UPDATE `tl_extcss_file` SET  `sorting` = 2147483648 WHERE sorting = 4294967295');
 	}
 }
 
