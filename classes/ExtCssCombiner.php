@@ -103,7 +103,7 @@ class ExtCssCombiner extends \Frontend
 		$arrReturn[self::$userCssKey][] = array
 		(
 			'src'	=> $this->objUserCssFile->value,
-			'type'	=> 'screen',
+			'type'	=> 'all', // 'all' is required by print media css 
 			'mode'	=> $this->mode,
 			'hash'	=> $this->objUserCssFile->hash,
 		);
@@ -350,7 +350,7 @@ class ExtCssCombiner extends \Frontend
 		$this->arrReturn[self::$fontAwesomeCssKey][] = array
 		(
 				'src'	=> $objOut->value,
-				'type'	=> 'screen',
+				'type'	=> 'all',
 				'mode'	=> $this->mode,
 				'hash'	=> $objOut->hash,
 		);
