@@ -239,7 +239,25 @@ class ExtCss extends ExtAssets
 
 		$objCss = ExtCssModel::findMultipleByIds(deserialize($objLayout->extcss));
 
-		if($objCss === null) return false;
+		if($objCss === null)
+		{
+			if(!is_array($GLOBALS['TL_USER_CSS']) || empty($GLOBALS['TL_USER_CSS'])) return false;
+				
+			// remove TL_USER_CSS less files, otherwise Contao Combiner fails
+			foreach($GLOBALS['TL_USER_CSS'] as $key => $css)
+			{
+				$arrCss = trimsplit('|', $css);
+				
+				$extension = substr($arrCss[0], strlen($arrCss[0]) - 4, strlen($arrCss[0]));
+				
+				if($extension == 'less')
+				{
+					unset($GLOBALS['TL_USER_CSS'][$key]);
+				}
+			}
+			
+			return false;
+		}
 
 		$arrReturn = array();
 
