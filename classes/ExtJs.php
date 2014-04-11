@@ -112,30 +112,28 @@ class ExtJs extends ExtAssets
 
 		if($objJs->addBootstrap)
 		{
-			$arrJs = $this->addTwitterBootstrap($arrJs);
+			$this->addTwitterBootstrap();
 		}
 
 		// inject extjs before other plugins, otherwise bootstrap may not work
-		$GLOBALS['TL_JAVASCRIPT'] = is_array($GLOBALS['TL_JAVASCRIPT']) ? array_merge($arrJs, $GLOBALS['TL_JAVASCRIPT']) : $arrJs;
-		
+		$GLOBALS['TL_JAVASCRIPT'] = is_array($GLOBALS['TL_JAVASCRIPT']) ? array_merge($GLOBALS['TL_JAVASCRIPT'], $arrJs) : $arrJs;
 	}
 
 	/*
 	 * TODO:
 	* - install via runonce
 	*/
-	public function addTwitterBootstrap($arrJs)
+	public function addTwitterBootstrap()
 	{
 		$in = BOOTSTRAPJSDIR . 'bootstrap.js';
 
-		if(!file_exists(TL_ROOT . '/' . $in)) return $arrJs;
+		if(!file_exists(TL_ROOT . '/' . $in)) return false;
 
 		// TODO: add css minimizer option for extcss group
 		$mode = $GLOBALS['TL_CONFIG']['gzipScripts'] ? 'static' : 'none';
 
-		array_insert($arrJs, -1, "$in|$mode");
-
-		return $arrJs;
+		// index 0 = jQuery
+		array_insert($GLOBALS['TL_JAVASCRIPT'], 1, array('bootstrap' => "$in|$mode"));
 	}
 
 }
