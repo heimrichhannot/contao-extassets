@@ -137,9 +137,13 @@ class ExtCss extends ExtAssets
 		
 		$objCssFiles = ExtCssFileModel::findBy(array('pid'), $dc->id);
 		
-		$objCssFilesModel = \FilesModel::findMultipleByUuids($objCssFiles->fetchEach('src'));
+		$arrOldFileNames = array();
 		
-		$arrOldFileNames = $objCssFilesModel->fetchEach('name');
+		if($objCssFiles !== null)
+		{
+			$objCssFilesModel = \FilesModel::findMultipleByUuids($objCssFiles->fetchEach('src'));
+			$arrOldFileNames = $objCssFilesModel->fetchEach('name');
+		}
 		
 		$arrFileNames = scan(TL_ROOT . '/' . $objObserveModel->path);
 		
