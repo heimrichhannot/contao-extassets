@@ -41,7 +41,6 @@ class ExtJs extends ExtAssets
 
 	public function hookReplaceDynamicScriptTags($strBuffer)
 	{
-		$start = microtime(true);
 		global $objPage;
 
 		if(!$objPage) return $strBuffer;
@@ -96,6 +95,7 @@ class ExtJs extends ExtAssets
 				file_put_contents(TL_ROOT . '/' . $target, $js);
 			}
 
+
 			$arrJs[] = "$target|none";
 		}
 
@@ -110,11 +110,11 @@ class ExtJs extends ExtAssets
 
 		if($objJs->addBootstrap)
 		{
-			$arrJs = $this->addTwitterBootstrap($arrJs);
+			$this->addTwitterBootstrap();
 		}
 
 		// inject extjs before other plugins, otherwise bootstrap may not work
-		$GLOBALS['TL_JAVASCRIPT'] = is_array($GLOBALS['TL_JAVASCRIPT']) ? array_merge($arrJs, $GLOBALS['TL_JAVASCRIPT']) : $arrJs;
+		$GLOBALS['TL_JAVASCRIPT'] = is_array($GLOBALS['TL_JAVASCRIPT']) ? array_merge($GLOBALS['TL_JAVASCRIPT'], $arrJs) : $arrJs;
 		
 	}
 
@@ -122,15 +122,14 @@ class ExtJs extends ExtAssets
 	 * TODO:
 	* - install via runonce
 	*/
-	public function addTwitterBootstrap($arrJs)
+	public function addTwitterBootstrap()
 	{
 		$in = BOOTSTRAPJSDIR . 'bootstrap.js';
 
-		if(!file_exists(TL_ROOT . '/' . $in)) return $arrJs;
+		if(!file_exists(TL_ROOT . '/' . $in)) return false;
 
-		array_insert($arrJs, -1, "$in|none");
-
-		return $arrJs;
+		// index 0 = jQuery
+		array_insert($GLOBALS['TL_JAVASCRIPT'], 1, array('bootstrap' => "$in|none"));
 	}
 
 }
