@@ -41,6 +41,7 @@ class ExtJs extends ExtAssets
 
 	public function hookReplaceDynamicScriptTags($strBuffer)
 	{
+		$start = microtime(true);
 		global $objPage;
 
 		if(!$objPage) return $strBuffer;
@@ -95,10 +96,7 @@ class ExtJs extends ExtAssets
 				file_put_contents(TL_ROOT . '/' . $target, $js);
 			}
 
-			// TODO: add css minimizer option for extcss group
-			$mode = $GLOBALS['TL_CONFIG']['gzipScripts'] ? 'static' : 'none';
-
-			$arrJs[] = "$target|$mode";
+			$arrJs[] = "$target|none";
 		}
 
 		// HOOK: add custom css
@@ -130,10 +128,7 @@ class ExtJs extends ExtAssets
 
 		if(!file_exists(TL_ROOT . '/' . $in)) return $arrJs;
 
-		// TODO: add css minimizer option for extcss group
-		$mode = $GLOBALS['TL_CONFIG']['gzipScripts'] ? 'static' : 'none';
-
-		array_insert($arrJs, -1, "$in|$mode");
+		array_insert($arrJs, -1, "$in|none");
 
 		return $arrJs;
 	}

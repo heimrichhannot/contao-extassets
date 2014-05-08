@@ -63,8 +63,6 @@ class ExtCssCombiner extends \Frontend
 			$this->rewriteBootstrap = true;
 		}
 
-		$start = microtime(true);
-		
 		if($this->addBootstrap)
 		{
 			$this->addBootstrapVariables();
