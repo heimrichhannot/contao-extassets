@@ -86,7 +86,7 @@ class ExtJs extends ExtAssets
 
 			if(file_exists(TL_ROOT . '/' . $target))
 			{
-				$targetFile = new File($target);
+				$targetFile = new \File($target);
 				$rewrite = !($version == $targetFile->hash);
 			}
 
@@ -96,7 +96,7 @@ class ExtJs extends ExtAssets
 			}
 
 			// TODO: add css minimizer option for extcss group
-			$mode = $GLOBALS['TL_CONFIG']['gzipScripts'] ? 'none' : 'static';
+			$mode = $GLOBALS['TL_CONFIG']['gzipScripts'] ? 'static' : 'none';
 
 			$arrJs[] = "$target|$mode";
 		}
