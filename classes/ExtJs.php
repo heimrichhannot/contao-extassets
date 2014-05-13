@@ -95,10 +95,8 @@ class ExtJs extends ExtAssets
 				file_put_contents(TL_ROOT . '/' . $target, $js);
 			}
 
-			// TODO: add css minimizer option for extcss group
-			$mode = $GLOBALS['TL_CONFIG']['gzipScripts'] ? 'static' : 'none';
 
-			$arrJs[] = "$target|$mode";
+			$arrJs[] = "$target|none";
 		}
 
 		// HOOK: add custom css
@@ -117,6 +115,7 @@ class ExtJs extends ExtAssets
 
 		// inject extjs before other plugins, otherwise bootstrap may not work
 		$GLOBALS['TL_JAVASCRIPT'] = is_array($GLOBALS['TL_JAVASCRIPT']) ? array_merge($GLOBALS['TL_JAVASCRIPT'], $arrJs) : $arrJs;
+		
 	}
 
 	/*
@@ -129,11 +128,8 @@ class ExtJs extends ExtAssets
 
 		if(!file_exists(TL_ROOT . '/' . $in)) return false;
 
-		// TODO: add css minimizer option for extcss group
-		$mode = $GLOBALS['TL_CONFIG']['gzipScripts'] ? 'static' : 'none';
-
 		// index 0 = jQuery
-		array_insert($GLOBALS['TL_JAVASCRIPT'], 1, array('bootstrap' => "$in|$mode"));
+		array_insert($GLOBALS['TL_JAVASCRIPT'], 1, array('bootstrap' => "$in|none"));
 	}
 
 }
