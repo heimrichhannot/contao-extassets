@@ -376,23 +376,30 @@ class ExtCssCombiner extends \Frontend
 			}
 			
 			
-			$arrCss[0] = 'assets/css/' . $objFile->name . '.css';
+			$arrCss[0] = 'assets/css/' . $objFile->filename . '.css';
 			
-			$objTarget = new File($arrCss[0]);
+			$objTarget = new \File($arrCss[0], false);
 			
-			if(!$this->isFileUpdated($objFile, $objTarget) && !$this->rewrite)
+			// must be set, otherwise the contao css combiner will not regenerate the css
+			$arrCss[3] = $objTarget->hash;
+			
+			if(!$this->isFileUpdated($objFile, $objTarget))
 			{
 				$GLOBALS['TL_USER_CSS'][$key] =  implode('|', $arrCss);
 				continue;
 			}
 			
-			$options = array('cache_dir'=> TL_ROOT . '/' . LESSCSSCACHEDIR);
+			$objTarget->delete();
 			
-			$parser = new \Less_Parser($options);
+			$objTarget = new \File($arrCss[0]);
+			$parser = new \Less_Parser();
 			$parser->parseFile(TL_ROOT . '/' . $objFile->value, $this->uriRoot);
 			$parser->parse($content);
 			$objTarget->write($parser->getCss());
 			$objTarget->close();
+			
+			// must be updated, otherwise the contao css combiner will not regenerate the css
+			$arrCss[3] = $objTarget->hash;
 			
 			$GLOBALS['TL_USER_CSS'][$key] = implode('|', $arrCss);
 		}
