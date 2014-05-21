@@ -74,7 +74,7 @@ class ExtJs extends ExtAssets
 			while($objFiles->next())
 			{
 				$objFile = \FilesModel::findByPk($objFiles->src);
-				if(!file_exists(TL_ROOT .'/'. $objFile->path)) continue;
+				if($objFile === null || !file_exists(TL_ROOT .'/'. $objFile->path)) continue;
 				$js .= file_get_contents($objFile->path) . "\n";
 			}
 
