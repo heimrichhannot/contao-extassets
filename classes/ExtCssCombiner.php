@@ -333,8 +333,9 @@ class ExtCssCombiner extends \Frontend
 		{
 			$strCss = $objFile->getContent();
 			
+			
 			$strCss = str_replace('@import "', '@import "../', $strCss);
-			$strCss = str_replace('../variables', $this->variablesSrc, $strCss);
+			$strCss = str_replace('../variables.less', $this->variablesSrc, $strCss);
 			
 			$objTarget->write($strCss);
 			$objTarget->close();

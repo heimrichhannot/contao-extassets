@@ -22,7 +22,7 @@ define('BOOTSTRAPLESSDIR', 'assets/bootstrap/less/');
 define('BOOTSTRAPLESSCUSTOMDIR', 'assets/bootstrap/less/custom/');
 define('BOOTSTRAPJSDIR', 'assets/bootstrap/dist/js/');
 
-define('FONTAWESOMEVERSION', 'v4.0.3');
+define('FONTAWESOMEVERSION', 'v4.1.0');
 define('FONTAWESOMEDIR', 'assets/font-awesome/');
 define('FONTAWESOMELESSDIR', 'assets/font-awesome/less/');
 define('FONTAWESOMELESSCUSTOMDIR', 'assets/font-awesome/less/custom/');
