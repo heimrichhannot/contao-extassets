@@ -130,7 +130,7 @@ $GLOBALS['TL_DCA']['tl_extcss'] = array
 					'exclude'                 => true,
 					'inputType'               => 'fileTree',
 					'eval'                    => array('fieldType'=>'radio', 'filesOnly'=>true, 'extensions'=>'css, less'),
-					'sql'                     => "binary(16) NULL"
+					'sql'                     => (version_compare(VERSION, '3.2', '<')) ? "varchar(255) NOT NULL default ''" : "binary(16) NULL"
 				),
 				'addFontAwesome' => array(
 					'label'                   => &$GLOBALS['TL_LANG']['tl_extcss']['addFontAwesome'],
@@ -144,7 +144,7 @@ $GLOBALS['TL_DCA']['tl_extcss'] = array
 						'exclude'                 => true,
 						'inputType'               => 'fileTree',
 						'eval'                    => array('fieldType'=>'radio', 'filesOnly'=>false, 'extensions'=>'css, less'),
-						'sql'                     => "binary(16) NULL"
+						'sql'                     => (version_compare(VERSION, '3.2', '<')) ? "varchar(255) NOT NULL default ''" : "binary(16) NULL"
 				),
 			)
 );
