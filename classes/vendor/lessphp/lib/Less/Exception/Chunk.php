@@ -30,6 +30,7 @@ class Less_Exception_Chunk extends Less_Exception_Parser{
 		$this->message = 'ParseError: Unexpected input'; //default message
 
 		$this->index = $index;
+
 		$this->currentFile = $currentFile;
 
 		$this->input = $input;
@@ -45,7 +46,7 @@ class Less_Exception_Chunk extends Less_Exception_Parser{
 	 * We don't actually need the chunks
 	 *
 	 */
-	function Chunks(){
+	protected function Chunks(){
 		$level = 0;
 		$parenLevel = 0;
 		$lastMultiCommentEndBrace = null;
@@ -94,7 +95,7 @@ class Less_Exception_Chunk extends Less_Exception_Parser{
 						return $this->fail("missing opening `{`");
 
 					}
-					//if (!$level) { $this->emitChunk(); }
+					//if (!$level && !$parenLevel) { $this->emitChunk(); }
 					continue;
 				// \
 				case 92:
@@ -165,15 +166,19 @@ class Less_Exception_Chunk extends Less_Exception_Parser{
 			return $this->fail("missing closing `)`", $lastParen);
 		}
 
+
+		//chunk didn't fail
+
+
 		//$this->emitChunk(true);
 	}
 
-	function CharCode($pos){
+	public function CharCode($pos){
 		return ord($this->input[$pos]);
 	}
 
 
-	function fail( $msg, $index = null ){
+	public function fail( $msg, $index = null ){
 
 		if( !$index ){
 			$this->index = $this->parserCurrentIndex;

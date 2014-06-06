@@ -21,7 +21,7 @@ class Less_Functions{
 	/**
 	 * @param string $op
 	 */
-	static public function operate( $op, $a, $b ){
+    public static function operate( $op, $a, $b ){
 		switch ($op) {
 			case '+': return $a + $b;
 			case '-': return $a - $b;
@@ -30,11 +30,15 @@ class Less_Functions{
 		}
 	}
 
-	static public function clamp($val, $max = 1){
+	public static function clamp($val, $max = 1){
 		return min( max($val, 0), $max);
 	}
 
-	static function fround( $value ){
+	public static function fround( $value ){
+
+		if( $value === 0 ){
+			return $value;
+		}
 
 		if( Less_Parser::$options['numPrecision'] ){
 			$p = pow(10, Less_Parser::$options['numPrecision']);
@@ -43,7 +47,7 @@ class Less_Functions{
 		return $value;
 	}
 
-	static public function number($n){
+    public static function number($n){
 
 		if ($n instanceof Less_Tree_Dimension) {
 			return floatval( $n->unit->is('%') ? $n->value / 100 : $n->value);
@@ -54,7 +58,7 @@ class Less_Functions{
 		}
 	}
 
-	static public function scaled($n, $size = 255 ){
+    public static function scaled($n, $size = 255 ){
 		if( $n instanceof Less_Tree_Dimension && $n->unit->is('%') ){
 			return (float)$n->value * $size / 100;
 		} else {
@@ -98,7 +102,7 @@ class Less_Functions{
 	/**
 	 * @param double $h
 	 */
-	function hsla_hue($h, $m1, $m2){
+	public function hsla_hue($h, $m1, $m2){
 		$h = $h < 0 ? $h + 1 : ($h > 1 ? $h - 1 : $h);
 		if	  ($h * 6 < 1) return $m1 + ($m2 - $m1) * $h * 6;
 		else if ($h * 2 < 1) return $m2;
@@ -190,6 +194,15 @@ class Less_Functions{
 
 	public function luma ($color) {
 		return new Less_Tree_Dimension(Less_Parser::round( $color->luma() * $color->alpha * 100), '%');
+	}
+
+	public function luminance( $color ){
+		$luminance =
+			(0.2126 * $color->rgb[0] / 255)
+		  + (0.7152 * $color->rgb[1] / 255)
+		  + (0.0722 * $color->rgb[2] / 255);
+
+		return new Less_Tree_Dimension(Less_Parser::round( $luminance * $color->alpha * 100), '%');
 	}
 
 	public function saturate($color, $amount = null){
@@ -357,32 +370,82 @@ class Less_Functions{
 	}
 
 
+	/**
+	 * todo: This function will need some additional work to make it work the same as less.js
+	 *
+	 */
+	public function replace( $string, $pattern, $replacement, $flags = null ){
+		$result = $string->value;
+
+		$expr = '/'.str_replace('/','\\/',$pattern->value).'/';
+		if( $flags && $flags->value){
+			$expr .= self::replace_flags($flags->value);
+		}
+
+		$result = preg_replace($expr,$replacement->value,$result);
+
+
+		if( property_exists($string,'quote') ){
+			return new Less_Tree_Quoted( $string->quote, $result, $string->escaped);
+		}
+		return new Less_Tree_Quoted( '', $result );
+	}
+
+	public static function replace_flags($flags){
+		$flags = str_split($flags,1);
+		$new_flags = '';
+
+		foreach($flags as $flag){
+			switch($flag){
+				case 'e':
+				case 'g':
+				break;
+
+				default:
+				$new_flags .= $flag;
+				break;
+			}
+		}
+
+		return $new_flags;
+	}
+
 	public function _percent(){
-		$quoted = func_get_arg(0);
+		$string = func_get_arg(0);
 
 		$args = func_get_args();
 		array_shift($args);
-		$str = $quoted->value;
+		$result = $string->value;
 
 		foreach($args as $arg){
-			if( preg_match('/%[sda]/i',$str, $token) ){
+			if( preg_match('/%[sda]/i',$result, $token) ){
 				$token = $token[0];
 				$value = stristr($token, 's') ? $arg->value : $arg->toCSS();
 				$value = preg_match('/[A-Z]$/', $token) ? urlencode($value) : $value;
-				$str = preg_replace('/%[sda]/i',$value, $str, 1);
+				$result = preg_replace('/%[sda]/i',$value, $result, 1);
 			}
 		}
-		$str = str_replace('%%', '%', $str);
+		$result = str_replace('%%', '%', $result);
 
-		return new Less_Tree_Quoted('"' . $str . '"', $str);
+		return new Less_Tree_Quoted( $string->quote , $result, $string->escaped);
 	}
 
-	public function unit($val, $unit = null ){
+    public function unit( $val, $unit = null) {
 		if( !($val instanceof Less_Tree_Dimension) ){
 			throw new Less_Exception_Compiler('The first argument to unit must be a number' . ($val instanceof Less_Tree_Operation ? '. Have you forgotten parenthesis?' : '.') );
 		}
-		return new Less_Tree_Dimension($val->value, $unit ? $unit->toCSS() : "");
-	}
+
+		if( $unit ){
+			if( $unit instanceof Less_Tree_Keyword ){
+				$unit = $unit->value;
+			} else {
+				$unit = $unit->toCSS();
+			}
+		} else {
+			$unit = "";
+		}
+		return new Less_Tree_Dimension($val->value, $unit );
+    }
 
 	public function convert($val, $unit){
 		return $val->convertTo($unit->value);
@@ -457,55 +520,88 @@ class Less_Functions{
 	/**
 	 * @param boolean $isMin
 	 */
-	function _minmax( $isMin, $args ){
+	private function _minmax( $isMin, $args ){
 
 		$arg_count = count($args);
 
 		if( $arg_count < 1 ){
 			throw new Less_Exception_Compiler( 'one or more arguments required');
-
-		}elseif( $arg_count === 1 ){
-			return $args[0];
-
 		}
+
+		$j = null;
+		$unitClone = null;
+		$unitStatic = null;
 
 
 		$order = array();	// elems only contains original argument values.
 		$values = array();	// key is the unit.toString() for unified tree.Dimension values,
 							// value is the index into the order array.
 
+
 		for( $i = 0; $i < $arg_count; $i++ ){
 			$current = $args[$i];
 			if( !($current instanceof Less_Tree_Dimension) ){
-				$order[] = $current;
+				if( is_array($args[$i]->value) ){
+					$args[] = $args[$i]->value;
+				}
 				continue;
 			}
-			$currentUnified = $current->unify();
-			$unit = $currentUnified->unit->toString();
 
-			if( !isset($values[$unit]) ){
+			if( $current->unit->toString() === '' && !$unitClone ){
+				$temp = new Less_Tree_Dimension($current->value, $unitClone);
+				$currentUnified = $temp->unify();
+			}else{
+				$currentUnified = $current->unify();
+			}
+
+			if( $currentUnified->unit->toString() === "" && !$unitStatic ){
+				$unit = $unitStatic;
+			}else{
+				$unit = $currentUnified->unit->toString();
+			}
+
+			if( $unit !== '' && !$unitStatic || $unit !== '' && $order[0]->unify()->unit->toString() === "" ){
+				$unitStatic = $unit;
+			}
+
+			if( $unit != '' && !$unitClone ){
+				$unitClone = $current->unit->toString();
+			}
+
+			if( isset($values['']) && $unit !== '' && $unit === $unitStatic ){
+				$j = $values[''];
+			}elseif( isset($values[$unit]) ){
+				$j = $values[$unit];
+			}else{
+
+				if( $unitStatic && $unit !== $unitStatic ){
+					throw new Less_Exception_Compiler( 'incompatible types');
+				}
 				$values[$unit] = count($order);
 				$order[] = $current;
 				continue;
 			}
 
-			$j = $values[$unit];
-			$referenceUnified = $order[$j]->unify();
+
+			if( $order[$j]->unit->toString() === "" && $unitClone ){
+				$temp = new Less_Tree_Dimension( $order[$j]->value, $unitClone);
+				$referenceUnified = $temp->unifiy();
+			}else{
+				$referenceUnified = $order[$j]->unify();
+			}
 			if( ($isMin && $currentUnified->value < $referenceUnified->value) || (!$isMin && $currentUnified->value > $referenceUnified->value) ){
 				$order[$j] = $current;
 			}
 		}
+
 		if( count($order) == 1 ){
 			return $order[0];
 		}
-
-		foreach($order as $k => $a){
-			$order[$k] = $a->toCSS();
+		$args = array();
+		foreach($order as $a){
+			$args[] = $a->toCSS($this->env);
 		}
-
-		$args = implode( Less_Environment::$_outputMap[','], $order);
-
-		return new Less_Tree_Anonymous( ($isMin ? 'min' : 'max') . '(' . $args . ')');
+		return new Less_Tree_Anonymous( ($isMin?'min(':'max(') . implode(Less_Environment::$_outputMap[','],$args).')');
 	}
 
 	public function min(){
@@ -516,6 +612,10 @@ class Less_Functions{
 	public function max(){
 		$args = func_get_args();
 		return $this->_minmax( false, $args );
+	}
+
+	public function getunit($n){
+		return new Less_Tree_Anonymous($n->unit);
 	}
 
 	public function argb($color) {
@@ -615,12 +715,12 @@ class Less_Functions{
 		return null;
 	}
 
-	function length($values){
+	public function length($values){
 		$n = (property_exists($values,'value') && is_array($values->value)) ? count($values->value) : 1;
 		return new Less_Tree_Dimension($n);
 	}
 
-	function datauri($mimetypeNode, $filePathNode = null ) {
+	public function datauri($mimetypeNode, $filePathNode = null ) {
 
 		$filePath = ( $filePathNode ? $filePathNode->value : null );
 		$mimetype = $mimetypeNode->value;
@@ -696,7 +796,7 @@ class Less_Functions{
 	}
 
 	//svg-gradient
-	function svggradient( $direction ){
+	public function svggradient( $direction ){
 
 		$throw_message = 'svg-gradient expects direction, start_color [start_position], [color position,]..., end_color [end_position]';
 		$arguments = func_get_args();
@@ -895,7 +995,7 @@ class Less_Functions{
 	}
 
 	// non-w3c functions:
-	function colorBlendAverage($cb, $cs ){
+	public function colorBlendAverage($cb, $cs ){
 		return ($cb + $cs) / 2;
 	}
 
@@ -903,7 +1003,7 @@ class Less_Functions{
 		return $this->colorBlend( array($this,'colorBlendNegation'),  $color1, $color2 );
 	}
 
-	function colorBlendNegation($cb, $cs){
+	public function colorBlendNegation($cb, $cs){
 		return 1 - abs($cb + $cs - 1);
 	}
 

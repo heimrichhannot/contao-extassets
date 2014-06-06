@@ -132,7 +132,7 @@ $GLOBALS['TL_DCA']['tl_extcss_file'] = array(
 								'mandatory' => true,
 								'extensions' => 'css, less'
 						),
-						'sql' => "binary(16) NULL"
+						'sql' => (version_compare(VERSION, '3.2', '<')) ?  "binary(16) NULL" : ''
 				)
 		)
 );

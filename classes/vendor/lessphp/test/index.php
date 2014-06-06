@@ -11,14 +11,19 @@ set_error_handler(array('ParserTest','showError'),E_ALL | E_STRICT);
 set_time_limit(60);
 //error_reporting(E_ALL | E_STRICT);
 
+$dir = dirname(dirname(__FILE__));
 
 
 //get parser
-$dir = dirname(dirname(__FILE__));
 require_once $dir.'/lib/Less/Autoloader.php';
 Less_Autoloader::register();
-
 require_once $dir.'/lessc.inc.php';
+
+
+
+//using release
+/* require_once $dir.'/test/release/Less.php'; */
+
 
 
 //get diff
@@ -246,7 +251,8 @@ class ParserTest{
 			 * Less_Cache Testing
 			Less_Cache::$cache_dir = $this->cache_dir;
 			//$cached_css_file = Less_Cache::Regen( array($file_less=>'') );
-			$cached_css_file = Less_Cache::Get( array($file_less=>'') );
+			//$options['output'] = md5($file_less).'.css';
+			$cached_css_file = Less_Cache::Get( array($file_less=>''), $options );
 			$compiled = file_get_contents( $this->cache_dir.'/'.$cached_css_file );
 			*/
 
@@ -684,8 +690,9 @@ class ParserTest{
  * Output an object in a readable format for comparison with similar output from javascript
  *
  */
-function obj($mixed){
-	static $objects = array();
+function obj($mixed, $objects = array() ){
+	$objects_before = $objects;
+
 	global $obj_buffer;
 	if( empty($obj_buffer) ){
 		$obj_buffer = "----make sure caching is turned off----\n";
@@ -696,7 +703,7 @@ function obj($mixed){
 
 
 	$exclude_keys = array('originalRuleset','currentFileInfo','lookups','index','ruleset_id','type','_rulesets','_variables','allowImports','_css','cache_string','elements_len',
-					'_oelements','first_oelements','_oelements_len','cacheable');
+					'_oelements','first_oelements','_oelements_len','cacheable', ); //'variable','combinator'
 	//$exclude_keys = array();
 
 	$type = gettype($mixed);
@@ -736,7 +743,7 @@ function obj($mixed){
 			ksort($mixed);
 			foreach($mixed as $key => $value){
 				$level++;
-				$output .= str_repeat('    ',$level) . '[' . $key . '] => ' . obj($value) . "\n";
+				$output .= str_repeat('    ',$level) . '[' . $key . '] => ' . obj($value, $objects ) . "\n";
 				$level--;
 			}
 			$output .= str_repeat('    ',$level).')';
@@ -766,6 +773,8 @@ function obj($mixed){
 		$objects = array();
 		$obj_buffer .= $output . "\n------------------------------------------------------------\n";
 	}
+
+	$objects = $objects_before;
 	return $output;
 }
 
@@ -799,10 +808,14 @@ function func_trace($len = 1){
 	$debug = debug_backtrace();
 	array_shift($debug);
 	for($i = 0; $i < $len; $i++ ){
-		$trace = $debug[$i]['file'].' @'.$debug[$i]['line'];
+		if( isset($debug[$i]['file']) ){
+			$trace = $debug[$i]['file'].' @'.$debug[$i]['line'];
+		}else{
+			$trace = $debug[$i]['class'].'::'.$debug[$i]['function'];
+		}
 		if( !in_array($trace, $traces) ){
 			msg($trace);
-			$traces[] = $trace;
+			//$traces[] = $trace;
 		}
 	}
 }
@@ -839,10 +852,8 @@ $content = ob_get_clean();
 
 		if( isset($_GET['file']) ){
 			echo '<script src="assets/lessjs-config.js"></script>';
-			//echo '<script src="assets/less-1.4.2.js"></script>';
-			//echo '<script src="assets/less-1.5.1.js"></script>';
-			//echo '<script src="assets/less-1.6.1.js"></script>';
-			echo '<script src="assets/less-1.6.3.js"></script>';
+			//echo '<script src="assets/less-1.6.3.js"></script>';
+			echo '<script src="assets/less-1.7.0.js"></script>';
 		}
 	?>
 </head>

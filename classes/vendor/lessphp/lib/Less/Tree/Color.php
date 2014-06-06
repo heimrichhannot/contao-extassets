@@ -41,7 +41,15 @@ class Less_Tree_Color extends Less_Tree{
 	}
 
 	public function luma(){
-		return (0.2126 * $this->rgb[0] / 255) + (0.7152 * $this->rgb[1] / 255) + (0.0722 * $this->rgb[2] / 255);
+		$r = $this->rgb[0] / 255;
+		$g = $this->rgb[1] / 255;
+		$b = $this->rgb[2] / 255;
+
+		$r = ($r <= 0.03928) ? $r / 12.92 : pow((($r + 0.055) / 1.055), 2.4);
+		$g = ($g <= 0.03928) ? $g / 12.92 : pow((($g + 0.055) / 1.055), 2.4);
+		$b = ($b <= 0.03928) ? $b / 12.92 : pow((($b + 0.055) / 1.055), 2.4);
+
+		return 0.2126 * $r + 0.7152 * $g + 0.0722 * $b;
 	}
 
 	/**
@@ -108,19 +116,6 @@ class Less_Tree_Color extends Less_Tree{
 			$rgb[$c] = Less_Functions::operate( $op, $this->rgb[$c], $other->rgb[$c]);
 		}
 		return new Less_Tree_Color($rgb, $alpha);
-
-
-
-		$result = array();
-
-		if (! ($other instanceof Less_Tree_Color)) {
-			$other = $other->toColor();
-		}
-
-		for ($c = 0; $c < 3; $c++) {
-			$result[$c] = Less_Functions::operate( $op, $this->rgb[$c], $other->rgb[$c]);
-		}
-		return new Less_Tree_Color($result, $this->alpha + $other->alpha);
 	}
 
 	public function toRGB(){
@@ -153,7 +148,7 @@ class Less_Tree_Color extends Less_Tree{
 	}
 
 	//Adapted from http://mjijackson.com/2008/02/rgb-to-hsl-and-rgb-to-hsv-color-model-conversion-algorithms-in-javascript
-	function toHSV() {
+    public function toHSV() {
 		$r = $this->rgb[0] / 255;
 		$g = $this->rgb[1] / 255;
 		$b = $this->rgb[2] / 255;
@@ -201,7 +196,7 @@ class Less_Tree_Color extends Less_Tree{
 			$x->alpha === $this->alpha) ? 0 : -1;
 	}
 
-	function toHex( $v ){
+    public function toHex( $v ){
 
 		$ret = '#';
 		foreach($v as $c){

@@ -107,7 +107,7 @@ class Less_Tree_Mixin_Call extends Less_Tree{
 			} else {
 				$defaultResult = $defTrue;
 				if( ($count[$defTrue] + $count[$defFalse]) > 1 ){
-					throw Exception( 'Ambiguous use of `default()` found when matching for `'. $this->format($args) + '`' );
+					throw new Exception( 'Ambiguous use of `default()` found when matching for `'. $this->format($args) + '`' );
 				}
 			}
 
@@ -124,7 +124,7 @@ class Less_Tree_Mixin_Call extends Less_Tree{
 							$mixin = new Less_Tree_Mixin_Definition('', array(), $mixin->rules, null, false);
 							$mixin->originalRuleset = $mixins[$m]->originalRuleset;
 						}
-						$rules = array_merge($rules, $mixin->compile($env, $args, $this->important)->rules);
+						$rules = array_merge($rules, $mixin->evalCall($env, $args, $this->important)->rules);
 					} catch (Exception $e) {
 						//throw new Less_Exception_Compiler($e->getMessage(), $e->index, null, $this->currentFileInfo['filename']);
 						throw new Less_Exception_Compiler($e->getMessage(), null, null, $this->currentFileInfo);
@@ -145,7 +145,7 @@ class Less_Tree_Mixin_Call extends Less_Tree{
 			throw new Less_Exception_Compiler('No matching definition was found for `'.$this->Format( $args ).'`', null, $this->index, $this->currentFileInfo);
 
 		}else{
-			throw new Less_Exception_Compiler(trim($this->selector->toCSS()) . " is undefined", null, $this->index);
+			throw new Less_Exception_Compiler(trim($this->selector->toCSS()) . " is undefined in ".$this->currentFileInfo['filename'], null, $this->index);
 		}
 
 	}
