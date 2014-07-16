@@ -84,7 +84,7 @@ class ExtJs extends ExtAssets
 			$target = 'assets/js/' . $objJs->title . '.js';
 
 			$rewrite = true;
-			$version = md5($css);
+			$version = md5($js);
 
 			if(file_exists(TL_ROOT . '/' . $target))
 			{
