@@ -14,8 +14,14 @@ class ExtAssets extends \Frontend
 		$this->initFontAwesome();
 	}
 
-	protected function initBootstrap()
+	public static function initBootstrap($replace=false)
 	{
+        if($replace && is_dir(TL_ROOT . '/' . BOOTSTRAPDIR))
+        {
+            $objFolder = new \Folder(TL_ROOT . '/' . BOOTSTRAPDIR);
+            $objFolder->delete();
+        }
+
 		// download boostrap if folder doesn't exist
 		if(!is_dir(TL_ROOT . '/' . BOOTSTRAPDIR))
 		{
@@ -45,8 +51,14 @@ class ExtAssets extends \Frontend
 		}
 	}
 
-	protected function initFontAwesome()
+    public static function initFontAwesome($replace=false)
 	{
+        if($replace && is_dir(TL_ROOT . '/' . FONTAWESOMEDIR))
+        {
+            $objFolder = new \Folder(TL_ROOT . '/' . FONTAWESOMEDIR);
+            $objFolder->delete();
+        }
+
 		// download font-awesome if folder doesn't exist
 		if(!is_dir(TL_ROOT . '/' . FONTAWESOMEDIR))
 		{

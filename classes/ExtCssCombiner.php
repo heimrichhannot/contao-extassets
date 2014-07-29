@@ -216,9 +216,28 @@ class ExtCssCombiner extends \Frontend
 	 */
 	protected function addBootstrapMixins()
 	{
-		$objFile = new \File($this->getBootstrapSrc('mixins.less'));
+        $objFile = new \File($this->getBootstrapSrc('mixins.less'));
 
-		if($objFile->size > 0)
+        if(str_replace('v', '', BOOTSTRAPVERSION) >= '3.2.0')
+        {
+            preg_match_all('/@import "(.*)";/', $objFile->getContent(), $arrImports);
+
+            if(is_array($arrImports[1]))
+            {
+                foreach($arrImports[1] as $strFile)
+                {
+                    if(!file_exists(TL_ROOT . '/' . BOOTSTRAPLESSDIR . '/' . $strFile)) continue;
+
+                    $objMixinFile = new \File(BOOTSTRAPLESSDIR . '/' . $strFile);
+                    $this->arrCss['mixins'] .= $objMixinFile->getContent();
+                }
+            }
+
+            return;
+        }
+
+
+        if($objFile->size > 0)
 		{
 			$this->arrCss['mixins'] = $objFile->getContent();
 		}
