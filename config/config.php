@@ -16,7 +16,7 @@
  */
 define('CSSDIR', 'assets/css/');
 
-define('BOOTSTRAPVERSION', 'v3.1.1');
+define('BOOTSTRAPVERSION', 'v3.2.0');
 define('BOOTSTRAPDIR', 'assets/bootstrap/');
 define('BOOTSTRAPLESSDIR', 'assets/bootstrap/less/');
 define('BOOTSTRAPLESSCUSTOMDIR', 'assets/bootstrap/less/custom/');
