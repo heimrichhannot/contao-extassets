@@ -393,29 +393,36 @@ class ExtCssCombiner extends \Frontend
 				$content .= $this->arrCss['mixins'];
 			}
 			
-			
+			if($this->addFontAwesome)
+			{
+				$content .= $this->arrCss['core-fontawesome'];
+				$content .= $this->arrCss['variables-fontawesome'];
+				$content .= $this->arrCss['icons-fontawesome'];
+				$content .= $this->arrCss['mixins-fontawesome'];
+			}
+
 			$arrCss[0] = 'assets/css/' . $objFile->filename . '.css';
 			
 			$objTarget = new \File($arrCss[0], false);
-			
+
 			// must be set, otherwise the contao css combiner will not regenerate the css
 			$arrCss[3] = $objTarget->hash;
-			
+
 			if(!$this->isFileUpdated($objFile, $objTarget))
 			{
 				$GLOBALS['TL_USER_CSS'][$key] =  implode('|', $arrCss);
 				continue;
 			}
-			
+
 			$objTarget->delete();
-			
+
 			$objTarget = new \File($arrCss[0]);
 			$parser = new \Less_Parser();
-			$parser->parseFile(TL_ROOT . '/' . $objFile->value, $this->uriRoot);
 			$parser->parse($content);
+			$parser->parseFile(TL_ROOT . '/' . $objFile->value, $this->uriRoot);
 			$objTarget->write($parser->getCss());
 			$objTarget->close();
-			
+
 			// must be updated, otherwise the contao css combiner will not regenerate the css
 			$arrCss[3] = $objTarget->hash;
 			
