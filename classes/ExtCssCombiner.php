@@ -51,11 +51,16 @@ class ExtCssCombiner extends \Frontend
 
 		$this->arrReturn = $arrReturn;
 
-		$this->checkModelUpdate();
-
 		$this->variablesSrc = 'variables-' . $this->title . '.less';
 
 		$this->objUserCssFile = new \File($this->getSrc($this->title . '.css'));;
+
+		// rewrite if group css is empty // created recently
+		if($this->objUserCssFile->size == 0)
+		{
+			$this->rewrite = true;
+			$this->rewriteBootstrap = true;
+		}
 
 		$this->uriRoot = (TL_ASSETS_URL ? TL_ASSETS_URL : Environment::get('url')) . '/assets/css/';
 
@@ -399,27 +404,6 @@ class ExtCssCombiner extends \Frontend
 			$this->arrCss[$key] = $strContent;
 
 			unset($GLOBALS['TL_USER_CSS'][$key]);
-		}
-	}
-
-	/**
-	 * If ExtCss Model has changed set:
-	 * - $this->rewrite
-	 * - $this->rewriteBootstrap
-	 * to true. Bootstrap and default Files update will be forced.
-	 */
-	protected function checkModelUpdate()
-	{
-		$objFile = new ExtHashFile($this->getSrc($this->title));
-
-		$strHash = $objFile->getHash();
-
-		// hash not set yet, file recently created new
-		if(empty($strHash) || $this->tstamp > $strHash)
-		{
-			$this->rewrite = true;
-			$this->rewriteBootstrap = true;
-			$objFile->write($this->tstamp);
 		}
 	}
 
