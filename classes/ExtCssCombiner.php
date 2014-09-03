@@ -37,7 +37,9 @@ class ExtCssCombiner extends \Frontend
 	
 	protected $uriRoot;
 	
-	public $debug = false;
+	public $debug = true;
+
+	protected $objLess;
 
 	public function __construct(ExtCssModel $objCss, $arrReturn = array())
 	{
@@ -56,7 +58,9 @@ class ExtCssCombiner extends \Frontend
 		$this->objUserCssFile = new \File($this->getSrc($this->title . '.css'));;
 
 		$this->uriRoot = (TL_ASSETS_URL ? TL_ASSETS_URL : Environment::get('url')) . '/assets/css/';
-		
+
+		$this->objLess = new \lessc();
+
 		if($this->debug)
 		{
 			$this->rewrite = true;
@@ -82,7 +86,7 @@ class ExtCssCombiner extends \Frontend
 			$this->addFontAwesome();
 		}
 		
-		$this->transformUserLessFilesToCss();
+		$this->addCustomLessFiles();
 
 		$this->addCssFiles();
 	}
@@ -93,8 +97,7 @@ class ExtCssCombiner extends \Frontend
 
 		if(is_array($this->arrCss) && !empty($this->arrCss) && ($this->rewrite || $this->rewriteBootstrap))
 		{
-			$lessc = new \lessc();
-			$strCss = $lessc->compile(implode("\n", $this->arrCss));
+			$strCss = $this->objLess->compile(implode("\n", $this->arrCss));
 			$this->objUserCssFile->write($strCss);
 		}
 
@@ -374,59 +377,28 @@ class ExtCssCombiner extends \Frontend
 		);
 	}
 	
-	protected function transformUserLessFilesToCss()
+	protected function addCustomLessFiles()
 	{
 		if(!is_array($GLOBALS['TL_USER_CSS']) || empty($GLOBALS['TL_USER_CSS'])) return false;
-			
+
 		foreach($GLOBALS['TL_USER_CSS'] as $key => $css)
 		{
-			$content = '';
-			
 			$arrCss = trimsplit('|', $css);
 
 			$objFile = new \File($arrCss[0]);
 
-			$arrCss[0] = 'assets/css/' . $objFile->filename . '.css';
+			$strContent = $objFile->getContent();
 
-			$objTarget = new \File($arrCss[0], false);
+			$hasImports = preg_match_all('!@import(\s+)?(\'|")(.+)(\'|");!U', $strContent, $arrImport);
 
-			// must be set, otherwise the contao css combiner will not regenerate the css
-			$arrCss[3] = $objTarget->hash;
-
-			if(!$this->isFileUpdated($objFile, $objTarget))
+			if($hasImports)
 			{
-				$GLOBALS['TL_USER_CSS'][$key] =  implode('|', $arrCss);
-				continue;
+				$this->objLess->addImportDir($objFile->dirname);
 			}
 
-			$objTarget->delete();
+			$this->arrCss[$key] = $strContent;
 
-			if($this->addBootstrap)
-			{
-				$content .= $this->arrCss['variables'];
-				$content .= $this->arrCss['utilities'];
-				$content .= $this->arrCss['mixins'];
-			}
-			
-			if($this->addFontAwesome)
-			{
-				$content .= $this->arrCss['core-fontawesome'];
-				$content .= $this->arrCss['variables-fontawesome'];
-				$content .= $this->arrCss['icons-fontawesome'];
-				$content .= $this->arrCss['mixins-fontawesome'];
-			}
-
-			$objTarget = new \File($arrCss[0]);
-			$parser = new \Less_Parser();
-			$parser->parse($content);
-			$parser->parseFile(TL_ROOT . '/' . $objFile->value, $this->uriRoot);
-			$objTarget->write($parser->getCss());
-			$objTarget->close();
-
-			// must be updated, otherwise the contao css combiner will not regenerate the css
-			$arrCss[3] = $objTarget->hash;
-			
-			$GLOBALS['TL_USER_CSS'][$key] = implode('|', $arrCss);
+			unset($GLOBALS['TL_USER_CSS'][$key]);
 		}
 	}
 
