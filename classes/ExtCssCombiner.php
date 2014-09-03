@@ -37,7 +37,7 @@ class ExtCssCombiner extends \Frontend
 	
 	protected $uriRoot;
 	
-	public $debug = true;
+	public $debug = false;
 
 	protected $objLess;
 
