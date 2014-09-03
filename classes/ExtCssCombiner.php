@@ -383,7 +383,7 @@ class ExtCssCombiner extends \Frontend
 			$content = '';
 			
 			$arrCss = trimsplit('|', $css);
-			
+
 			$objFile = new \File($arrCss[0]);
 
 			$arrCss[0] = 'assets/css/' . $objFile->filename . '.css';
