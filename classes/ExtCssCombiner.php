@@ -391,6 +391,11 @@ class ExtCssCombiner extends \Frontend
 			$arrCss = trimsplit('|', $css);
 
 			$objFile = new \File($arrCss[0]);
+			
+			if($this->isFileUpdated($objFile, $this->objUserCssFile))
+			{
+				$this->rewrite = true;
+			}
 
 			$strContent = $objFile->getContent();
 
