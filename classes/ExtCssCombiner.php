@@ -130,6 +130,8 @@ class ExtCssCombiner extends \Frontend
 
 			if($objFileModel === null) continue;
 
+			if(!file_exists(TL_ROOT . '/' . $objFileModel->path)) continue;
+
 			$objFile = new \File($objFileModel->path);
 
 			if($objFile->size == 0) continue;
@@ -148,6 +150,8 @@ class ExtCssCombiner extends \Frontend
 		$objFile = new \File($this->getBootstrapSrc('bootstrap.less'));
 		$objTarget = new \File($this->getBootstrapCustomSrc('bootstrap-' . $this->title .  '.less'));
 		$objOut = new \File($this->getSrc('bootstrap-' . $this->title .  '.css'), true);
+
+		//$this->objLess->addImportDir($objFile->dirname);
 
 		if($this->rewriteBootstrap || !$objOut->exists())
 		{
@@ -399,6 +403,7 @@ class ExtCssCombiner extends \Frontend
 
 			$strContent = $objFile->getContent();
 
+			// replace variables.less by custom variables.less
 			$hasImports = preg_match_all('!@import(\s+)?(\'|")(.+)(\'|");!U', $strContent, $arrImport);
 
 			if($hasImports)

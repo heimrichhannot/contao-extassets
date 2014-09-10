@@ -125,7 +125,7 @@ class ExtCss extends ExtAssets
 		$objCss = ExtCssModel::findByPk($groupId);
 
 		if($objCss === null || $objCss->observeFolderSRC == '') return false;
-		
+
 		$objObserveModel = \FilesModel::findByUuid($objCss->observeFolderSRC);
 		
 		if($objObserveModel === null || !is_dir(TL_ROOT . '/' . $objObserveModel->path)) return false;
@@ -135,7 +135,7 @@ class ExtCss extends ExtAssets
 		// check if folder content has updated
 		if($lastUpdate <= $objObserveModel->tstamp) return false;
 		
-		$objCssFiles = ExtCssFileModel::findBy(array('pid'), $dc->id);
+		$objCssFiles = ExtCssFileModel::findBy(array('pid'), $groupId);
 		
 		$arrOldFileNames = array();
 		
