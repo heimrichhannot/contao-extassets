@@ -4,7 +4,9 @@ namespace ExtAssets;
 
 use Contao\File;
 use Contao\Environment;
+
 require_once TL_ROOT . "/system/modules/extassets/classes/vendor/lessphp/lessc.inc.php";
+require_once TL_ROOT . "/system/modules/extassets/classes/vendor/php-css-splitter/src/Splitter.php";
 
 class ExtCssCombiner extends \Frontend
 {
@@ -26,7 +28,7 @@ class ExtCssCombiner extends \Frontend
 	public static $userCssKey = 'usercss';
 
 	public static $bootstrapCssKey = 'bootstrap';
-	
+
 	public static $bootstrapPrintCssKey = 'bootstrap-print';
 
 	public static $bootstrapResponsiveCssKey = 'bootstrap-responsive';
@@ -34,9 +36,9 @@ class ExtCssCombiner extends \Frontend
 	public static $fontAwesomeCssKey = 'font-awesome';
 
 	protected $objUserCssFile; // Target File of combined less output
-	
+
 	protected $uriRoot;
-	
+
 	public $debug = false;
 
 	protected $objLess;
@@ -56,9 +58,8 @@ class ExtCssCombiner extends \Frontend
 		$this->objUserCssFile = new \File($this->getSrc($this->title . '.css'));;
 
 		// rewrite if group css is empty // created recently
-		if($this->objUserCssFile->size == 0)
-		{
-			$this->rewrite = true;
+		if ($this->objUserCssFile->size == 0) {
+			$this->rewrite          = true;
 			$this->rewriteBootstrap = true;
 		}
 
@@ -66,14 +67,12 @@ class ExtCssCombiner extends \Frontend
 
 		$this->objLess = new \lessc();
 
-		if($this->debug)
-		{
-			$this->rewrite = true;
+		if ($this->debug) {
+			$this->rewrite          = true;
 			$this->rewriteBootstrap = true;
 		}
 
-		if($this->addBootstrap)
-		{
+		if ($this->addBootstrap) {
 			$this->addBootstrapVariables();
 			$this->addFontAwesomeCore();
 			$this->addBootstrapPrintCss();
@@ -83,14 +82,13 @@ class ExtCssCombiner extends \Frontend
 			$this->addBootstrapUtilities();
 		}
 
-		if($this->addFontAwesome)
-		{
+		if ($this->addFontAwesome) {
 			$this->addFontAwesomeVariables();
 			$this->addFontAwesomeIcons();
 			$this->addFontAwesomeMixins();
 			$this->addFontAwesome();
 		}
-		
+
 		$this->addCustomLessFiles();
 
 		$this->addCssFiles();
@@ -100,19 +98,48 @@ class ExtCssCombiner extends \Frontend
 	{
 		$arrReturn = $this->arrReturn;
 
-		if(is_array($this->arrCss) && !empty($this->arrCss) && ($this->rewrite || $this->rewriteBootstrap))
-		{
+		$strCss = $this->objUserCssFile->getContent();
+
+		if (is_array($this->arrCss) && !empty($this->arrCss) && ($this->rewrite || $this->rewriteBootstrap)) {
+
 			$strCss = $this->objLess->compile(implode("\n", $this->arrCss));
 			$this->objUserCssFile->write($strCss);
 		}
 
-		$arrReturn[self::$userCssKey][] = array
-		(
-			'src'	=> $this->objUserCssFile->value,
-			'type'	=> 'all', // 'all' is required by print media css 
-			'mode'	=> $this->mode,
-			'hash'	=> $this->objUserCssFile->hash,
-		);
+		$splitter = new \CssSplitter\Splitter();
+		$count    = $splitter->countSelectors($strCss);
+
+		// IE 6 - 9 has a limit of 4096 selectors
+		if ($count > 0) {
+			$parts = ceil($count / 4095);
+			for($i = 1; $i <= $parts; $i++)
+			{
+				$objFile = new \File("assets/css/$this->title-part-{$i}.css");
+				$objFile->write($splitter->split($strCss, $i));
+				$objFile->close();
+
+				$arrReturn[self::$userCssKey][] = array
+				(
+					'src'  => $objFile->value,
+					'type' => 'all', // 'all' is required by print media css
+					'mode' => $this->mode,
+					'hash' => $objFile->hash,
+				);
+			}
+
+		}
+		else{
+			$this->objUserCssFile->write($strCss);
+
+			$arrReturn[self::$userCssKey][] = array
+			(
+				'src'  => $this->objUserCssFile->value,
+				'type' => 'all', // 'all' is required by print media css
+				'mode' => $this->mode,
+				'hash' => $this->objUserCssFile->hash,
+			);
+		}
+
 
 		return $arrReturn;
 	}
@@ -122,22 +149,20 @@ class ExtCssCombiner extends \Frontend
 	{
 		$objFiles = ExtCssFileModel::findMultipleByPid($this->id);
 
-		if($objFiles === null) return false;
+		if ($objFiles === null) return false;
 
-		while($objFiles->next())
-		{
+		while ($objFiles->next()) {
 			$objFileModel = \FilesModel::findByPk($objFiles->src);
 
-			if($objFileModel === null) continue;
+			if ($objFileModel === null) continue;
 
-			if(!file_exists(TL_ROOT . '/' . $objFileModel->path)) continue;
+			if (!file_exists(TL_ROOT . '/' . $objFileModel->path)) continue;
 
 			$objFile = new \File($objFileModel->path);
 
-			if($objFile->size == 0) continue;
+			if ($objFile->size == 0) continue;
 
-			if($this->isFileUpdated($objFile, $this->objUserCssFile) || $this->rewrite)
-			{
+			if ($this->isFileUpdated($objFile, $this->objUserCssFile) || $this->rewrite) {
 				$this->rewrite = true;
 			}
 
@@ -147,28 +172,26 @@ class ExtCssCombiner extends \Frontend
 
 	protected function addBootstrap()
 	{
-		$objFile = new \File($this->getBootstrapSrc('bootstrap.less'));
-		$objTarget = new \File($this->getBootstrapCustomSrc('bootstrap-' . $this->title .  '.less'));
-		$objOut = new \File($this->getSrc('bootstrap-' . $this->title .  '.css'), true);
+		$objFile   = new \File($this->getBootstrapSrc('bootstrap.less'));
+		$objTarget = new \File($this->getBootstrapCustomSrc('bootstrap-' . $this->title . '.less'));
+		$objOut    = new \File($this->getSrc('bootstrap-' . $this->title . '.css'), true);
 
 		//$this->objLess->addImportDir($objFile->dirname);
 
-		if($this->rewriteBootstrap || !$objOut->exists())
-		{
+		if ($this->rewriteBootstrap || !$objOut->exists()) {
 			$strCss = $objFile->getContent();
 
 			$strCss = str_replace('@import "', '@import "../', $strCss);
 
 
-			if($this->bootstrapVariablesSRC)
-			{
+			if ($this->bootstrapVariablesSRC) {
 				$strCss = str_replace('../variables.less', $this->variablesSrc, $strCss);
 			}
 
 			$objTarget->write($strCss);
 			$objTarget->close();
 
-			$lessc = new \lessc();
+			$lessc  = new \lessc();
 			$strCss = $lessc->compileFile(TL_ROOT . '/' . $objTarget->value, TL_ROOT . '/' . $objOut->value);
 
 			$objOut = new \File($objOut->value);
@@ -176,10 +199,10 @@ class ExtCssCombiner extends \Frontend
 
 		$this->arrReturn[self::$bootstrapCssKey][] = array
 		(
-			'src'	=> $objOut->value,
-			'type'	=> 'all', // 'all' is required for .hidden-print class, not 'screen'
-			'mode'	=> $this->mode,
-			'hash'	=> $objOut->hash,
+			'src'  => $objOut->value,
+			'type' => 'all', // 'all' is required for .hidden-print class, not 'screen'
+			'mode' => $this->mode,
+			'hash' => $objOut->hash,
 		);
 	}
 
@@ -191,25 +214,22 @@ class ExtCssCombiner extends \Frontend
 	{
 		$objFile = new \File($this->getBootstrapSrc('variables.less'));
 
-		if($objFile->size > 0)
-		{
+		if ($objFile->size > 0) {
 			$this->arrCss['variables'] = $objFile->getContent();
 		}
 
-		if(!$this->bootstrapVariablesSRC) return false;
+		if (!$this->bootstrapVariablesSRC) return false;
 
 		$objTarget = new \File($this->getBootstrapCustomSrc($this->variablesSrc));
 
 		// overwrite bootstrap variables with custom variables
 		$objFileModel = \FilesModel::findByPk($this->bootstrapVariablesSRC);
 
-		if($objFileModel !== false)
-		{
+		if ($objFileModel !== false) {
 			$objFile = new \File($objFileModel->path);
 
-			if($this->isFileUpdated($objFile, $objTarget))
-			{
-				$this->rewrite = true;
+			if ($this->isFileUpdated($objFile, $objTarget)) {
+				$this->rewrite          = true;
 				$this->rewriteBootstrap = true;
 				$this->arrCss['variables'] .= "\n" . $objFile->getContent();
 			} else {
@@ -217,8 +237,7 @@ class ExtCssCombiner extends \Frontend
 			}
 		}
 
-		if($this->rewriteBootstrap)
-		{
+		if ($this->rewriteBootstrap) {
 			$objTarget->write($this->arrCss['variables']);
 		}
 	}
@@ -228,29 +247,25 @@ class ExtCssCombiner extends \Frontend
 	 */
 	protected function addBootstrapMixins()
 	{
-        $objFile = new \File($this->getBootstrapSrc('mixins.less'));
+		$objFile = new \File($this->getBootstrapSrc('mixins.less'));
 
-        if(str_replace('v', '', BOOTSTRAPVERSION) >= '3.2.0')
-        {
-            preg_match_all('/@import "(.*)";/', $objFile->getContent(), $arrImports);
+		if (str_replace('v', '', BOOTSTRAPVERSION) >= '3.2.0') {
+			preg_match_all('/@import "(.*)";/', $objFile->getContent(), $arrImports);
 
-            if(is_array($arrImports[1]))
-            {
-                foreach($arrImports[1] as $strFile)
-                {
-                    if(!file_exists(TL_ROOT . '/' . BOOTSTRAPLESSDIR . '/' . $strFile)) continue;
+			if (is_array($arrImports[1])) {
+				foreach ($arrImports[1] as $strFile) {
+					if (!file_exists(TL_ROOT . '/' . BOOTSTRAPLESSDIR . '/' . $strFile)) continue;
 
-                    $objMixinFile = new \File(BOOTSTRAPLESSDIR . '/' . $strFile);
-                    $this->arrCss['mixins'] .= $objMixinFile->getContent();
-                }
-            }
+					$objMixinFile = new \File(BOOTSTRAPLESSDIR . '/' . $strFile);
+					$this->arrCss['mixins'] .= $objMixinFile->getContent();
+				}
+			}
 
-            return;
-        }
+			return;
+		}
 
 
-        if($objFile->size > 0)
-		{
+		if ($objFile->size > 0) {
 			$this->arrCss['mixins'] = $objFile->getContent();
 		}
 	}
@@ -262,8 +277,7 @@ class ExtCssCombiner extends \Frontend
 	{
 		$objFile = new \File($this->getBootstrapSrc('alerts.less'));
 
-		if($objFile->size > 0)
-		{
+		if ($objFile->size > 0) {
 			$this->arrCss['alerts'] = $objFile->getContent();
 		}
 	}
@@ -273,21 +287,19 @@ class ExtCssCombiner extends \Frontend
 	{
 		$objFile = new \File($this->getBootstrapSrc('utilities.less'));
 
-		if($objFile->size > 0)
-		{
+		if ($objFile->size > 0) {
 			$this->arrCss['utilities'] = $objFile->getContent();
 		}
 	}
 
 	protected function addBootstrapPrintCss()
 	{
-		$objFile = new \File($this->getBootstrapSrc('print.less'));
+		$objFile   = new \File($this->getBootstrapSrc('print.less'));
 		$objTarget = new \File($this->getSrc('bootstrap-print.css'));
-		
-		if($this->isFileUpdated($objFile, $objTarget) || $this->rewrite)
-		{
-			$options = array('cache_dir'=> TL_ROOT . '/' . LESSCSSCACHEDIR);
-				
+
+		if ($this->isFileUpdated($objFile, $objTarget) || $this->rewrite) {
+			$options = array('cache_dir' => TL_ROOT . '/' . LESSCSSCACHEDIR);
+
 			$parser = new \Less_Parser($options);
 			$parser->parseFile(TL_ROOT . '/' . $objFile->value, $this->uriRoot);
 			$objTarget->write($parser->getCss());
@@ -296,27 +308,25 @@ class ExtCssCombiner extends \Frontend
 
 		$this->arrReturn[self::$bootstrapPrintCssKey][] = array
 		(
-				'src'	=> $objTarget->value,
-				'type'	=> 'print',
-				'mode'	=> $this->mode,
-				'hash'	=> $objTarget->hash,
+			'src'  => $objTarget->value,
+			'type' => 'print',
+			'mode' => $this->mode,
+			'hash' => $objTarget->hash,
 		);
 	}
-	
+
 	protected function addFontAwesomeVariables()
 	{
-		$objFile = new \File($this->getFontAwesomeSrc('variables.less'));
+		$objFile   = new \File($this->getFontAwesomeSrc('variables.less'));
 		$objTarget = new \File($this->getFontAwesomeCustomSrc($this->variablesSrc), true);
 
-		if($objFile->size > 0)
-		{
+		if ($objFile->size > 0) {
 			$this->arrCss['variables-fontawesome'] = $objFile->getContent();
 			// change font path
 			$this->arrCss['variables-fontawesome'] = str_replace("../fonts", '/' . rtrim(FONTAWESOMEFONTDIR, '/'), $this->arrCss['variables-fontawesome']);
 		}
 
-		if(!$objTarget->exists() || $objTarget->size == 0)
-		{
+		if (!$objTarget->exists() || $objTarget->size == 0) {
 			\File::putContent($this->getFontAwesomeCustomSrc($this->variablesSrc), $this->arrCss['variables-fontawesome']);
 		}
 	}
@@ -324,54 +334,50 @@ class ExtCssCombiner extends \Frontend
 	protected function addFontAwesomeCore()
 	{
 		$objFile = new \File($this->getFontAwesomeSrc('core.less'));
-	
-		if($objFile->size > 0)
-		{
+
+		if ($objFile->size > 0) {
 			$this->arrCss['core-fontawesome'] = $objFile->getContent();
 		}
 	}
-	
+
 	protected function addFontAwesomeMixins()
 	{
 		$objFile = new \File($this->getFontAwesomeSrc('mixins.less'));
 
-		if($objFile->size > 0)
-		{
+		if ($objFile->size > 0) {
 			$this->arrCss['mixins-fontawesome'] = $objFile->getContent();
 		}
 	}
-	
+
 	/**
 	 * Font-Awesome 4.0 support for less icons
 	 */
 	protected function addFontAwesomeIcons()
 	{
 		$objFile = new \File($this->getFontAwesomeSrc('icons.less'));
-	
-		if($objFile->size > 0)
-		{
+
+		if ($objFile->size > 0) {
 			$this->arrCss['icons-fontawesome'] = $objFile->getContent();
 		}
 	}
 
 	protected function addFontAwesome()
 	{
-		$objFile = new \File($this->getFontAwesomeSrc('font-awesome.less'));
-		$objTarget = new \File($this->getFontAwesomeCustomSrc('font-awesome-' . $this->title .  '.less'));
-		$objOut = new \File($this->getSrc('font-awesome-' . $this->title .  '.css'), true);
+		$objFile   = new \File($this->getFontAwesomeSrc('font-awesome.less'));
+		$objTarget = new \File($this->getFontAwesomeCustomSrc('font-awesome-' . $this->title . '.less'));
+		$objOut    = new \File($this->getSrc('font-awesome-' . $this->title . '.css'), true);
 
-		if($this->rewrite || !$objOut->exists() || $objTarget->size == 0 || $objOut->size == 0 )
-		{
+		if ($this->rewrite || !$objOut->exists() || $objTarget->size == 0 || $objOut->size == 0) {
 			$strCss = $objFile->getContent();
-			
-			
+
+
 			$strCss = str_replace('@import "', '@import "../', $strCss);
 			$strCss = str_replace('../variables.less', $this->variablesSrc, $strCss);
-			
+
 			$objTarget->write($strCss);
 			$objTarget->close();
-			
-			$lessc = new \lessc();
+
+			$lessc  = new \lessc();
 			$strCss = $lessc->compileFile(TL_ROOT . '/' . $objTarget->value, TL_ROOT . '/' . $objOut->value);
 
 			$objOut = new \File($objOut->value);
@@ -379,25 +385,23 @@ class ExtCssCombiner extends \Frontend
 
 		$this->arrReturn[self::$fontAwesomeCssKey][] = array
 		(
-				'src'	=> $objOut->value,
-				'type'	=> 'all',
-				'mode'	=> $this->mode,
-				'hash'	=> $objOut->hash,
+			'src'  => $objOut->value,
+			'type' => 'all',
+			'mode' => $this->mode,
+			'hash' => $objOut->hash,
 		);
 	}
-	
+
 	protected function addCustomLessFiles()
 	{
-		if(!is_array($GLOBALS['TL_USER_CSS']) || empty($GLOBALS['TL_USER_CSS'])) return false;
+		if (!is_array($GLOBALS['TL_USER_CSS']) || empty($GLOBALS['TL_USER_CSS'])) return false;
 
-		foreach($GLOBALS['TL_USER_CSS'] as $key => $css)
-		{
+		foreach ($GLOBALS['TL_USER_CSS'] as $key => $css) {
 			$arrCss = trimsplit('|', $css);
 
 			$objFile = new \File($arrCss[0]);
-			
-			if($this->isFileUpdated($objFile, $this->objUserCssFile))
-			{
+
+			if ($this->isFileUpdated($objFile, $this->objUserCssFile)) {
 				$this->rewrite = true;
 			}
 
@@ -406,8 +410,7 @@ class ExtCssCombiner extends \Frontend
 			// replace variables.less by custom variables.less
 			$hasImports = preg_match_all('!@import(\s+)?(\'|")(.+)(\'|");!U', $strContent, $arrImport);
 
-			if($hasImports)
-			{
+			if ($hasImports) {
 				$this->objLess->addImportDir($objFile->dirname);
 			}
 
@@ -419,13 +422,12 @@ class ExtCssCombiner extends \Frontend
 
 	protected function isFileUpdated(\File $objFile, \File $objTarget)
 	{
-		return($objFile->size > 0 && ($this->rewrite || $this->rewriteBootstrap || $objFile->mtime > $objTarget->mtime));
+		return ($objFile->size > 0 && ($this->rewrite || $this->rewriteBootstrap || $objFile->mtime > $objTarget->mtime));
 	}
 
 	public function __get($strKey)
 	{
-		if (isset($this->arrData[$strKey]))
-		{
+		if (isset($this->arrData[$strKey])) {
 			return $this->arrData[$strKey];
 		}
 
@@ -451,7 +453,7 @@ class ExtCssCombiner extends \Frontend
 	{
 		return FONTAWESOMELESSDIR . $src;
 	}
-	
+
 	protected function getFontAwesomeCustomSrc($src)
 	{
 		return FONTAWESOMELESSCUSTOMDIR . $src;
