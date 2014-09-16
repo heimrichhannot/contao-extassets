@@ -11,13 +11,15 @@
  * @copyright Heimrich & Hannot GmbH
  */
 
-
 /**
  * Namespace
  */
 namespace ExtAssets;
 
 use Contao\FilesModel;
+
+require_once TL_ROOT . "/system/modules/extassets/classes/vendor/php-css-splitter/src/Splitter.php";
+
 /**
  * Class ExtCss
  *
@@ -285,8 +287,25 @@ class ExtCss extends ExtAssets
 			}
 		}
 
-		$arrUserCss = array();
+		$arrBaseCss = array(); // TL_CSS
+		$arrUserCss = array(); // TL_USER_CSS
 
+		$static = true;
+
+		// collect all usercss
+		if(isset($arrReturn[ExtCssCombiner::$userCssKey]) && is_array($arrReturn[ExtCssCombiner::$userCssKey]))
+		{
+			foreach($arrReturn[ExtCssCombiner::$userCssKey] as $arrCss)
+			{
+				// if not static, css has been split, and bootstrap mustn't not be aggregated, otherwise
+				// will be loaded after user css
+				if($arrCss['mode'] != 'static'){
+					$static = false;
+				}
+
+				$arrUserCss[] = sprintf('%s|%s|%s|%s', $arrCss['src'], $arrCss['type'], $arrCss['mode'], $arrCss['hash']);
+			}
+		}
 
 		// TODO: Refactor equal logic…
 		// at first collect bootstrap to prevent overwrite of usercss
@@ -297,7 +316,7 @@ class ExtCss extends ExtAssets
 			foreach($arrReturn[ExtCssCombiner::$bootstrapCssKey] as $arrCss)
 			{
 				if(in_array($arrCss['hash'], $arrHashs)) continue;
-				$arrUserCss[] = sprintf('%s|%s|%s|%s', $arrCss['src'], $arrCss['type'], $arrCss['mode'], $arrCss['hash']);
+				$arrBaseCss[] = sprintf('%s|%s|%s|%s', $arrCss['src'], $arrCss['type'], !$static ? $static : $arrCss['mode'], $arrCss['hash']);
 				$arrHashs[] = $arrCss['hash'];
 			}
 		}
@@ -311,7 +330,7 @@ class ExtCss extends ExtAssets
 			foreach($arrReturn[ExtCssCombiner::$bootstrapPrintCssKey] as $arrCss)
 			{
 				if(in_array($arrCss['hash'], $arrHashs)) continue;
-				$arrUserCss[] = sprintf('%s|%s|%s|%s', $arrCss['src'], $arrCss['type'], $arrCss['mode'], $arrCss['hash']);
+				$arrBaseCss[] = sprintf('%s|%s|%s|%s', $arrCss['src'], $arrCss['type'], !$static ? $static : $arrCss['mode'], $arrCss['hash']);
 				$arrHashs[] = $arrCss['hash'];
 			}
 		}
@@ -324,26 +343,20 @@ class ExtCss extends ExtAssets
 			foreach($arrReturn[ExtCssCombiner::$fontAwesomeCssKey] as $arrCss)
 			{
 				if(in_array($arrCss['hash'], $arrHashs)) continue;
-				$arrUserCss[] = sprintf('%s|%s|%s|%s', $arrCss['src'], $arrCss['type'], $arrCss['mode'], $arrCss['hash']);
+				$arrBaseCss[] = sprintf('%s|%s|%s|%s', $arrCss['src'], $arrCss['type'], !$static ? $static : $arrCss['mode'], $arrCss['hash']);
 				$arrHashs[] = $arrCss['hash'];
 			}
 		}
 
-		// collect all usercss
-		if(isset($arrReturn[ExtCssCombiner::$userCssKey]) && is_array($arrReturn[ExtCssCombiner::$userCssKey]))
-		{
-			foreach($arrReturn[ExtCssCombiner::$userCssKey] as $arrCss)
-			{
-				$arrUserCss[] = sprintf('%s|%s|%s|%s', $arrCss['src'], $arrCss['type'], $arrCss['mode'], $arrCss['hash']);
-			}
-		}
 
 		if($GLOBALS['TL_CONFIG']['bypassCache'])
 		{
+			$GLOBALS['TL_CSS'] = array_merge(is_array($GLOBALS['TL_CSS']) ? $GLOBALS['TL_CSS'] : array(), $arrBaseCss);
 			$GLOBALS['TL_USER_CSS'] = array_merge(is_array($GLOBALS['TL_USER_CSS']) ? $GLOBALS['TL_USER_CSS'] : array(), $arrUserCss);
 		}
 		else
 		{
+			$GLOBALS['TL_CSS'] = array_merge($arrBaseCss, is_array($GLOBALS['TL_CSS']) ? $GLOBALS['TL_CSS'] : array());
 			$GLOBALS['TL_USER_CSS'] = array_merge($arrUserCss, is_array($GLOBALS['TL_USER_CSS']) ? $GLOBALS['TL_USER_CSS'] : array());
 		}
 	}

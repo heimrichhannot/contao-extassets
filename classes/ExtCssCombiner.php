@@ -122,19 +122,17 @@ class ExtCssCombiner extends \Frontend
 				(
 					'src'  => $objFile->value,
 					'type' => 'all', // 'all' is required by print media css
-					'mode' => $this->mode, // mustn't be static, otherwise contao will aggregate the files again (splitting not working)
+					'mode' => '', // mustn't be static, otherwise contao will aggregate the files again (splitting not working)
 					'hash' => $this->objUserCssFile->hash,
 				);
 			}
 
 		}
 		else{
-			$this->objUserCssFile->write($strCss);
-
 			$arrReturn[self::$userCssKey][] = array
 			(
 				'src'  => $this->objUserCssFile->value,
-				'type' => $this->mode, // 'all' is required by print media css
+				'type' => 'all', // 'all' is required by print media css
 				'mode' => $this->mode,
 				'hash' => $this->objUserCssFile->hash,
 			);
