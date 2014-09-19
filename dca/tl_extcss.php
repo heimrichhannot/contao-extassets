@@ -65,6 +65,12 @@ $GLOBALS['TL_DCA']['tl_extcss'] = array
 						'href'                => 'table=tl_extcss_file',
 						'icon'                => 'edit.gif'
 					),
+					'editheader' => array
+					(
+						'label'               => &$GLOBALS['TL_LANG']['tl_extcss']['editheader'],
+						'href'                => 'act=edit',
+						'icon'                => 'header.gif',
+					),
 					'copy' => array
 					(
 						'label'               => &$GLOBALS['TL_LANG']['tl_extcss']['copy'],
@@ -96,7 +102,7 @@ $GLOBALS['TL_DCA']['tl_extcss'] = array
 			// Subpalettes
 			'subpalettes' => array
 			(
-				'addBootstrap'				=> 'bootstrapVariablesSRC',
+				'addBootstrap'				=> 'bootstrapVariablesSRC,addBootstrapPrint',
 			),
 			// Fields
 			'fields' => array
@@ -122,6 +128,13 @@ $GLOBALS['TL_DCA']['tl_extcss'] = array
 					'exclude'                 => true,
 					'inputType'               => 'checkbox',
 					'default'				  => true,
+					'eval'                    => array('submitOnChange'=>true),
+					'sql'					  => "char(1) NOT NULL default ''",
+				),
+				'addBootstrapPrint' => array(
+					'label'                   => &$GLOBALS['TL_LANG']['tl_extcss']['addBootstrapPrint'],
+					'exclude'                 => true,
+					'inputType'               => 'checkbox',
 					'eval'                    => array('submitOnChange'=>true),
 					'sql'					  => "char(1) NOT NULL default ''",
 				),

@@ -200,7 +200,7 @@ class ExtCss extends ExtAssets
 
 		$blnXhtml = ($objPage->outputFormat == 'xhtml');
 
-		$GLOBALS['TL_HEAD'][] = '<meta name="viewport" content="width=device-width,initial-scale=1.0"' . ($blnXhtml ? ' />' : '>') . "\n";
+		$GLOBALS['TL_HEAD'][] = '<meta name="viewport" content="width=device-width, initial-scale=1.0, minimal-ui"' . ($blnXhtml ? ' />' : '>') . "\n";
 	}
 
 	/**
