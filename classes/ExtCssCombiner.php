@@ -79,6 +79,7 @@ class ExtCssCombiner extends \Frontend
 			$this->addBootstrapAlerts();
 			$this->addBootstrap();
 			$this->addBootstrapUtilities();
+			$this->addBootstrapType();
 		}
 
 		if ($this->addFontAwesome) {
@@ -290,6 +291,15 @@ class ExtCssCombiner extends \Frontend
 
 		if ($objFile->size > 0) {
 			$this->arrCss['utilities'] = $objFile->getContent();
+		}
+	}
+
+	protected function addBootstrapType()
+	{
+		$objFile = new \File($this->getBootstrapSrc('type.less'));
+
+		if ($objFile->size > 0) {
+			$this->arrCss['type'] = $objFile->getContent();
 		}
 	}
 
