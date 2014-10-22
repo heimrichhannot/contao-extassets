@@ -17,6 +17,7 @@
 ClassLoader::addNamespaces(array
 (
 	'ExtAssets',
+	'CssSplitter',
 ));
 
 
@@ -26,17 +27,20 @@ ClassLoader::addNamespaces(array
 ClassLoader::addClasses(array
 (
 	// Models
-	'ExtAssets\ExtJsFileModel'  => 'system/modules/extassets/models/ExtJsFileModel.php',
-	'ExtAssets\ExtCssFileModel' => 'system/modules/extassets/models/ExtCssFileModel.php',
-	'ExtAssets\ExtCssModel'     => 'system/modules/extassets/models/ExtCssModel.php',
-	'ExtAssets\ExtJsModel'      => 'system/modules/extassets/models/ExtJsModel.php',
+	'ExtAssets\ExtCssModel'          => 'system/modules/extassets/models/ExtCssModel.php',
+	'ExtAssets\ExtJsModel'           => 'system/modules/extassets/models/ExtJsModel.php',
+	'ExtAssets\ExtCssFileModel'      => 'system/modules/extassets/models/ExtCssFileModel.php',
+	'ExtAssets\ExtJsFileModel'       => 'system/modules/extassets/models/ExtJsFileModel.php',
 
 	// Classes
-	'ExtAssets\ExtJs'           => 'system/modules/extassets/classes/ExtJs.php',
-	'ExtAssets\ExtAutomator'    => 'system/modules/extassets/classes/ExtAutomator.php',
-	'ExtAssets\ExtHashFile'     => 'system/modules/extassets/classes/ExtHashFile.php',
-	'Diff'                      => 'system/modules/extassets/classes/vendor/lessphp/test/php-diff/lib/Diff.php',
-	'ExtAssets\ExtCss'          => 'system/modules/extassets/classes/ExtCss.php',
-	'ExtAssets\ExtCssCombiner'  => 'system/modules/extassets/classes/ExtCssCombiner.php',
-	'ExtAssets\ExtAssets'       => 'system/modules/extassets/classes/ExtAssets.php',
+	'ExtAssets\ExtAutomator'         => 'system/modules/extassets/classes/ExtAutomator.php',
+	'ExtAssets\ExtHashFile'          => 'system/modules/extassets/classes/ExtHashFile.php',
+	'ExtAssets\ExtCssCombiner'       => 'system/modules/extassets/classes/ExtCssCombiner.php',
+	'ExtAssets\ExtAssets'            => 'system/modules/extassets/classes/ExtAssets.php',
+	'ExtAssets\ExtJs'                => 'system/modules/extassets/classes/ExtJs.php',
+	'ExtAssets\ExtAssetsUpdater'     => 'system/modules/extassets/classes/ExtAssetsUpdater.php',
+	'ExtAssets\ExtCss'               => 'system/modules/extassets/classes/ExtCss.php',
+	'Diff'                           => 'system/modules/extassets/classes/vendor/lessphp/test/php-diff/lib/Diff.php',
+	'CssSplitter\Tests\SplitterTest' => 'system/modules/extassets/classes/vendor/php-css-splitter/tests/Tests/SplitterTest.php',
+	'CssSplitter\Splitter'           => 'system/modules/extassets/classes/vendor/php-css-splitter/src/Splitter.php',
 ));

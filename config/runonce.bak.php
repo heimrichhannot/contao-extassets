@@ -22,13 +22,12 @@ class ExtAssetsRunOnce extends Controller
 
     public function run()
     {
-        $this->updateDB();
-        $this->updateFrameworks();
-    }
+		if(class_exists('\\ExtAssets\\ExtAssetsUpdater'))
+		{
+			\ExtAssets\ExtAssetsUpdater::run();
+		}
 
-    protected function updateDB()
-    {
-        \Database::getInstance()->prepare('UPDATE `tl_extcss_file` SET  `sorting` = 2147483648 WHERE sorting = 4294967295');
+        $this->updateFrameworks();
     }
 
     protected function updateFrameworks()

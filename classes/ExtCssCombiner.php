@@ -101,7 +101,6 @@ class ExtCssCombiner extends \Frontend
 		$strCss = $this->objUserCssFile->getContent();
 
 		if (is_array($this->arrCss) && !empty($this->arrCss) && ($this->rewrite || $this->rewriteBootstrap)) {
-
 			$strCss = $this->objLess->compile(implode("\n", $this->arrCss));
 			$this->objUserCssFile->write($strCss);
 		}
@@ -112,8 +111,7 @@ class ExtCssCombiner extends \Frontend
 		// IE 6 - 9 has a limit of 4096 selectors
 		if ($count > 0) {
 			$parts = ceil($count / 4095);
-			for($i = 1; $i <= $parts; $i++)
-			{
+			for ($i = 1; $i <= $parts; $i++) {
 				$objFile = new \File("assets/css/$this->title-part-{$i}.css");
 				$objFile->write($splitter->split($strCss, $i));
 				$objFile->close();
@@ -127,8 +125,7 @@ class ExtCssCombiner extends \Frontend
 				);
 			}
 
-		}
-		else{
+		} else {
 			$arrReturn[self::$userCssKey][] = array
 			(
 				'src'  => $this->objUserCssFile->value,
