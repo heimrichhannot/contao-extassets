@@ -121,7 +121,7 @@ class ExtCssCombiner extends \Frontend
 					'src'  => $objFile->value,
 					'type' => 'all', // 'all' is required by print media css
 					'mode' => '', // mustn't be static, otherwise contao will aggregate the files again (splitting not working)
-					'hash' => $this->objUserCssFile->hash,
+					'hash' => version_compare(VERSION, '3.4', '>=') ? $this->objUserCssFile->mtime : $this->objUserCssFile->hash,
 				);
 			}
 
@@ -131,7 +131,7 @@ class ExtCssCombiner extends \Frontend
 				'src'  => $this->objUserCssFile->value,
 				'type' => 'all', // 'all' is required by print media css
 				'mode' => $this->mode,
-				'hash' => $this->objUserCssFile->hash,
+				'hash' => version_compare(VERSION, '3.4', '>=') ? $this->objUserCssFile->mtime : $this->objUserCssFile->hash,
 			);
 		}
 
@@ -201,7 +201,7 @@ class ExtCssCombiner extends \Frontend
 			'src'  => $objOut->value,
 			'type' => 'all', // 'all' is required for .hidden-print class, not 'screen'
 			'mode' => $this->mode,
-			'hash' => $objOut->hash,
+			'hash' => version_compare(VERSION, '3.4', '>=') ? $objOut->mtime : $objOut->hash,
 		);
 	}
 
@@ -373,7 +373,7 @@ class ExtCssCombiner extends \Frontend
 			'src'  => $objOut->value,
 			'type' => 'all',
 			'mode' => $this->mode,
-			'hash' => $objOut->hash,
+			'hash' => version_compare(VERSION, '3.4', '>=') ? $objOut->mtime : $objOut->hash,
 		);
 	}
 
