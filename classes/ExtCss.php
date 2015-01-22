@@ -170,6 +170,21 @@ class ExtCss extends ExtAssets
 			}
 		}
 
+		// cleanup
+		$arrRemoveDiff = array_diff($arrOldFileNames, $arrFileNames);
+
+		if(!empty($arrRemoveDiff))
+		{
+			// add new files
+			foreach($arrRemoveDiff as $key => $path)
+			{
+				// file is not part of the observed folder
+				if(strpos($path, $objObserveModel->path) === FALSE) continue;
+
+				static::removeCssFileFromGroup($path, $groupId);
+			}
+		}
+
 		return true;
 	}
 
@@ -193,6 +208,22 @@ class ExtCss extends ExtAssets
 		return $arrReturn;
 	}
 
+	protected static function removeCssFileFromGroup($path, $groupId)
+	{
+		$objFileModel = \FilesModel::findBy('path', $path);
+
+		if($objFileModel === null) return false;
+
+		$objExtCssFileModel = ExtCssFileModel::findBy('src', $objFileModel->uuid);
+
+		if($objExtCssFileModel === null) return false;
+
+		$objFileModel->delete();
+		$objExtCssFileModel->delete();
+
+		return true;
+	}
+
 	protected static function addCssFileToGroup($path, $groupId)
 	{
 		// create Files Model
@@ -202,7 +233,7 @@ class ExtCss extends ExtAssets
 
 		$objFile->close();
 
-		$objFileModel = new \ExtCssFileModel();
+		$objFileModel = new ExtCssFileModel();
 		$objFileModel->pid = $groupId;
 		$objFileModel->tstamp = time();
 		$objFileModel->sorting = ceil(4294967295 / 2);
