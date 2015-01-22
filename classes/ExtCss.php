@@ -175,14 +175,15 @@ class ExtCss extends ExtAssets
 
 	protected static function scanLessFiles($path, $arrReturn=array())
 	{
-		$arrFileNames = scan($path);
+		$arrFileNames = scan(TL_ROOT . '/' . $path);
 
 		foreach($arrFileNames as $key => $name)
 		{
 			$src = $path . '/' . $name;
 			$arrReturn[] = $src;
 
-			if(is_dir($src))
+
+			if(is_dir(TL_ROOT . '/' . $src))
 			{
 				unset($arrReturn[$key]);
 				array_insert($arrReturn, $key, static::scanLessFiles($src));
