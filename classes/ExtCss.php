@@ -84,8 +84,8 @@ class ExtCss extends ExtAssets
 	public static function isLiveMode()
 	{
 		return static::getInstance()->blnLiveMode
-		? true
-		: false;
+			? true
+			: false;
 	}
 
 
@@ -104,8 +104,8 @@ class ExtCss extends ExtAssets
 	public static function isDesignerMode()
 	{
 		return static::getInstance()->blnLiveMode
-		? false
-		: true;
+			? false
+			: true;
 	}
 
 
@@ -121,7 +121,7 @@ class ExtCss extends ExtAssets
 	{
 		// TODO: cleanup list, remove no longer existing files
 	}
-	
+
 	public static function observeCssGroupFolder($groupId)
 	{
 		$objCss = ExtCssModel::findByPk($groupId);
@@ -129,60 +129,85 @@ class ExtCss extends ExtAssets
 		if($objCss === null || $objCss->observeFolderSRC == '') return false;
 
 		$objObserveModel = \FilesModel::findByUuid($objCss->observeFolderSRC);
-		
+
 		if($objObserveModel === null || !is_dir(TL_ROOT . '/' . $objObserveModel->path)) return false;
-		
+
 		$lastUpdate = filemtime(TL_ROOT . '/' . $objObserveModel->path);
-		
+
 		// check if folder content has updated
 		if($lastUpdate <= $objObserveModel->tstamp) return false;
-		
+
 		$objCssFiles = ExtCssFileModel::findBy(array('pid'), $groupId);
-		
+
 		$arrOldFileNames = array();
-		
+
 		if($objCssFiles !== null)
 		{
 			$objCssFilesModel = \FilesModel::findMultipleByUuids($objCssFiles->fetchEach('src'));
-			$arrOldFileNames = $objCssFilesModel->fetchEach('name');
+			$arrOldFileNames = $objCssFilesModel->fetchEach('path');
 		}
-		
-		$arrFileNames = scan(TL_ROOT . '/' . $objObserveModel->path);
-		
+
+		$arrFileNames = static::scanLessFiles($objObserveModel->path);
+
 		$arrDiff = array_diff($arrFileNames, $arrOldFileNames);
-		
+
 		// exclude bootstrap variables src
 		$objVariablesModel = \FilesModel::findByUuid($objCss->bootstrapVariablesSRC);
 
-		$variablesKey = array_search($objVariablesModel->name, $arrDiff);
-		
+		$variablesKey = array_search($objVariablesModel->path, $arrDiff);
+
 		if($variablesKey !== false)
 		{
 			unset($arrDiff[$variablesKey]);
 		}
-		
+
 		if(!empty($arrDiff))
 		{
 			// add new files
-			foreach($arrDiff as $key => $name)
+			foreach($arrDiff as $key => $path)
 			{
-				// create Files Model
-				$objFile = new \File($objObserveModel->path . '/' . $name);
-				
-				if (!in_array(strtolower($objFile->extension), array('css', 'less'))) continue;
-				
-				$objFile->close();
-				
-				$objFileModel = new \ExtCssFileModel();
-				$objFileModel->pid = $groupId;
-				$objFileModel->tstamp = time();
-				$objFileModel->sorting = ceil(4294967295 / 2);
-				$objFileModel->src = $objFile->getModel()->uuid;
-				$objFileModel->save();
+				static::addCssFileToGroup($path, $groupId);
 			}
 		}
-		
+
 		return true;
+	}
+
+	protected static function scanLessFiles($path, $arrReturn=array())
+	{
+		$arrFileNames = scan($path);
+
+		foreach($arrFileNames as $key => $name)
+		{
+			$src = $path . '/' . $name;
+			$arrReturn[] = $src;
+
+			if(is_dir($src))
+			{
+				unset($arrReturn[$key]);
+				array_insert($arrReturn, $key, static::scanLessFiles($src));
+			}
+		}
+
+		return $arrReturn;
+	}
+
+	protected static function addCssFileToGroup($path, $groupId)
+	{
+		// create Files Model
+		$objFile = new \File($path);
+
+		if (!in_array(strtolower($objFile->extension), array('css', 'less'))) return false;
+
+		$objFile->close();
+
+		$objFileModel = new \ExtCssFileModel();
+		$objFileModel->pid = $groupId;
+		$objFileModel->tstamp = time();
+		$objFileModel->sorting = ceil(4294967295 / 2);
+		$objFileModel->src = $objFile->getModel()->uuid;
+		$objFileModel->save();
+		return $objFileModel;
 	}
 
 
@@ -224,7 +249,7 @@ class ExtCss extends ExtAssets
 	public function hookReplaceDynamicScriptTags($strBuffer)
 	{
 		global $objPage;
-		
+
 		if(!$objPage) return $strBuffer;
 
 		$objLayout = \LayoutModel::findByPk($objPage->layout);
@@ -248,20 +273,20 @@ class ExtCss extends ExtAssets
 		if($objCss === null)
 		{
 			if(!is_array($GLOBALS['TL_USER_CSS']) || empty($GLOBALS['TL_USER_CSS'])) return false;
-				
+
 			// remove TL_USER_CSS less files, otherwise Contao Combiner fails
 			foreach($GLOBALS['TL_USER_CSS'] as $key => $css)
 			{
 				$arrCss = trimsplit('|', $css);
-				
+
 				$extension = substr($arrCss[0], strlen($arrCss[0]) - 4, strlen($arrCss[0]));
-				
+
 				if($extension == 'less')
 				{
 					unset($GLOBALS['TL_USER_CSS'][$key]);
 				}
 			}
-			
+
 			return false;
 		}
 
@@ -270,7 +295,7 @@ class ExtCss extends ExtAssets
 		while($objCss->next())
 		{
 			static::observeCssGroupFolder($objCss->id);
-			
+
 			$start = time();
 
 			$combiner = new ExtCssCombiner($objCss->current(), $arrReturn);
@@ -320,13 +345,13 @@ class ExtCss extends ExtAssets
 				$arrHashs[] = $arrCss['hash'];
 			}
 		}
-		
+
 		// TODO: Refactor equal logic…
 		// at first collect bootstrap to prevent overwrite of usercss
 		if(isset($arrReturn[ExtCssCombiner::$bootstrapPrintCssKey]) && is_array($arrReturn[ExtCssCombiner::$bootstrapPrintCssKey]))
 		{
 			$arrHashs = array();
-		
+
 			foreach($arrReturn[ExtCssCombiner::$bootstrapPrintCssKey] as $arrCss)
 			{
 				if(in_array($arrCss['hash'], $arrHashs)) continue;
