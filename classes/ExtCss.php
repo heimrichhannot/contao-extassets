@@ -195,13 +195,14 @@ class ExtCss extends ExtAssets
 		foreach($arrFileNames as $key => $name)
 		{
 			$src = $path . '/' . $name;
-			$arrReturn[] = $src;
-
 
 			if(is_dir(TL_ROOT . '/' . $src))
 			{
-				unset($arrReturn[$key]);
 				array_insert($arrReturn, $key, static::scanLessFiles($src));
+			}
+			else
+			{
+				$arrReturn[] = $src;
 			}
 		}
 
@@ -257,7 +258,7 @@ class ExtCss extends ExtAssets
 
 		$blnXhtml = ($objPage->outputFormat == 'xhtml');
 
-		$GLOBALS['TL_HEAD'][] = '<meta name="viewport" content="width=device-width, initial-scale=1.0, minimal-ui"' . ($blnXhtml ? ' />' : '>') . "\n";
+		$GLOBALS['TL_HEAD'][] = '<meta name="viewport" content="width=device-width, initial-scale=1.0"' . ($blnXhtml ? ' />' : '>') . "\n";
 	}
 
 	/**
