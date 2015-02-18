@@ -284,34 +284,23 @@ class ExtCssCombiner extends \Frontend
 
 	protected function addBootstrapUtilities()
 	{
-		$objFile = new \File($this->getBootstrapSrc('utilities.less'));
+		$arrUtilities = array
+		(
+			'utilities.less',
+			'responsive-utilities.less',
+			'forms.less',
+			'buttons.less',
+			'alerts.less',
+			'grid.less'
+		);
 
-		if ($objFile->size > 0) {
-			$this->arrCss['utilities'] = $objFile->getContent();
-		}
+		foreach($arrUtilities as $strFile)
+		{
+			$objFile = new \File($this->getBootstrapSrc($strFile));
 
-		$objFile = new \File($this->getBootstrapSrc('responsive-utilities.less'));
-
-		if ($objFile->size > 0) {
-			$this->arrCss['utilities'] .= $objFile->getContent();
-		}
-
-		$objFile = new \File($this->getBootstrapSrc('forms.less'));
-
-		if ($objFile->size > 0) {
-			$this->arrCss['utilities'] .= $objFile->getContent();
-		}
-
-		$objFile = new \File($this->getBootstrapSrc('buttons.less'));
-
-		if ($objFile->size > 0) {
-			$this->arrCss['utilities'] .= $objFile->getContent();
-		}
-
-		$objFile = new \File($this->getBootstrapSrc('alerts.less'));
-
-		if ($objFile->size > 0) {
-			$this->arrCss['utilities'] .= $objFile->getContent();
+			if ($objFile->size > 0) {
+				$this->arrCss['utilities'] .= $objFile->getContent();
+			}
 		}
 	}
 
