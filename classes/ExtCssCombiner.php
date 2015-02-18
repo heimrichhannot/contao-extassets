@@ -295,6 +295,12 @@ class ExtCssCombiner extends \Frontend
 		if ($objFile->size > 0) {
 			$this->arrCss['utilities'] .= $objFile->getContent();
 		}
+
+		$objFile = new \File($this->getBootstrapSrc('forms.less'));
+
+		if ($objFile->size > 0) {
+			$this->arrCss['utilities'] .= $objFile->getContent();
+		}
 	}
 
 	protected function addBootstrapType()
