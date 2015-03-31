@@ -35,6 +35,8 @@ class ExtAssetsUpdater
 					if(in_array($arrField['name'], $arrNames)){
 						\Database\Updater::convertSingleField($strTable, $arrField['name']);
 					}
+
+
 				}
 			}
 		}

@@ -137,8 +137,8 @@ class ExtCss extends ExtAssets
 		// check if folder content has updated
 		if($lastUpdate <= $objObserveModel->tstamp) return false;
 
-		$objCssFiles = ExtCssFileModel::findBy(array('pid'), $groupId);
-
+		$objCssFiles = ExtCssFileModel::findMultipleByPids(array($groupId));
+		
 		$arrOldFileNames = array();
 
 		if($objCssFiles !== null)
@@ -172,7 +172,7 @@ class ExtCss extends ExtAssets
 
 		// cleanup
 		$arrRemoveDiff = array_diff($arrOldFileNames, $arrFileNames);
-
+		
 		if(!empty($arrRemoveDiff))
 		{
 			// add new files
@@ -328,20 +328,20 @@ class ExtCss extends ExtAssets
 		while($objCss->next())
 		{
 			static::observeCssGroupFolder($objCss->id);
+		}
 
-			$start = time();
+		$objCss->reset();
 
-			$combiner = new ExtCssCombiner($objCss->current(), $arrReturn);
+		$combiner = new ExtCssCombiner($objCss, $arrReturn);
 
-			$arrReturn = $combiner->getUserCss();
+		$arrReturn = $combiner->getUserCss();
 
-			// HOOK: add custom css
-			if (isset($GLOBALS['TL_HOOKS']['parseExtCss']) && is_array($GLOBALS['TL_HOOKS']['parseExtCss']))
+		// HOOK: add custom css
+		if (isset($GLOBALS['TL_HOOKS']['parseExtCss']) && is_array($GLOBALS['TL_HOOKS']['parseExtCss']))
+		{
+			foreach ($GLOBALS['TL_HOOKS']['parseExtCss'] as $callback)
 			{
-				foreach ($GLOBALS['TL_HOOKS']['parseExtCss'] as $callback)
-				{
-					$arrCss = static::importStatic($callback[0])->$callback[1]($arrCss);
-				}
+				$arrCss = static::importStatic($callback[0])->$callback[1]($arrCss);
 			}
 		}
 

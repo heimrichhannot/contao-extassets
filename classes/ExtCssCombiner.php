@@ -43,17 +43,21 @@ class ExtCssCombiner extends \Frontend
 
 	protected $objLess;
 
-	public function __construct(ExtCssModel $objCss, $arrReturn = array())
+	public function __construct(\Model\Collection $objCss, $arrReturn = array())
 	{
 		parent::__construct();
 		$this->loadDataContainer('tl_extcss');
-		$this->arrData = $objCss->row();
 
+		while($objCss->next())
+		{
+			$this->arrData[] = $objCss->row();
+		}
+
+		$this->variablesSrc = 'variables-' . $this->title . '.less';
+		
 		$this->mode = $GLOBALS['TL_CONFIG']['bypassCache'] ? 'none' : 'static';
 
 		$this->arrReturn = $arrReturn;
-
-		$this->variablesSrc = 'variables-' . $this->title . '.less';
 
 		$this->objUserCssFile = new \File($this->getSrc($this->title . '.css'));;
 
@@ -141,11 +145,12 @@ class ExtCssCombiner extends \Frontend
 
 	protected function addCssFiles()
 	{
-		$objFiles = ExtCssFileModel::findMultipleByPid($this->id);
+		$objFiles = ExtCssFileModel::findMultipleByPids($this->ids);
 
 		if ($objFiles === null) return false;
 
-		while ($objFiles->next()) {
+		while ($objFiles->next())
+		{
 			$objFileModel = \FilesModel::findByPk($objFiles->src);
 
 			if ($objFileModel === null) continue;
@@ -156,7 +161,8 @@ class ExtCssCombiner extends \Frontend
 
 			if ($objFile->size == 0) continue;
 
-			if ($this->isFileUpdated($objFile, $this->objUserCssFile) || $this->rewrite) {
+			if ($this->isFileUpdated($objFile, $this->objUserCssFile) || $this->rewrite)
+			{
 				$this->rewrite = true;
 			}
 
@@ -222,21 +228,31 @@ class ExtCssCombiner extends \Frontend
 		$objTarget = new \File($this->getBootstrapCustomSrc($this->variablesSrc));
 
 		// overwrite bootstrap variables with custom variables
-		$objFileModel = \FilesModel::findByPk($this->bootstrapVariablesSRC);
-
-		if ($objFileModel !== false) {
-			$objFile = new \File($objFileModel->path);
-
-			if ($this->isFileUpdated($objFile, $objTarget)) {
-				$this->rewrite          = true;
-				$this->rewriteBootstrap = true;
-				$this->arrCss['variables'] .= "\n" . $objFile->getContent();
-			} else {
-				$this->arrCss['variables'] .= "\n" . $objFile->getContent();
-			}
+		if(is_array($arrBootstrapVariablesSrc = deserialize($this->bootstrapVariablesSRC)))
+		{
+			$objFilesModels = \FilesModel::findMultipleByUuids($arrBootstrapVariablesSrc);
 		}
 
-		if ($this->rewriteBootstrap) {
+		if($objFilesModels !== null)
+		{
+			while($objFilesModels->next())
+			{
+				$objFile = new \File($objFilesModels->path);
+				
+				if ($this->isFileUpdated($objFile, $objTarget))
+				{
+					$this->rewrite          = true;
+					$this->rewriteBootstrap = true;
+					$this->arrCss['variables'] .= "\n" . $objFile->getContent();
+				} else
+				{
+					$this->arrCss['variables'] .= "\n" . $objFile->getContent();
+				}
+			}
+		}
+		
+		if ($this->rewriteBootstrap)
+		{
 			$objTarget->write($this->arrCss['variables']);
 		}
 	}
@@ -425,11 +441,40 @@ class ExtCssCombiner extends \Frontend
 
 	public function __get($strKey)
 	{
-		if (isset($this->arrData[$strKey])) {
+		switch($strKey)
+		{
+			case 'title':
+				return standardize(\String::restoreBasicEntities(implode('-', $this->getEach('title'))));
+			case 'addBootstrap':
+			case 'addBootstrapPrint':
+			case 'addFontAwesome':
+				return max($this->getEach($strKey));
+			case 'bootstrapVariablesSRC':
+				return $this->getEach('bootstrapVariablesSRC');
+			case 'bootstrapVariablesOrderSRC':
+				return $this->getEach($strKey);
+			case 'ids':
+				return $this->getEach('id'); // must be id
+		}
+
+		if (isset($this->arrData[$strKey]))
+		{
 			return $this->arrData[$strKey];
 		}
 
 		return parent::__get($strKey);
+	}
+
+	public function getEach($strKey)
+	{
+		$return = array();
+
+		foreach ($this->arrData as $key => $value)
+		{
+			$return[] = $value[$strKey];
+		}
+
+		return $return;
 	}
 
 	protected function getSrc($src)

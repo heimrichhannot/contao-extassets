@@ -28,26 +28,32 @@ class ExtCssFileModel extends \Model
 
 	protected static $strTable = 'tl_extcss_file';
 
+
 	/**
-	 * Find multiple css files by their IDs
+	 * Find multiple css files by their pid
 	 *
 	 * @param array $arrIds     An array of group IDs
 	 * @param array $arrOptions An optional options array
 	 *
 	 * @return \Model\Collection|null A collection of css files or null if there are no css files
 	 */
-	public static function findMultipleByPid($intId, array $arrOptions=array())
+	public static function findMultipleByPids(array $arrPids = array(), array $arrOptions=array())
 	{
 		$t = static::$strTable;
 
-		$arrColumns = array("$t.pid=?");
+		if (!is_array($arrPids) || empty($arrPids))
+		{
+			return null;
+		}
+
+		$arrColumns = array("$t.pid IN(" . implode(',', array_map('intval', $arrPids)) . ")");
 
 		if (!isset($arrOptions['order']))
 		{
 			$arrOptions['order'] = "$t.sorting";
 		}
 
-		return static::findBy($arrColumns, $intId, $arrOptions);
+		return static::findBy($arrColumns, null, $arrOptions);
 	}
 
 }
