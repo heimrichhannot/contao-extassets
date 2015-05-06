@@ -359,6 +359,8 @@ class ExtCss extends ExtAssets
 				// will be loaded after user css
 				if($arrCss['mode'] != 'static'){
 					$static = false;
+					// add hash to url, otherwise css file will still be cached
+					$arrCss['src'] .= '?' .$arrCss['hash'];
 				}
 
 				$arrUserCss[] = sprintf('%s|%s|%s|%s', $arrCss['src'], $arrCss['type'], $arrCss['mode'], $arrCss['hash']);
