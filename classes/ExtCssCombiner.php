@@ -2,10 +2,6 @@
 
 namespace ExtAssets;
 
-use Contao\File;
-use Contao\Environment;
-
-require_once TL_ROOT . "/system/modules/extassets/classes/vendor/lessphp/lessc.inc.php";
 require_once TL_ROOT . "/system/modules/extassets/classes/vendor/php-css-splitter/src/Splitter.php";
 
 class ExtCssCombiner extends \Frontend
@@ -43,6 +39,10 @@ class ExtCssCombiner extends \Frontend
 
 	protected $objLess;
 
+	protected $arrLessOptions = array();
+
+	protected $arrLessImportDirs = array();
+
 	public function __construct(\Model\Collection $objCss, $arrReturn = array())
 	{
 		parent::__construct();
@@ -67,9 +67,15 @@ class ExtCssCombiner extends \Frontend
 			$this->rewriteBootstrap = true;
 		}
 
-		$this->uriRoot = (TL_ASSETS_URL ? TL_ASSETS_URL : Environment::get('url')) . '/assets/css/';
+		$this->uriRoot = (TL_ASSETS_URL ? TL_ASSETS_URL : \Environment::get('url')) . '/assets/css/';
 
-		$this->objLess = new \lessc();
+		$this->arrLessOptions = array
+		(
+			'compress' => !\Config::get('bypassCache'),
+			'cache_dir' => TL_ROOT . '/assets/css/lesscache',
+		);
+
+		$this->objLess = new \Less_Parser($this->arrLessOptions);
 
 		if ($this->debug) {
 			$this->rewrite          = true;
@@ -104,8 +110,11 @@ class ExtCssCombiner extends \Frontend
 
 		$strCss = $this->objUserCssFile->getContent();
 
-		if (is_array($this->arrCss) && !empty($this->arrCss) && ($this->rewrite || $this->rewriteBootstrap)) {
-			$strCss = $this->objLess->compile(implode("\n", $this->arrCss));
+		if (is_array($this->arrCss) && !empty($this->arrCss) && ($this->rewrite || $this->rewriteBootstrap))
+		{
+			$this->objLess->SetImportDirs($this->arrLessImportDirs);
+			$this->objLess->parse(implode("\n", $this->arrCss));
+			$strCss = $this->objLess->getCss();
 			$this->objUserCssFile->write($strCss);
 		}
 
@@ -145,7 +154,7 @@ class ExtCssCombiner extends \Frontend
 
 	protected function addCssFiles()
 	{
-		$objFiles = ExtCssFileModel::findMultipleByPids($this->ids);
+		$objFiles = ExtCssFileModel::findMultipleByPids($this->ids, array('order' => 'pid, sorting'));
 
 		if ($objFiles === null) return false;
 
@@ -196,10 +205,11 @@ class ExtCssCombiner extends \Frontend
 			$objTarget->write($strCss);
 			$objTarget->close();
 
-			$lessc  = new \lessc();
-			$strCss = $lessc->compileFile(TL_ROOT . '/' . $objTarget->value, TL_ROOT . '/' . $objOut->value);
+			$objParser = new \Less_Parser($this->arrLessOptions);
+			$objParser->parseFile(TL_ROOT . '/' . $objTarget->value);
 
 			$objOut = new \File($objOut->value);
+			$objOut->write($objParser->getCss());
 		}
 
 		$this->arrReturn[self::$bootstrapCssKey][] = array
@@ -238,7 +248,7 @@ class ExtCssCombiner extends \Frontend
 			while($objFilesModels->next())
 			{
 				$objFile = new \File($objFilesModels->path);
-				
+
 				if ($this->isFileUpdated($objFile, $objTarget))
 				{
 					$this->rewrite          = true;
@@ -250,7 +260,7 @@ class ExtCssCombiner extends \Frontend
 				}
 			}
 		}
-		
+
 		if ($this->rewriteBootstrap)
 		{
 			$objTarget->write($this->arrCss['variables']);
@@ -391,10 +401,11 @@ class ExtCssCombiner extends \Frontend
 			$objTarget->write($strCss);
 			$objTarget->close();
 
-			$lessc  = new \lessc();
-			$strCss = $lessc->compileFile(TL_ROOT . '/' . $objTarget->value, TL_ROOT . '/' . $objOut->value);
+			$objParser = new \Less_Parser($this->arrLessOptions);
+			$objParser->parseFile(TL_ROOT . '/' . $objTarget->value);
 
 			$objOut = new \File($objOut->value);
+			$objOut->write($objParser->getCss());
 		}
 
 		$this->arrReturn[self::$fontAwesomeCssKey][] = array
@@ -424,8 +435,9 @@ class ExtCssCombiner extends \Frontend
 			// replace variables.less by custom variables.less
 			$hasImports = preg_match_all('!@import(\s+)?(\'|")(.+)(\'|");!U', $strContent, $arrImport);
 
-			if ($hasImports) {
-				$this->objLess->addImportDir($objFile->dirname);
+			if ($hasImports)
+			{
+				$this->arrLessImportDirs[$objFile->dirname] = $objFile->dirname;
 			}
 
 			$this->arrCss[$key] = $strContent;

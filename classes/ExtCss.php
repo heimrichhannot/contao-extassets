@@ -16,8 +16,6 @@
  */
 namespace ExtAssets;
 
-use Contao\FilesModel;
-
 require_once TL_ROOT . "/system/modules/extassets/classes/vendor/php-css-splitter/src/Splitter.php";
 
 /**
