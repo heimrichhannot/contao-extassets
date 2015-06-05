@@ -154,8 +154,8 @@ class ExtCssCombiner extends \Frontend
 
 	protected function addCssFiles()
 	{
-		$objFiles = ExtCssFileModel::findMultipleByPids($this->ids, array('order' => 'pid, sorting'));
-
+		$objFiles = ExtCssFileModel::findMultipleByPids($this->ids, array('order' => 'FIELD(pid, ' . implode(",", $this->ids) . '), sorting DESC'));
+		
 		if ($objFiles === null) return false;
 
 		while ($objFiles->next())
@@ -163,7 +163,7 @@ class ExtCssCombiner extends \Frontend
 			$objFileModel = \FilesModel::findByPk($objFiles->src);
 
 			if ($objFileModel === null) continue;
-
+			
 			if (!file_exists(TL_ROOT . '/' . $objFileModel->path)) continue;
 
 			$objFile = new \File($objFileModel->path);

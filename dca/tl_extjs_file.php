@@ -130,7 +130,7 @@ $GLOBALS['TL_DCA']['tl_extjs_file'] = array
 			'label'     => &$GLOBALS['TL_LANG']['tl_extjs_file']['src'],
 			'exclude'   => true,
 			'inputType' => 'fileTree',
-			'eval'      => array('fieldType' => 'radio', 'filesOnly' => true, 'mandatory' => true, 'extensions' => 'js', 'path' => '/'),
+			'eval'      => array('fieldType' => 'radio', 'filesOnly' => true, 'mandatory' => true, 'extensions' => 'js'),
 			'sql'       => (version_compare(VERSION, '3.2', '<')) ? "varchar(255) NOT NULL default ''" : "binary(16) NULL"
 		)
 	)
