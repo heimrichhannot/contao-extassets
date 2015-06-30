@@ -235,9 +235,14 @@ class ExtCss extends ExtAssets
 		$objFileModel = new ExtCssFileModel();
 		$objFileModel->pid = $groupId;
 		$objFileModel->tstamp = time();
-		$objFileModel->sorting = ceil(4294967295 / 2);
+
+		$objNextSorting = \Database::getInstance()->prepare("SELECT MAX(sorting) AS sorting FROM tl_extcss_file WHERE pid=?")
+			->execute($groupId);
+
+		$objFileModel->sorting = (intval($objNextSorting->sorting) + 64);
 		$objFileModel->src = $objFile->getModel()->uuid;
 		$objFileModel->save();
+		
 		return $objFileModel;
 	}
 
