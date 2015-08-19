@@ -18,6 +18,7 @@
     },
     "require": {
         "contao/core": ">=3.4,<4-dev",
+        "robloach/component-installer": "*",
         "contao-community-alliance/composer-installer": "*",
         "components/bootstrap": ">=3.3,<4-dev",
         "components/font-awesome" : ">=4.4,<5-dev"
