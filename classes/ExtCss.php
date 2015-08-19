@@ -25,7 +25,7 @@ require_once TL_ROOT . "/system/modules/extassets/classes/vendor/php-css-splitte
  * @author     r.kaltofen@heimrich-hannot.de
  * @package    Devtools
  */
-class ExtCss extends ExtAssets
+class ExtCss extends \Frontend
 {
 
 	/**

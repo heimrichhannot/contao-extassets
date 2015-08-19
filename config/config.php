@@ -16,17 +16,15 @@
  */
 define('CSSDIR', 'assets/css/');
 
-define('BOOTSTRAPVERSION', 'v3.3.4');
-define('BOOTSTRAPDIR', 'assets/bootstrap/');
-define('BOOTSTRAPLESSDIR', 'assets/bootstrap/less/');
-define('BOOTSTRAPLESSCUSTOMDIR', 'assets/bootstrap/less/custom/');
-define('BOOTSTRAPJSDIR', 'assets/bootstrap/dist/js/');
+define('BOOTSTRAPDIR', 'assets/components/bootstrap/');
+define('BOOTSTRAPLESSDIR', 'assets/components/bootstrap/less/');
+define('BOOTSTRAPLESSCUSTOMDIR', 'assets/components/bootstrap/less/custom/');
+define('BOOTSTRAPJSDIR', 'assets/components/bootstrap/dist/js/');
 
-define('FONTAWESOMEVERSION', 'v4.3.0');
-define('FONTAWESOMEDIR', 'assets/font-awesome/');
-define('FONTAWESOMELESSDIR', 'assets/font-awesome/less/');
-define('FONTAWESOMELESSCUSTOMDIR', 'assets/font-awesome/less/custom/');
-define('FONTAWESOMEFONTDIR', 'assets/font-awesome/fonts/');
+define('FONTAWESOMEDIR', 'assets/components/font-awesome/');
+define('FONTAWESOMELESSDIR', 'assets/components/font-awesome/less/');
+define('FONTAWESOMELESSCUSTOMDIR', 'assets/components/font-awesome/less/custom/');
+define('FONTAWESOMEFONTDIR', 'assets/components/font-awesome/fonts/');
 
 define('LESSCSSCACHEDIR', 'assets/css/lesscache/');
 

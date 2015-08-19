@@ -34,7 +34,6 @@ ClassLoader::addClasses(array
 	'ExtAssets\ExtAutomator'         => 'system/modules/extassets/classes/ExtAutomator.php',
 	'ExtAssets\ExtHashFile'          => 'system/modules/extassets/classes/ExtHashFile.php',
 	'ExtAssets\ExtCssCombiner'       => 'system/modules/extassets/classes/ExtCssCombiner.php',
-	'ExtAssets\ExtAssets'            => 'system/modules/extassets/classes/ExtAssets.php',
 	'ExtAssets\ExtJs'                => 'system/modules/extassets/classes/ExtJs.php',
 	'ExtAssets\ExtAssetsUpdater'     => 'system/modules/extassets/classes/ExtAssetsUpdater.php',
 	'ExtAssets\ExtCss'               => 'system/modules/extassets/classes/ExtCss.php',
