@@ -21,7 +21,8 @@
         "robloach/component-installer": "*",
         "contao-community-alliance/composer-installer": "*",
         "components/bootstrap": ">=3.3,<4-dev",
-        "heimrichhannot/font-awesome" : ">=4.4,<5-dev"
+        "heimrichhannot/font-awesome" : ">=4.4,<5-dev",
+        "heimrichhannot/elegant-icons" : ">=1.0,<2-dev"
     },
     "autoload": {
         "classmap": [""]
