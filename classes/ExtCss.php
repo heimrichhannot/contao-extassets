@@ -398,20 +398,6 @@ class ExtCss extends \Frontend
 			}
 		}
 
-		// add font awesome if checked
-		if(isset($arrReturn[ExtCssCombiner::$fontAwesomeCssKey]) && is_array($arrReturn[ExtCssCombiner::$fontAwesomeCssKey]))
-		{
-			$arrHashs = array();
-
-			foreach($arrReturn[ExtCssCombiner::$fontAwesomeCssKey] as $arrCss)
-			{
-				if(in_array($arrCss['hash'], $arrHashs)) continue;
-				$arrBaseCss[] = sprintf('%s|%s|%s|%s', $arrCss['src'], $arrCss['type'], !$static ? $static : $arrCss['mode'], $arrCss['hash']);
-				$arrHashs[] = $arrCss['hash'];
-			}
-		}
-
-
 		if($GLOBALS['TL_CONFIG']['bypassCache'])
 		{
 			$GLOBALS['TL_CSS'] = array_merge(is_array($GLOBALS['TL_CSS']) ? $GLOBALS['TL_CSS'] : array(), $arrBaseCss);

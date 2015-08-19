@@ -97,12 +97,11 @@ $GLOBALS['TL_DCA']['tl_extcss'] = array
 			'palettes' => array
 			(
 				'__selector__'				=> array('addBootstrap'),
-				'default'                   => '{title_legend},title,observeFolderSRC;{bootstrap_legend},addBootstrap;{font_awesome_legend},addFontAwesome;'
+				'default'                   => '{title_legend},title,observeFolderSRC;{bootstrap_legend},bootstrapVariablesSRC,addBootstrapPrint;{font_legend},addElegantIcons;'
 			),
 			// Subpalettes
 			'subpalettes' => array
 			(
-				'addBootstrap'				=> 'bootstrapVariablesSRC,addBootstrapPrint',
 			),
 			// Fields
 			'fields' => array
@@ -123,14 +122,6 @@ $GLOBALS['TL_DCA']['tl_extcss'] = array
 					'eval'                    => array('mandatory'=>true, 'maxlength'=>255),
 					'sql'                     => "varchar(255) NOT NULL default ''"
 				),
-				'addBootstrap' => array(
-					'label'                   => &$GLOBALS['TL_LANG']['tl_extcss']['addBootstrap'],
-					'exclude'                 => true,
-					'inputType'               => 'checkbox',
-					'default'				  => true,
-					'eval'                    => array('submitOnChange'=>true),
-					'sql'					  => "char(1) NOT NULL default ''",
-				),
 				'addBootstrapPrint' => array(
 					'label'                   => &$GLOBALS['TL_LANG']['tl_extcss']['addBootstrapPrint'],
 					'exclude'                 => true,
@@ -145,8 +136,8 @@ $GLOBALS['TL_DCA']['tl_extcss'] = array
 					'eval'                    => array('fieldType'=>'radio', 'filesOnly'=>true, 'extensions'=>'css, less'),
 					'sql'                     => (version_compare(VERSION, '3.2', '<')) ? "varchar(255) NOT NULL default ''" : "binary(16) NULL"
 				),
-				'addFontAwesome' => array(
-					'label'                   => &$GLOBALS['TL_LANG']['tl_extcss']['addFontAwesome'],
+				'addElegantIcons' => array(
+					'label'                   => &$GLOBALS['TL_LANG']['tl_extcss']['addElegantIcons'],
 					'exclude'                 => true,
 					'inputType'               => 'checkbox',
 					'default'                 => true,

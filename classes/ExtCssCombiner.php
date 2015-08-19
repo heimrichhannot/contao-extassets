@@ -73,6 +73,7 @@ class ExtCssCombiner extends \Frontend
 		(
 			'compress' => !\Config::get('bypassCache'),
 			'cache_dir' => TL_ROOT . '/assets/css/lesscache',
+
 		);
 
 		$this->objLess = new \Less_Parser($this->arrLessOptions);
@@ -82,21 +83,21 @@ class ExtCssCombiner extends \Frontend
 			$this->rewriteBootstrap = true;
 		}
 
-		if ($this->addBootstrap) {
-			$this->addBootstrapVariables();
-			$this->addFontAwesomeCore();
-			$this->addBootstrapMixins();
-			$this->addBootstrapAlerts();
-			$this->addBootstrap();
-			$this->addBootstrapUtilities();
-			$this->addBootstrapType();
-		}
+		$this->addBootstrapVariables();
+		$this->addFontAwesomeVariables();
+		$this->addFontAwesomeCore();
+		$this->addFontAwesomeIcons();
+		$this->addFontAwesomeMixins();
+		$this->addFontAwesome();
+		$this->addBootstrapMixins();
+		$this->addBootstrapAlerts();
+		$this->addBootstrap();
+		$this->addBootstrapUtilities();
+		$this->addBootstrapType();
 
-		if ($this->addFontAwesome) {
-			$this->addFontAwesomeVariables();
-			$this->addFontAwesomeIcons();
-			$this->addFontAwesomeMixins();
-			$this->addFontAwesome();
+		if ($this->addElegantIcons) {
+			$this->addElegantIconsVariables();
+			$this->addElegantIcons();
 		}
 
 		$this->addCustomLessFiles();
@@ -110,12 +111,19 @@ class ExtCssCombiner extends \Frontend
 
 		$strCss = $this->objUserCssFile->getContent();
 
-		if (is_array($this->arrCss) && !empty($this->arrCss) && ($this->rewrite || $this->rewriteBootstrap))
+		if (($this->rewrite || $this->rewriteBootstrap))
 		{
-			$this->objLess->SetImportDirs($this->arrLessImportDirs);
-			$this->objLess->parse(implode("\n", $this->arrCss));
-			$strCss = $this->objLess->getCss();
-			$this->objUserCssFile->write($strCss);
+
+			try{
+				$this->objLess->SetImportDirs($this->arrLessImportDirs);
+				$strCss = $this->objLess->getCss();
+				$this->objUserCssFile->write($strCss);
+			} catch(\Exception $e)
+			{
+				echo '<pre>';
+				echo $e->getMessage();
+				echo '</pre>';
+			}
 		}
 
 		$splitter = new \CssSplitter\Splitter();
@@ -170,12 +178,7 @@ class ExtCssCombiner extends \Frontend
 
 			if ($objFile->size == 0) continue;
 
-			if ($this->isFileUpdated($objFile, $this->objUserCssFile) || $this->rewrite)
-			{
-				$this->rewrite = true;
-			}
-
-			$this->arrCss[$objFileModel->id] = $objFile->getContent();
+			$this->objLess->parseFile($objFile->value);
 		}
 	}
 
@@ -206,7 +209,7 @@ class ExtCssCombiner extends \Frontend
 			$objTarget->close();
 
 			$objParser = new \Less_Parser($this->arrLessOptions);
-			$objParser->parseFile(TL_ROOT . '/' . $objTarget->value);
+			$objParser->parseFile($objTarget->value);
 
 			$objOut = new \File($objOut->value);
 			$objOut->write($objParser->getCss());
@@ -229,8 +232,10 @@ class ExtCssCombiner extends \Frontend
 	{
 		$objFile = new \File($this->getBootstrapSrc('variables.less'));
 
+		$strVariables = array();
+
 		if ($objFile->size > 0) {
-			$this->arrCss['variables'] = $objFile->getContent();
+			$strVariables = $objFile->getContent();
 		}
 
 		if (!$this->bootstrapVariablesSRC) return false;
@@ -253,17 +258,18 @@ class ExtCssCombiner extends \Frontend
 				{
 					$this->rewrite          = true;
 					$this->rewriteBootstrap = true;
-					$this->arrCss['variables'] .= "\n" . $objFile->getContent();
+					$strVariables .= "\n" . $objFile->getContent();
 				} else
 				{
-					$this->arrCss['variables'] .= "\n" . $objFile->getContent();
+					$strVariables .= "\n" . $objFile->getContent();
 				}
 			}
 		}
 
 		if ($this->rewriteBootstrap)
 		{
-			$objTarget->write($this->arrCss['variables']);
+			$objTarget->write($strVariables);
+			$this->objLess->parse($strVariables);
 		}
 	}
 
@@ -282,7 +288,7 @@ class ExtCssCombiner extends \Frontend
 					if (!file_exists(TL_ROOT . '/' . BOOTSTRAPLESSDIR . '/' . $strFile)) continue;
 
 					$objMixinFile = new \File(BOOTSTRAPLESSDIR . '/' . $strFile);
-					$this->arrCss['mixins'] .= $objMixinFile->getContent();
+					$this->objLess->parseFile($objMixinFile->value);
 				}
 			}
 
@@ -291,7 +297,7 @@ class ExtCssCombiner extends \Frontend
 
 
 		if ($objFile->size > 0) {
-			$this->arrCss['mixins'] = $objFile->getContent();
+			$this->objLess->parseFile($objFile->value);
 		}
 	}
 
@@ -303,7 +309,7 @@ class ExtCssCombiner extends \Frontend
 		$objFile = new \File($this->getBootstrapSrc('alerts.less'));
 
 		if ($objFile->size > 0) {
-			$this->arrCss['alerts'] = $objFile->getContent();
+			$this->objLess->parseFile($objFile->value);
 		}
 	}
 
@@ -325,7 +331,7 @@ class ExtCssCombiner extends \Frontend
 			$objFile = new \File($this->getBootstrapSrc($strFile));
 
 			if ($objFile->size > 0) {
-				$this->arrCss['utilities'] .= $objFile->getContent();
+				$this->objLess->parseFile($objFile->value);
 			}
 		}
 	}
@@ -335,42 +341,36 @@ class ExtCssCombiner extends \Frontend
 		$objFile = new \File($this->getBootstrapSrc('type.less'));
 
 		if ($objFile->size > 0) {
-			$this->arrCss['type'] = $objFile->getContent();
+			$this->objLess->parseFile($objFile->value);
 		}
 	}
 
 	protected function addFontAwesomeVariables()
 	{
-		$objFile   = new \File($this->getFontAwesomeSrc('variables.less'));
+		$objFile   = new \File($this->getFontAwesomeLessSrc('variables.less'));
 		$objTarget = new \File($this->getFontAwesomeCustomSrc($this->variablesSrc), true);
 
 		if ($objFile->size > 0) {
-			$this->arrCss['variables-fontawesome'] = $objFile->getContent();
+			$strCss = $objFile->getContent();
 			// change font path
-			$this->arrCss['variables-fontawesome'] = str_replace("../fonts", '/' . rtrim(FONTAWESOMEFONTDIR, '/'), $this->arrCss['variables-fontawesome']);
+			$strCss = str_replace("../fonts", '/' . rtrim(FONTAWESOMEFONTDIR, '/'), $strCss);
 		}
 
 		if (!$objTarget->exists() || $objTarget->size == 0) {
-			\File::putContent($this->getFontAwesomeCustomSrc($this->variablesSrc), $this->arrCss['variables-fontawesome']);
+			\File::putContent($this->getFontAwesomeCustomSrc($this->variablesSrc), $strCss);
 		}
+
+		$this->objLess->parseFile($objTarget->value);
 	}
 
 	protected function addFontAwesomeCore()
 	{
-		$objFile = new \File($this->getFontAwesomeSrc('core.less'));
-
-		if ($objFile->size > 0) {
-			$this->arrCss['core-fontawesome'] = $objFile->getContent();
-		}
+		$this->objLess->parseFile($this->getFontAwesomeLessSrc('core.less'));
 	}
 
 	protected function addFontAwesomeMixins()
 	{
-		$objFile = new \File($this->getFontAwesomeSrc('mixins.less'));
-
-		if ($objFile->size > 0) {
-			$this->arrCss['mixins-fontawesome'] = $objFile->getContent();
-		}
+		$this->objLess->parseFile($this->getFontAwesomeLessSrc('mixins.less'));
 	}
 
 	/**
@@ -378,43 +378,38 @@ class ExtCssCombiner extends \Frontend
 	 */
 	protected function addFontAwesomeIcons()
 	{
-		$objFile = new \File($this->getFontAwesomeSrc('icons.less'));
-
-		if ($objFile->size > 0) {
-			$this->arrCss['icons-fontawesome'] = $objFile->getContent();
-		}
+		$this->objLess->parseFile($this->getFontAwesomeLessSrc('icons.less'));
 	}
 
 	protected function addFontAwesome()
 	{
-		$objFile   = new \File($this->getFontAwesomeSrc('font-awesome.less'));
-		$objTarget = new \File($this->getFontAwesomeCustomSrc('font-awesome-' . $this->title . '.less'));
-		$objOut    = new \File($this->getSrc('font-awesome-' . $this->title . '.css'), true);
+		if($this->rewrite)
+		{
+			$objFile = new \File($this->getFontAwesomeCssSrc('font-awesome.css'), true);
 
-		if ($this->rewrite || !$objOut->exists() || $objTarget->size == 0 || $objOut->size == 0) {
 			$strCss = $objFile->getContent();
+			$strCss = str_replace("../fonts", '/' . rtrim(FONTAWESOMEFONTDIR, '/'), $strCss);
 
-
-			$strCss = str_replace('@import "', '@import "../', $strCss);
-			$strCss = str_replace('../variables.less', $this->variablesSrc, $strCss);
-
-			$objTarget->write($strCss);
-			$objTarget->close();
-
-			$objParser = new \Less_Parser($this->arrLessOptions);
-			$objParser->parseFile(TL_ROOT . '/' . $objTarget->value);
-
-			$objOut = new \File($objOut->value);
-			$objOut->write($objParser->getCss());
+			$this->objLess->parse($strCss);
 		}
+	}
 
-		$this->arrReturn[self::$fontAwesomeCssKey][] = array
-		(
-			'src'  => $objOut->value,
-			'type' => 'all',
-			'mode' => $this->mode,
-			'hash' => version_compare(VERSION, '3.4', '>=') ? $objOut->mtime : $objOut->hash,
-		);
+	protected function addElegantIconsVariables()
+	{
+		$this->objLess->parseFile($this->getElegentIconsLessSrc('variables.less'));
+	}
+
+	protected function addElegantIcons()
+	{
+		if($this->rewrite)
+		{
+			$objFile = new \File($this->getElegentIconsCssSrc('elegant-icons.css'), true);
+
+			$strCss = $objFile->getContent();
+			$strCss = str_replace("../fonts", '/' . rtrim(ELEGANTICONSFONTDIR, '/'), $strCss);
+
+			$this->objLess->parse($strCss);
+		}
 	}
 
 	protected function addCustomLessFiles()
@@ -440,7 +435,7 @@ class ExtCssCombiner extends \Frontend
 				$this->arrLessImportDirs[$objFile->dirname] = $objFile->dirname;
 			}
 
-			$this->arrCss[$key] = $strContent;
+			$this->objLess->parseFile($objFile->value);
 
 			unset($GLOBALS['TL_USER_CSS'][$key]);
 		}
@@ -457,9 +452,10 @@ class ExtCssCombiner extends \Frontend
 		{
 			case 'title':
 				return standardize(\String::restoreBasicEntities(implode('-', $this->getEach('title'))));
-			case 'addBootstrap':
 			case 'addBootstrapPrint':
 			case 'addFontAwesome':
+				return max($this->getEach($strKey));
+			case 'addElegantIcons':
 				return max($this->getEach($strKey));
 			case 'bootstrapVariablesSRC':
 				return $this->getEach('bootstrapVariablesSRC');
@@ -504,7 +500,12 @@ class ExtCssCombiner extends \Frontend
 		return BOOTSTRAPLESSCUSTOMDIR . $src;
 	}
 
-	protected function getFontAwesomeSrc($src)
+	protected function getFontAwesomeCssSrc($src)
+	{
+		return FONTAWESOMECSSDIR . $src;
+	}
+
+	protected function getFontAwesomeLessSrc($src)
 	{
 		return FONTAWESOMELESSDIR . $src;
 	}
@@ -512,6 +513,16 @@ class ExtCssCombiner extends \Frontend
 	protected function getFontAwesomeCustomSrc($src)
 	{
 		return FONTAWESOMELESSCUSTOMDIR . $src;
+	}
+
+	protected function getElegentIconsCssSrc($src)
+	{
+		return ELEGANTICONSCSSDIR . $src;
+	}
+
+	protected function getElegentIconsLessSrc($src)
+	{
+		return ELEGANTICONSLESSDIR . $src;
 	}
 
 }

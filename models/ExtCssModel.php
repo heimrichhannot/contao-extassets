@@ -64,9 +64,6 @@ class ExtCssModel extends \Model
 			$arrOptions['order'] = \Database::getInstance()->findInSet("$t.id", $arrIds);
 		}
 
-		$arrOptions['column'] = array('addBootstrap=1');
-
-
 		return static::findBy(array("$t.id IN(" . implode(',', array_map('intval', $arrIds)) . ")"), null, $arrOptions);
 	}
 }

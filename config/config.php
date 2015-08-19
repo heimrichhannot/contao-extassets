@@ -22,9 +22,15 @@ define('BOOTSTRAPLESSCUSTOMDIR', 'assets/components/bootstrap/less/custom/');
 define('BOOTSTRAPJSDIR', 'assets/components/bootstrap/dist/js/');
 
 define('FONTAWESOMEDIR', 'assets/components/font-awesome/');
-define('FONTAWESOMELESSDIR', 'assets/components/font-awesome/less/');
-define('FONTAWESOMELESSCUSTOMDIR', 'assets/components/font-awesome/less/custom/');
-define('FONTAWESOMEFONTDIR', 'assets/components/font-awesome/fonts/');
+define('FONTAWESOMECSSDIR', FONTAWESOMEDIR . 'css/');
+define('FONTAWESOMELESSDIR', FONTAWESOMEDIR . 'less/');
+define('FONTAWESOMELESSCUSTOMDIR', FONTAWESOMEDIR . 'less/custom/');
+define('FONTAWESOMEFONTDIR', FONTAWESOMEDIR . 'fonts/');
+
+define('ELEGANTICONSDIR', 'assets/components/elegant-icons/');
+define('ELEGANTICONSCSSDIR', ELEGANTICONSDIR . 'css/');
+define('ELEGANTICONSLESSDIR', ELEGANTICONSDIR . 'less/');
+define('ELEGANTICONSFONTDIR', ELEGANTICONSDIR . 'fonts/');
 
 define('LESSCSSCACHEDIR', 'assets/css/lesscache/');
 
