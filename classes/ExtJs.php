@@ -17,7 +17,7 @@
  */
 namespace ExtAssets;
 
-class ExtJs extends ExtAssets
+class ExtJs extends \Frontend
 {
 
 	/**
