@@ -15,16 +15,17 @@
  * Fields
  */
 $GLOBALS['TL_LANG']['tl_extcss']['title'] = array('Titel', 'Bitte geben Sie einen Titel an.');
-$GLOBALS['TL_LANG']['tl_extcss']['addBootstrapPrint'] = array('print.css aktivieren', 'Fügen Sie der CSS Gruppe Twitter Bootstrap print.css hinzu.');
-$GLOBALS['TL_LANG']['tl_extcss']['bootstrapVariablesSRC'] = array('Variablen Quelle', 'Falls vorhanden, werden die Bootstap Variablen aus variables.less mit den Variablen dieser Datei überschrieben.');
+$GLOBALS['TL_LANG']['tl_extcss']['addBootstrapPrint'] = array('print.css aktivieren', 'Fügen Sie der CSS Gruppe die Bootstrap print.css hinzu.');
+$GLOBALS['TL_LANG']['tl_extcss']['variablesSRC'] = array('Variablen Quellen', 'Sollen globale Variablen, so z.B. die Bootstrap Variablen, überschrieben werden, so geben Sie die Dateien hier an.');
+$GLOBALS['TL_LANG']['tl_extcss']['variablesOrderSRC'] = array('Sortierreihenfolge ', 'Sortierreihenfolge der Variablen Quellen.');
 $GLOBALS['TL_LANG']['tl_extcss']['observeFolderSRC'] = array('Ordner überwachen', 'Geben Sie einen Ordner an, der überwacht werden soll, und neue Dateien automatisch hinzugefügt werden.');
 $GLOBALS['TL_LANG']['tl_extcss']['addElegantIcons'] = array('Elegant Icons hinzufügen', 'Elegant Icon Font der Gruppe hinzufügen.');
 
 /**
  * Legends
  */
-$GLOBALS['TL_LANG']['tl_extcss']['title_legend'] = 'Titel & Überwachung';
-$GLOBALS['TL_LANG']['tl_extcss']['bootstrap_legend'] = 'Twitter Bootstrap';
+$GLOBALS['TL_LANG']['tl_extcss']['title_legend'] = 'Titel';
+$GLOBALS['TL_LANG']['tl_extcss']['config_legend'] = 'Konfiguration';
 $GLOBALS['TL_LANG']['tl_extcss']['font_legend'] = 'Icon-Fonts';
 
 /**

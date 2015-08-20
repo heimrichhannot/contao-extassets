@@ -13,9 +13,11 @@ namespace ExtAssets;
 
 class ExtAssetsUpdater
 {
+
 	public static function run()
 	{
 		$objDatabase = \Database::getInstance();
+		\Controller::loadDataContainer('tl_extcss');
 
 		$arrFields = array
 		(
@@ -31,13 +33,37 @@ class ExtAssetsUpdater
 				if (!$objDatabase->tableExists($strTable)) continue;
 
 				// convert file fields
-				foreach ($objDatabase->listFields($strTable) as $arrField) {
+				foreach ($objDatabase->listFields($strTable) as $arrField)
+				{
+					// with extassets 1.1.1 bootstrapVariablesSRC changed to variablesSRC
+					if($arrField['name'] == 'bootstrapVariablesSRC')
+					{
+						if(!$objDatabase->fieldExists('variablesSRC', $strTable))
+						{
+							$sql = &$GLOBALS['TL_DCA']['tl_extcss']['fields']['variablesSRC']['sql'];
+							$objDatabase->query("ALTER TABLE $strTable ADD `variablesSRC` $sql");
+
+							$sql = &$GLOBALS['TL_DCA']['tl_extcss']['fields']['variablesOrderSRC']['sql'];
+							$objDatabase->query("ALTER TABLE $strTable ADD `variablesOrderSRC` $sql");
+						}
+
+						$objGroups = $objDatabase->execute('SELECT * FROM ' . $strTable . ' WHERE bootstrapVariablesSRC IS NOT NULL AND variablesSRC IS NULL');
+
+						while($objGroups->next())
+						{
+							$variables = serialize(array($objGroups->bootstrapVariablesSRC));
+
+							$objDatabase->prepare('UPDATE ' . $strTable . ' SET variablesSRC = ?, variablesOrderSRC = ?')->execute($variables,$variables);
+						}
+
+						$objDatabase->query("ALTER TABLE $strTable DROP `bootstrapVariablesSRC`");
+					}
+
 					if(in_array($arrField['name'], $arrNames)){
 						\Database\Updater::convertSingleField($strTable, $arrField['name']);
 					}
-
-
 				}
+
 			}
 		}
 

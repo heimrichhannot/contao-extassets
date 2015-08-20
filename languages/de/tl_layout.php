@@ -14,5 +14,5 @@
 /**
  * Fields
  */
-$GLOBALS['TL_LANG']['tl_layout']['extcss'] = array('Externes CSS', 'Weisen Sie dem Layout eine Gruppe externer CSS Dateien zu.');
+$GLOBALS['TL_LANG']['tl_layout']['extcss'] = array('Externes CSS', 'Weisen Sie dem Layout eine Gruppe externer Css oder Less Dateien zu.');
 $GLOBALS['TL_LANG']['tl_layout']['extjs'] = array('Externes Javascript', 'Weisen Sie dem Layout eine Gruppe externer Javascript Dateien zu.');

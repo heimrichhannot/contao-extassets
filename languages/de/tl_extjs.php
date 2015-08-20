@@ -15,14 +15,14 @@
  * Fields
  */
 $GLOBALS['TL_LANG']['tl_extjs']['title'] = array('Titel', 'Bitte geben Sie einen Titel an.');
-$GLOBALS['TL_LANG']['tl_extjs']['addBootstrap'] = array('Twitter Bootstrap aktivieren', 'Fügen Sie der Javascript Gruppe Twitter Bootstrap hinzu.');
+$GLOBALS['TL_LANG']['tl_extjs']['addBootstrap'] = array('Bootstrap javascript aktivieren', 'Fügen Sie der Javascript Gruppe Bootstrap javascript hinzu.');
 
 
 /**
  * Legends
  */
 $GLOBALS['TL_LANG']['tl_extjs']['title_legend'] = 'Titel';
-$GLOBALS['TL_LANG']['tl_extjs']['bootstrap_legend'] = 'Twitter Bootstrap';
+$GLOBALS['TL_LANG']['tl_extjs']['bootstrap_legend'] = 'Bootstrap';
 
 /**
  * Buttons

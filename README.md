@@ -1,55 +1,62 @@
-# contao-extassets
+# Contao Extassets
 
-Contao external CSS &amp; JS assets groups with bootstrap and font-awesome support
+Create your own css & js groups and add them to your contao theme layouts.
 
-The aim was to make external CSS & Javascript better groupable and attach it to the page layout.
 
-## Features
+## General features
+- Backend Module for external css
+- Backend Module for external js 
+- Add multiple CSS & JS groups to contao layout 
+- Bootstrap framework support (for css by default, enable within js group)
+- Font-Awesome added by default (availability of all variables and mixins)
+- Elegant Icons can be added (availability of all variables and mixins)
+- Css file caching for production mode (disable byPassCache in contao settings)
 
-#### LESS
+## External CSS
 
-All CSS files of the group are handled by less.php (https://github.com/oyejorge/less.php) parser and parsed accordingly.
+### Features
+- Complete lesscss support, automatically compile all your less files within a external css group to css
+- Observer folders (recursive) within your external css groups
+- Add multiple custom variable files, to overwrite for example bootstrap variables.less (like @brand-primary)
+- make use of all bootstrap mixins and variables within your own less files (See: http://getbootstrap.com/customize/#less-variables)
+- bootstrap print.css support
+- Internet Explorer 6-9 - 4096 css-selector handling (Internet Explorer 6 - 9 has only a maximum of 4096 css-selectors possible per file. Extassets make usage of https://github.com/zweilove/css_splitter ans solve this problem by splitting aggregated files into parts.)
+- all files within $GLOBALS['TL_USER_CSS'] will be parsed within external css groups
 
-#### Bootstrap
+### Hooks
 
-- automatically download the framework (on first page load of the according frontend layout)
-- possible to embed on selecte CSS-group
-- overwrite all less-variables (variables.less) based on CSS-group
-- make use of LESS-Mixins (mixins.less)
-- Bootstrap Javascript-Support (Javascript-Group in Layout)
+#### addCustomAssets
 
-##### Example of usage of bootstrap mixins and variables
-
-Reference a singular variables.less file in your css-group as "variables-src", and overwrite existing bootstrap variables by your own.
-Rewritable bootstrap variables can be looked up, at "assets/bootstrap/less/variables.less", after framework has been downloaded automatically. 
-
-Bootstrap mixins and variables can be used easily in your css-code, and redundant css-code will be minimized
+Attach custom fonts or css libraries to extassets combiner. 
 
 ```
-#main {
+// config.php
+$GLOBALS['TL_HOOKS']['addCustomAssets'][] = array('MyClass', 'addCustomAssetsHook');
 
-	margin-bottom: @grid-gutter-width;
 
-        .carousel-control{
-                .transition(opacity 750ms ease-out);
-        }
+// MyClass.php
 
+public function addCustomAssetsHook(\Less_Parser $objLess, $arrData, \ExtAssets\ExtCssCombiner $objCombiner)
+{
+    // example: add custom less variables to your css group to provide acces to mixins or variables in your external css files
+    $this->objLess->parseFile('/assets/components/my-library/less/my-variables.less'));
+    
+    // example: add custom font to your css group
+    $objFile = new \File('/assets/components/my-library/css/my-font.css, true);
+    $strCss = $objFile->getContent();
+    $strCss = str_replace("../fonts", '/assets/components/my-library/'), $strCss); // make font path absolut, mostly required
+    $this->objLess->parse($strCss);
 }
-```
-
-More: http://getbootstrap.com/ 
-
-
-#### Font Awesome
-
-- automatically download the framework (on first page load of the according frontend layout)
-- possible to embed on selecte CSS-group
-- make use of LESS-Mixins & Variables (mixins.less)
-
-##### Example of usage of font-awesome mixins and variables
 
 ```
-i {
+
+### Font Awesome (http://fontawesome.io/)
+
+Use font-awesome mixins and variables right inside your less files.
+
+```
+// my-styles.less
+.my-button{
   .fa;
   .fa-lg;
   &:before{
@@ -58,12 +65,21 @@ i {
 }
 ```
 
-Font-Awesome variables can be looked up, at "assets/font-awesome/less/variables.less", after framework has been downloaded automatically. 
+List of all font-awesome variables, see (https://github.com/heimrichhannot/font-awesome/blob/master/less/variables.less). 
 
-#### Aggregates css & js files
 
-Enable "Compress scripts" under "System -> Settings -> Global Settings", and css as well as js groups will be aggregated and compressed.
+### Elegant Icon Font (http://www.elegantthemes.com/blog/resources/elegant-icon-font)
 
-#### Internet Explorer 6-9 - 4096 css-selector handling
+Use elegant-icon mixins and variables right inside your less files.
 
-Internet Explorer 6 - 9 has only a maximum of 4096 css-selectors possible per file. Extassets make usage of https://github.com/zweilove/css_splitter ans solve this problem by splitting aggregated files into parts.
+```
+// my-styles.less
+.my-button{
+  .ei;
+  &:before{
+    content: @ei-var-info;
+  }
+}
+```
+
+List of all elegant-icon variables, see (https://github.com/heimrichhannot/elegant-icons/blob/master/less/variables.less). 

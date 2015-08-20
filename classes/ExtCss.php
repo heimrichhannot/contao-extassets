@@ -115,11 +115,6 @@ class ExtCss extends \Frontend
 		static::getInstance()->blnLiveMode = !$designerMode;
 	}
 
-	public static function cleanUpCssGroup($groupId)
-	{
-		// TODO: cleanup list, remove no longer existing files
-	}
-
 	public static function observeCssGroupFolder($groupId)
 	{
 		$objCss = ExtCssModel::findByPk($groupId);
@@ -150,14 +145,21 @@ class ExtCss extends \Frontend
 		$arrDiff = array_diff($arrFileNames, $arrOldFileNames);
 
 		// exclude bootstrap variables src
-		$objVariablesModel = \FilesModel::findByUuid($objCss->bootstrapVariablesSRC);
+		$objVariablesModel = \FilesModel::findMultipleByUuids(deserialize($objCss->variablesOrderSRC, true));
 
-		$variablesKey = array_search($objVariablesModel->path, $arrDiff);
+		$arrRemove = array();
 
-		if($variablesKey !== false)
+		if($objVariablesModel !== null)
 		{
-			unset($arrDiff[$variablesKey]);
+			$arrVariables = $objVariablesModel->fetchEach('path');
+
+			// remove variables from oberserve files
+			$arrDiff = array_diff($arrDiff, $arrVariables);
+			
+			// remove variables from oberserve files
+			$arrRemove = array_intersect($arrOldFileNames, $arrVariables);
 		}
+		
 
 		if(!empty($arrDiff))
 		{
@@ -169,12 +171,12 @@ class ExtCss extends \Frontend
 		}
 
 		// cleanup
-		$arrRemoveDiff = array_diff($arrOldFileNames, $arrFileNames);
+		$arrRemove = array_merge($arrRemove, array_diff($arrOldFileNames, $arrFileNames));
 		
-		if(!empty($arrRemoveDiff))
+		if(!empty($arrRemove))
 		{
 			// add new files
-			foreach($arrRemoveDiff as $key => $path)
+			foreach($arrRemove as $key => $path)
 			{
 				// file is not part of the observed folder
 				if(strpos($path, $objObserveModel->path) === FALSE) continue;
@@ -217,7 +219,6 @@ class ExtCss extends \Frontend
 
 		if($objExtCssFileModel === null) return false;
 
-		$objFileModel->delete();
 		$objExtCssFileModel->delete();
 
 		return true;
@@ -335,7 +336,7 @@ class ExtCss extends \Frontend
 
 		$objCss->reset();
 
-		$combiner = new ExtCssCombiner($objCss, $arrReturn);
+		$combiner = new ExtCssCombiner($objCss, $arrReturn, !$GLOBALS['TL_CONFIG']['bypassCache']);
 
 		$arrReturn = $combiner->getUserCss();
 

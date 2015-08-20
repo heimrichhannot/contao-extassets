@@ -97,7 +97,7 @@ $GLOBALS['TL_DCA']['tl_extcss'] = array
 			'palettes' => array
 			(
 				'__selector__'				=> array('addBootstrap'),
-				'default'                   => '{title_legend},title,observeFolderSRC;{bootstrap_legend},bootstrapVariablesSRC,addBootstrapPrint;{font_legend},addElegantIcons;'
+				'default'                   => '{title_legend},title;{config_legend},observeFolderSRC,variablesSRC,addBootstrapPrint;{font_legend},addElegantIcons;'
 			),
 			// Subpalettes
 			'subpalettes' => array
@@ -129,12 +129,17 @@ $GLOBALS['TL_DCA']['tl_extcss'] = array
 					'eval'                    => array('submitOnChange'=>true),
 					'sql'					  => "char(1) NOT NULL default ''",
 				),
-				'bootstrapVariablesSRC'	=> array(
-					'label'                   => &$GLOBALS['TL_LANG']['tl_extcss']['bootstrapVariablesSRC'],
+				'variablesSRC'	=> array(
+					'label'                   => &$GLOBALS['TL_LANG']['tl_extcss']['variablesSRC'],
 					'exclude'                 => true,
 					'inputType'               => 'fileTree',
-					'eval'                    => array('fieldType'=>'radio', 'filesOnly'=>true, 'extensions'=>'css, less'),
-					'sql'                     => (version_compare(VERSION, '3.2', '<')) ? "varchar(255) NOT NULL default ''" : "binary(16) NULL"
+					'eval'                    => array('multiple'=>true, 'fieldType'=>'checkbox', 'orderField'=>'variablesOrderSRC', 'files'=>true, 'extensions'=>'css, less'),
+					'sql'                     => "blob NULL",
+				),
+				'variablesOrderSRC' => array
+				(
+					'label'                   => &$GLOBALS['TL_LANG']['tl_content']['variablesOrderSRC'],
+					'sql'                     => "blob NULL"
 				),
 				'addElegantIcons' => array(
 					'label'                   => &$GLOBALS['TL_LANG']['tl_extcss']['addElegantIcons'],

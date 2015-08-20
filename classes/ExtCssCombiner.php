@@ -35,7 +35,7 @@ class ExtCssCombiner extends \Frontend
 
 	protected $uriRoot;
 
-	public $debug = false;
+	public $debug = true;
 
 	protected $objLess;
 
@@ -43,9 +43,15 @@ class ExtCssCombiner extends \Frontend
 
 	protected $arrLessImportDirs = array();
 
-	public function __construct(\Model\Collection $objCss, $arrReturn = array())
+	protected $cache = true;
+
+	public function __construct(\Model\Collection $objCss, $arrReturn = array(), $blnCache)
 	{
 		parent::__construct();
+
+		$this->start = microtime(true);
+		$this->cache = $blnCache;
+
 		$this->loadDataContainer('tl_extcss');
 
 		while($objCss->next())
@@ -55,14 +61,14 @@ class ExtCssCombiner extends \Frontend
 
 		$this->variablesSrc = 'variables-' . $this->title . '.less';
 		
-		$this->mode = $GLOBALS['TL_CONFIG']['bypassCache'] ? 'none' : 'static';
+		$this->mode = $this->cache ? 'none' : 'static';
 
 		$this->arrReturn = $arrReturn;
 
 		$this->objUserCssFile = new \File($this->getSrc($this->title . '.css'));;
 
-		// rewrite if group css is empty // created recently
-		if ($this->objUserCssFile->size == 0) {
+		// rewrite if group css is empty or created/updated recently
+		if ($this->objUserCssFile->size == 0 || $this->lastUpdate > $this->objUserCssFile->mtime) {
 			$this->rewrite          = true;
 			$this->rewriteBootstrap = true;
 		}
@@ -76,33 +82,48 @@ class ExtCssCombiner extends \Frontend
 
 		);
 
-		$this->objLess = new \Less_Parser($this->arrLessOptions);
+		if(!$this->cache)
+		{
+			$this->objLess = new \Less_Parser($this->arrLessOptions);
 
-		if ($this->debug) {
-			$this->rewrite          = true;
-			$this->rewriteBootstrap = true;
+			$this->addBootstrapVariables();
+			$this->addFontAwesomeVariables();
+			$this->addFontAwesomeCore();
+			$this->addFontAwesomeIcons();
+			$this->addFontAwesomeMixins();
+			$this->addFontAwesome();
+			$this->addBootstrapMixins();
+			$this->addBootstrapAlerts();
+			$this->addBootstrap();
+			$this->addBootstrapUtilities();
+			$this->addBootstrapType();
+
+			if ($this->addElegantIcons) {
+				$this->addElegantIconsVariables();
+				$this->addElegantIcons();
+			}
+
+			// HOOK: add custom assets
+			if (isset($GLOBALS['TL_HOOKS']['addCustomAssets']) && is_array($GLOBALS['TL_HOOKS']['addCustomAssets']))
+			{
+				foreach ($GLOBALS['TL_HOOKS']['addCustomAssets'] as $callback)
+				{
+					$this->import($callback[0]);
+					$this->$callback[0]->$callback[1]($this->objLess, $this->arrData, $this);
+				}
+			}
+
+			$this->addCustomLessFiles();
+
+			$this->addCssFiles();
 		}
+		else{
+			// remove custom less files as long as we can not provide mixins and variables in cache mode
+			unset($GLOBALS['TL_USER_CSS']);
 
-		$this->addBootstrapVariables();
-		$this->addFontAwesomeVariables();
-		$this->addFontAwesomeCore();
-		$this->addFontAwesomeIcons();
-		$this->addFontAwesomeMixins();
-		$this->addFontAwesome();
-		$this->addBootstrapMixins();
-		$this->addBootstrapAlerts();
-		$this->addBootstrap();
-		$this->addBootstrapUtilities();
-		$this->addBootstrapType();
-
-		if ($this->addElegantIcons) {
-			$this->addElegantIconsVariables();
-			$this->addElegantIcons();
+			// always add bootstrap
+			$this->addBootstrap();
 		}
-
-		$this->addCustomLessFiles();
-
-		$this->addCssFiles();
 	}
 
 	public function getUserCss()
@@ -113,7 +134,6 @@ class ExtCssCombiner extends \Frontend
 
 		if (($this->rewrite || $this->rewriteBootstrap))
 		{
-
 			try{
 				$this->objLess->SetImportDirs($this->arrLessImportDirs);
 				$strCss = $this->objLess->getCss();
@@ -156,6 +176,13 @@ class ExtCssCombiner extends \Frontend
 			);
 		}
 
+		if($this->debug)
+		{
+			print '<pre>';
+			print_r('ExtCssCombiner execution time: ' . (microtime(true) - $this->start) . ' seconds');
+			print '</pre>';
+		}
+
 		return $arrReturn;
 	}
 
@@ -178,6 +205,11 @@ class ExtCssCombiner extends \Frontend
 
 			if ($objFile->size == 0) continue;
 
+			if ($this->isFileUpdated($objFile, $this->objUserCssFile))
+			{
+				$this->rewrite = true;
+			}
+
 			$this->objLess->parseFile($objFile->value);
 		}
 	}
@@ -195,8 +227,7 @@ class ExtCssCombiner extends \Frontend
 
 			$strCss = str_replace('@import "', '@import "../', $strCss);
 
-
-			if ($this->bootstrapVariablesSRC) {
+			if (is_array($this->variablesOrderSRC)) {
 				$strCss = str_replace('../variables.less', $this->variablesSrc, $strCss);
 			}
 
@@ -238,15 +269,12 @@ class ExtCssCombiner extends \Frontend
 			$strVariables = $objFile->getContent();
 		}
 
-		if (!$this->bootstrapVariablesSRC) return false;
+		if(!is_array($this->variablesOrderSRC)) return;
 
 		$objTarget = new \File($this->getBootstrapCustomSrc($this->variablesSrc));
 
 		// overwrite bootstrap variables with custom variables
-		if(is_array($arrBootstrapVariablesSrc = deserialize($this->bootstrapVariablesSRC)))
-		{
-			$objFilesModels = \FilesModel::findMultipleByUuids($arrBootstrapVariablesSrc);
-		}
+		$objFilesModels = \FilesModel::findMultipleByUuids($this->variablesOrderSRC);
 
 		if($objFilesModels !== null)
 		{
@@ -269,8 +297,9 @@ class ExtCssCombiner extends \Frontend
 		if ($this->rewriteBootstrap)
 		{
 			$objTarget->write($strVariables);
-			$this->objLess->parse($strVariables);
 		}
+
+		$this->objLess->parse($strVariables);
 	}
 
 	/**
@@ -347,20 +376,7 @@ class ExtCssCombiner extends \Frontend
 
 	protected function addFontAwesomeVariables()
 	{
-		$objFile   = new \File($this->getFontAwesomeLessSrc('variables.less'));
-		$objTarget = new \File($this->getFontAwesomeCustomSrc($this->variablesSrc), true);
-
-		if ($objFile->size > 0) {
-			$strCss = $objFile->getContent();
-			// change font path
-			$strCss = str_replace("../fonts", '/' . rtrim(FONTAWESOMEFONTDIR, '/'), $strCss);
-		}
-
-		if (!$objTarget->exists() || $objTarget->size == 0) {
-			\File::putContent($this->getFontAwesomeCustomSrc($this->variablesSrc), $strCss);
-		}
-
-		$this->objLess->parseFile($objTarget->value);
+		$this->objLess->parseFile($this->getFontAwesomeLessSrc('variables.less'));
 	}
 
 	protected function addFontAwesomeCore()
@@ -383,15 +399,12 @@ class ExtCssCombiner extends \Frontend
 
 	protected function addFontAwesome()
 	{
-		if($this->rewrite)
-		{
-			$objFile = new \File($this->getFontAwesomeCssSrc('font-awesome.css'), true);
+		$objFile = new \File($this->getFontAwesomeCssSrc('font-awesome.css'), true);
 
-			$strCss = $objFile->getContent();
-			$strCss = str_replace("../fonts", '/' . rtrim(FONTAWESOMEFONTDIR, '/'), $strCss);
+		$strCss = $objFile->getContent();
+		$strCss = str_replace("../fonts", '/' . rtrim(FONTAWESOMEFONTDIR, '/'), $strCss);
 
-			$this->objLess->parse($strCss);
-		}
+		$this->objLess->parse($strCss);
 	}
 
 	protected function addElegantIconsVariables()
@@ -401,15 +414,12 @@ class ExtCssCombiner extends \Frontend
 
 	protected function addElegantIcons()
 	{
-		if($this->rewrite)
-		{
-			$objFile = new \File($this->getElegentIconsCssSrc('elegant-icons.css'), true);
+		$objFile = new \File($this->getElegentIconsCssSrc('elegant-icons.css'), true);
 
-			$strCss = $objFile->getContent();
-			$strCss = str_replace("../fonts", '/' . rtrim(ELEGANTICONSFONTDIR, '/'), $strCss);
+		$strCss = $objFile->getContent();
+		$strCss = str_replace("../fonts", '/' . rtrim(ELEGANTICONSFONTDIR, '/'), $strCss);
 
-			$this->objLess->parse($strCss);
-		}
+		$this->objLess->parse($strCss);
 	}
 
 	protected function addCustomLessFiles()
@@ -457,12 +467,13 @@ class ExtCssCombiner extends \Frontend
 				return max($this->getEach($strKey));
 			case 'addElegantIcons':
 				return max($this->getEach($strKey));
-			case 'bootstrapVariablesSRC':
-				return $this->getEach('bootstrapVariablesSRC');
-			case 'bootstrapVariablesOrderSRC':
+			case 'variablesSRC':
+			case 'variablesOrderSRC':
 				return $this->getEach($strKey);
 			case 'ids':
 				return $this->getEach('id'); // must be id
+			case 'lastUpdate':
+				return max($this->getEach('tstamp')); // return max tstamp from css groups
 		}
 
 		if (isset($this->arrData[$strKey]))
@@ -479,7 +490,18 @@ class ExtCssCombiner extends \Frontend
 
 		foreach ($this->arrData as $key => $value)
 		{
-			$return[] = $value[$strKey];
+			$value = $value[$strKey];
+
+			$varUnserialized = @unserialize($value);
+
+			if (is_array($varUnserialized))
+			{
+				// flatten array
+				$return = array_merge($return, $varUnserialized);
+				continue;
+			}
+
+			$return[] = $value;
 		}
 
 		return $return;
