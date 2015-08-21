@@ -126,7 +126,7 @@ class ExtJs extends \Frontend
 	*/
 	public function addTwitterBootstrap()
 	{
-		$in = BOOTSTRAPJSDIR . 'bootstrap.js';
+		$in = BOOTSTRAPJSDIR . 'bootstrap' . (!$GLOBALS['TL_CONFIG']['debugMode'] ? '.min' : '') . '.js';
 
 		if(!file_exists(TL_ROOT . '/' . $in)) return false;
 
