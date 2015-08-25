@@ -54,8 +54,7 @@ class ExtCssCombiner extends \Frontend
 
 		$this->loadDataContainer('tl_extcss');
 
-		while($objCss->next())
-		{
+		while ($objCss->next()) {
 			$this->arrData[] = $objCss->row();
 		}
 
@@ -71,19 +70,19 @@ class ExtCssCombiner extends \Frontend
 		if ($this->objUserCssFile->size == 0 || $this->lastUpdate > $this->objUserCssFile->mtime) {
 			$this->rewrite          = true;
 			$this->rewriteBootstrap = true;
+			$this->cache            = false;
 		}
 
 		$this->uriRoot = (TL_ASSETS_URL ? TL_ASSETS_URL : \Environment::get('url')) . '/assets/css/';
 
 		$this->arrLessOptions = array
 		(
-			'compress' => !\Config::get('bypassCache'),
+			'compress'  => !\Config::get('bypassCache'),
 			'cache_dir' => TL_ROOT . '/assets/css/lesscache',
 
 		);
 
-		if(!$this->cache)
-		{
+		if (!$this->cache) {
 			$this->objLess = new \Less_Parser($this->arrLessOptions);
 
 			$this->addBootstrapVariables();
@@ -104,10 +103,8 @@ class ExtCssCombiner extends \Frontend
 			}
 
 			// HOOK: add custom assets
-			if (isset($GLOBALS['TL_HOOKS']['addCustomAssets']) && is_array($GLOBALS['TL_HOOKS']['addCustomAssets']))
-			{
-				foreach ($GLOBALS['TL_HOOKS']['addCustomAssets'] as $callback)
-				{
+			if (isset($GLOBALS['TL_HOOKS']['addCustomAssets']) && is_array($GLOBALS['TL_HOOKS']['addCustomAssets'])) {
+				foreach ($GLOBALS['TL_HOOKS']['addCustomAssets'] as $callback) {
 					$this->import($callback[0]);
 					$this->$callback[0]->$callback[1]($this->objLess, $this->arrData, $this);
 				}
@@ -116,8 +113,7 @@ class ExtCssCombiner extends \Frontend
 			$this->addCustomLessFiles();
 
 			$this->addCssFiles();
-		}
-		else{
+		} else {
 			// remove custom less files as long as we can not provide mixins and variables in cache mode
 			unset($GLOBALS['TL_USER_CSS']);
 
@@ -132,14 +128,12 @@ class ExtCssCombiner extends \Frontend
 
 		$strCss = $this->objUserCssFile->getContent();
 
-		if (($this->rewrite || $this->rewriteBootstrap))
-		{
-			try{
+		if (($this->rewrite || $this->rewriteBootstrap)) {
+			try {
 				$this->objLess->SetImportDirs($this->arrLessImportDirs);
 				$strCss = $this->objLess->getCss();
 				$this->objUserCssFile->write($strCss);
-			} catch(\Exception $e)
-			{
+			} catch (\Exception $e) {
 				echo '<pre>';
 				echo $e->getMessage();
 				echo '</pre>';
@@ -176,8 +170,7 @@ class ExtCssCombiner extends \Frontend
 			);
 		}
 
-		if($this->debug)
-		{
+		if ($this->debug) {
 			print '<pre>';
 			print_r('ExtCssCombiner execution time: ' . (microtime(true) - $this->start) . ' seconds');
 			print '</pre>';
@@ -191,22 +184,28 @@ class ExtCssCombiner extends \Frontend
 	{
 		$objFiles = ExtCssFileModel::findMultipleByPids($this->ids, array('order' => 'FIELD(pid, ' . implode(",", $this->ids) . '), sorting DESC'));
 		
-		if ($objFiles === null) return false;
+		if ($objFiles === null) {
+			return false;
+		}
 
-		while ($objFiles->next())
-		{
+		while ($objFiles->next()) {
 			$objFileModel = \FilesModel::findByPk($objFiles->src);
 
-			if ($objFileModel === null) continue;
+			if ($objFileModel === null) {
+				continue;
+			}
 			
-			if (!file_exists(TL_ROOT . '/' . $objFileModel->path)) continue;
+			if (!file_exists(TL_ROOT . '/' . $objFileModel->path)) {
+				continue;
+			}
 
 			$objFile = new \File($objFileModel->path);
 
-			if ($objFile->size == 0) continue;
+			if ($objFile->size == 0) {
+				continue;
+			}
 
-			if ($this->isFileUpdated($objFile, $this->objUserCssFile))
-			{
+			if ($this->isFileUpdated($objFile, $this->objUserCssFile)) {
 				$this->rewrite = true;
 			}
 
@@ -269,33 +268,30 @@ class ExtCssCombiner extends \Frontend
 			$strVariables = $objFile->getContent();
 		}
 
-		if(!is_array($this->variablesOrderSRC)) return;
+		if (!is_array($this->variablesOrderSRC)) {
+			return;
+		}
 
 		$objTarget = new \File($this->getBootstrapCustomSrc($this->variablesSrc));
 
 		// overwrite bootstrap variables with custom variables
 		$objFilesModels = \FilesModel::findMultipleByUuids($this->variablesOrderSRC);
 
-		if($objFilesModels !== null)
-		{
-			while($objFilesModels->next())
-			{
+		if ($objFilesModels !== null) {
+			while ($objFilesModels->next()) {
 				$objFile = new \File($objFilesModels->path);
 
-				if ($this->isFileUpdated($objFile, $objTarget))
-				{
+				if ($this->isFileUpdated($objFile, $objTarget)) {
 					$this->rewrite          = true;
 					$this->rewriteBootstrap = true;
 					$strVariables .= "\n" . $objFile->getContent();
-				} else
-				{
+				} else {
 					$strVariables .= "\n" . $objFile->getContent();
 				}
 			}
 		}
 
-		if ($this->rewriteBootstrap)
-		{
+		if ($this->rewriteBootstrap) {
 			$objTarget->write($strVariables);
 		}
 
@@ -314,7 +310,9 @@ class ExtCssCombiner extends \Frontend
 
 			if (is_array($arrImports[1])) {
 				foreach ($arrImports[1] as $strFile) {
-					if (!file_exists(TL_ROOT . '/' . BOOTSTRAPLESSDIR . '/' . $strFile)) continue;
+					if (!file_exists(TL_ROOT . '/' . BOOTSTRAPLESSDIR . '/' . $strFile)) {
+						continue;
+					}
 
 					$objMixinFile = new \File(BOOTSTRAPLESSDIR . '/' . $strFile);
 					$this->objLess->parseFile($objMixinFile->value);
@@ -352,11 +350,10 @@ class ExtCssCombiner extends \Frontend
 			'forms.less',
 			'buttons.less',
 			'alerts.less',
-			'grid.less'
+			'grid.less',
 		);
 
-		foreach($arrUtilities as $strFile)
-		{
+		foreach ($arrUtilities as $strFile) {
 			$objFile = new \File($this->getBootstrapSrc($strFile));
 
 			if ($objFile->size > 0) {
@@ -424,7 +421,9 @@ class ExtCssCombiner extends \Frontend
 
 	protected function addCustomLessFiles()
 	{
-		if (!is_array($GLOBALS['TL_USER_CSS']) || empty($GLOBALS['TL_USER_CSS'])) return false;
+		if (!is_array($GLOBALS['TL_USER_CSS']) || empty($GLOBALS['TL_USER_CSS'])) {
+			return false;
+		}
 
 		foreach ($GLOBALS['TL_USER_CSS'] as $key => $css) {
 			$arrCss = trimsplit('|', $css);
@@ -440,8 +439,7 @@ class ExtCssCombiner extends \Frontend
 			// replace variables.less by custom variables.less
 			$hasImports = preg_match_all('!@import(\s+)?(\'|")(.+)(\'|");!U', $strContent, $arrImport);
 
-			if ($hasImports)
-			{
+			if ($hasImports) {
 				$this->arrLessImportDirs[$objFile->dirname] = $objFile->dirname;
 			}
 
@@ -458,8 +456,7 @@ class ExtCssCombiner extends \Frontend
 
 	public function __get($strKey)
 	{
-		switch($strKey)
-		{
+		switch ($strKey) {
 			case 'title':
 				return standardize(\String::restoreBasicEntities(implode('-', $this->getEach('title'))));
 			case 'addBootstrapPrint':
@@ -476,8 +473,7 @@ class ExtCssCombiner extends \Frontend
 				return max($this->getEach('tstamp')); // return max tstamp from css groups
 		}
 
-		if (isset($this->arrData[$strKey]))
-		{
+		if (isset($this->arrData[$strKey])) {
 			return $this->arrData[$strKey];
 		}
 
@@ -488,14 +484,12 @@ class ExtCssCombiner extends \Frontend
 	{
 		$return = array();
 
-		foreach ($this->arrData as $key => $value)
-		{
+		foreach ($this->arrData as $key => $value) {
 			$value = $value[$strKey];
 
 			$varUnserialized = @unserialize($value);
 
-			if (is_array($varUnserialized))
-			{
+			if (is_array($varUnserialized)) {
 				// flatten array
 				$return = array_merge($return, $varUnserialized);
 				continue;
