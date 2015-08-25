@@ -53,7 +53,7 @@ class ExtAssetsUpdater
 						{
 							$variables = serialize(array($objGroups->bootstrapVariablesSRC));
 
-							$objDatabase->prepare('UPDATE ' . $strTable . ' SET variablesSRC = ?, variablesOrderSRC = ?')->execute($variables,$variables);
+							$objDatabase->prepare('UPDATE ' . $strTable . ' SET variablesSRC = ?, variablesOrderSRC = ? AND id = ?')->execute($variables,$variables,$objGroups->id);
 						}
 
 						$objDatabase->query("ALTER TABLE $strTable DROP `bootstrapVariablesSRC`");
