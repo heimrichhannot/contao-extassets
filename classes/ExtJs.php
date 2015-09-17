@@ -65,40 +65,57 @@ class ExtJs extends \Frontend
 
 		if($objJs === null) return false;
 
+		$cache = !$GLOBALS['TL_CONFIG']['debugMode'];
+
 		while($objJs->next())
 		{
 			$objFiles = ExtJsFileModel::findMultipleByPid($objJs->id);
 
 			if($objFiles === null) continue;
 
-            $js = '';
+			$strChunk = '';
+
+			$strFile = 'assets/js/' . $objJs->title . '.js';
+			$strFileMinified = str_replace('.js', '.min.js', $strFile);
+
+			$objGroup = new \File($strFile, file_exists(TL_ROOT . '/' . $strFile));
+
+			$rewrite = ($objJs->tstamp > $objGroup->mtime || $objGroup->size == 0);
 
 			while($objFiles->next())
 			{
-				$objFile = \FilesModel::findByPk($objFiles->src);
-				if($objFile === null || !file_exists(TL_ROOT .'/'. $objFile->path)) continue;
-				$js .= file_get_contents($objFile->path) . "\n";
+				$objFileModel = \FilesModel::findByPk($objFiles->src);
+
+				if($objFileModel === null || !file_exists(TL_ROOT .'/'. $objFileModel->path)) continue;
+
+				$objFile = new \File($objFileModel->path);
+
+				$strChunk .= $objFile->getContent() . "\n";
+
+				if($objFile->mtime > $objGroup->mtime)
+				{
+					$rewrite = true;
+				}
 			}
 
-			// TODO: Refactor Js Generation
-			$target = 'assets/js/' . $objJs->title . '.js';
-
-			$rewrite = true;
-			$version = md5($js);
-
-			if(file_exists(TL_ROOT . '/' . $target))
-			{
-				$targetFile = new \File($target);
-				$rewrite = !($version == $targetFile->hash);
-			}
-
+			// simple file caching
 			if($rewrite)
 			{
-				file_put_contents(TL_ROOT . '/' . $target, $js);
+				$objGroup->write($strChunk);
+				$objGroup->close();
+
+				// minify js
+				if($cache)
+				{
+					$objGroup = new \File($strFileMinified);
+					$objMinify = new \MatthiasMullie\Minify\JS();
+					$objMinify->add($strChunk);
+					$objGroup->write($objMinify->minify());
+					$objGroup->close();
+				}
 			}
 
-
-			$arrJs[] = "$target|none";
+			$arrJs[] = $cache ? ("$strFileMinified|static") : "$strFile";
 		}
 
 		// HOOK: add custom css

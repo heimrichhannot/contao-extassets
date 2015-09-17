@@ -22,7 +22,8 @@
         "contao-community-alliance/composer-installer": "*",
         "components/bootstrap": ">=3.3,<4-dev",
         "heimrichhannot/font-awesome" : ">=4.4,<5-dev",
-        "heimrichhannot/elegant-icons" : ">=1.0,<2-dev"
+        "heimrichhannot/elegant-icons" : ">=1.0,<2-dev",
+        "matthiasmullie/minify": "~1.3"
     },
     "autoload": {
         "classmap": [""]
