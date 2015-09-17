@@ -111,7 +111,7 @@ class ExtJs extends \Frontend
 					$objGroup = new \File($strFileMinified);
 					$objMinify = new \MatthiasMullie\Minify\JS();
 					$objMinify->add($strChunk);
-					$objGroup->write($objMinify->minify());
+					$objGroup->write(rtrim($objMinify->minify(), ";") . ";"); // append semicolon, otherwise "(intermediate value)(...) is not a function"
 					$objGroup->close();
 				}
 			}
