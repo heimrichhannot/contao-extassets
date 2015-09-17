@@ -79,8 +79,9 @@ class ExtJs extends \Frontend
 			$strFileMinified = str_replace('.js', '.min.js', $strFile);
 
 			$objGroup = new \File($strFile, file_exists(TL_ROOT . '/' . $strFile));
+			$objGroupMinified = new \File($strFileMinified, file_exists(TL_ROOT . '/' . $strFile));
 
-			$rewrite = ($objJs->tstamp > $objGroup->mtime || $objGroup->size == 0);
+			$rewrite = ($objJs->tstamp > $objGroup->mtime || $objGroup->size == 0 || ($cache && $objGroupMinified->size == 0));
 
 			while($objFiles->next())
 			{
@@ -148,7 +149,7 @@ class ExtJs extends \Frontend
 		if(!file_exists(TL_ROOT . '/' . $in)) return false;
 
 		// index 0 = jQuery
-		array_insert($GLOBALS['TL_JAVASCRIPT'], 1, array('bootstrap' => "$in|none"));
+		array_insert($GLOBALS['TL_JAVASCRIPT'], 1, array('bootstrap' => $in . (!$GLOBALS['TL_CONFIG']['debugMode'] ? '|static' : '')));
 	}
 
 }
