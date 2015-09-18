@@ -399,15 +399,8 @@ class ExtCss extends \Frontend
 			}
 		}
 
-		if($GLOBALS['TL_CONFIG']['bypassCache'])
-		{
-			$GLOBALS['TL_CSS'] = array_merge(is_array($GLOBALS['TL_CSS']) ? $GLOBALS['TL_CSS'] : array(), $arrBaseCss);
-			$GLOBALS['TL_USER_CSS'] = array_merge(is_array($GLOBALS['TL_USER_CSS']) ? $GLOBALS['TL_USER_CSS'] : array(), $arrUserCss);
-		}
-		else
-		{
-			$GLOBALS['TL_CSS'] = array_merge($arrBaseCss, is_array($GLOBALS['TL_CSS']) ? $GLOBALS['TL_CSS'] : array());
-			$GLOBALS['TL_USER_CSS'] = array_merge($arrUserCss, is_array($GLOBALS['TL_USER_CSS']) ? $GLOBALS['TL_USER_CSS'] : array());
-		}
+
+		$GLOBALS['TL_CSS'] = array_merge(is_array($GLOBALS['TL_CSS']) ? $GLOBALS['TL_CSS'] : array(), $arrBaseCss);
+		$GLOBALS['TL_USER_CSS'] = array_merge(is_array($GLOBALS['TL_USER_CSS']) ? $GLOBALS['TL_USER_CSS'] : array(), $arrUserCss);
 	}
 }
