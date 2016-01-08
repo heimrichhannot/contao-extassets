@@ -135,15 +135,13 @@ class ExtJs extends \Frontend
 
 		// inject extjs before other plugins, otherwise bootstrap may not work
 		$GLOBALS['TL_JAVASCRIPT'] = is_array($GLOBALS['TL_JAVASCRIPT']) ? array_merge($GLOBALS['TL_JAVASCRIPT'], $arrJs) : $arrJs;
-		
 	}
 
-	/*
-	 * TODO:
-	* - install via runonce
-	*/
 	public function addTwitterBootstrap()
 	{
+		// do not include more than once
+		if(isset($GLOBALS['TL_JAVASCRIPT']['bootstrap'])) return false;
+
 		$in = BOOTSTRAPJSDIR . 'bootstrap' . (!$GLOBALS['TL_CONFIG']['debugMode'] ? '.min' : '') . '.js';
 
 		if(!file_exists(TL_ROOT . '/' . $in)) return false;
