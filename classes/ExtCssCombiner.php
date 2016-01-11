@@ -88,7 +88,6 @@ class ExtCssCombiner extends \Frontend
 			$this->addBootstrapVariables();
 			$this->addFontAwesomeVariables();
 			$this->addFontAwesomeCore();
-			$this->addFontAwesomeIcons();
 			$this->addFontAwesomeMixins();
 			$this->addFontAwesome();
 			$this->addBootstrapMixins();
@@ -384,14 +383,6 @@ class ExtCssCombiner extends \Frontend
 	protected function addFontAwesomeMixins()
 	{
 		$this->objLess->parseFile($this->getFontAwesomeLessSrc('mixins.less'));
-	}
-
-	/**
-	 * Font-Awesome 4.0 support for less icons
-	 */
-	protected function addFontAwesomeIcons()
-	{
-		$this->objLess->parseFile($this->getFontAwesomeLessSrc('icons.less'));
 	}
 
 	protected function addFontAwesome()
