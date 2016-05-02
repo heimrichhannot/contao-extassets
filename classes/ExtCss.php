@@ -137,7 +137,11 @@ class ExtCss extends \Frontend
 		if($objCssFiles !== null)
 		{
 			$objCssFilesModel = \FilesModel::findMultipleByUuids($objCssFiles->fetchEach('src'));
-			$arrOldFileNames = $objCssFilesModel->fetchEach('path');
+
+			if($objCssFilesModel !== null)
+			{
+				$arrOldFileNames = $objCssFilesModel->fetchEach('path');
+			}
 		}
 
 		$arrFileNames = static::scanLessFiles($objObserveModel->path);
