@@ -17,6 +17,8 @@
  */
 namespace ExtAssets;
 
+use HeimrichHannot\Haste\Util\StringUtil;
+
 class ExtJs extends \Frontend
 {
 
@@ -139,15 +141,33 @@ class ExtJs extends \Frontend
 
 	public function addTwitterBootstrap()
 	{
+		$arrJs = $GLOBALS['TL_JAVASCRIPT'];
+
 		// do not include more than once
-		if(isset($GLOBALS['TL_JAVASCRIPT']['bootstrap'])) return false;
+		if(isset($arrJs['bootstrap'])) return false;
 
 		$in = BOOTSTRAPJSDIR . 'bootstrap' . (!$GLOBALS['TL_CONFIG']['debugMode'] ? '.min' : '') . '.js';
 
 		if(!file_exists(TL_ROOT . '/' . $in)) return false;
 
-		// index 0 = jQuery
-		array_insert($GLOBALS['TL_JAVASCRIPT'], 1, array('bootstrap' => $in . (!$GLOBALS['TL_CONFIG']['debugMode'] ? '|static' : '')));
-	}
+		$intJqueryIndex = 0;
+		$i = 0;
 
+		// detemine jquery index from file name, as we should append bootstrapper always after jquery
+		foreach ($arrJs as $index => $strFile)
+		{
+			if(!StringUtil::endsWith($strFile, 'jquery.min.js|static'))
+			{
+				$i++;
+				continue;
+			}
+
+			$intJqueryIndex = $i + 1;
+			break;
+		}
+		
+
+		array_insert($arrJs, $intJqueryIndex, array('bootstrap' => $in . (!$GLOBALS['TL_CONFIG']['debugMode'] ? '|static' : '')));
+		$GLOBALS['TL_JAVASCRIPT'] = $arrJs;
+	}
 }
