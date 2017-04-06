@@ -349,7 +349,7 @@ class ExtCss extends \Frontend
 		{
 			foreach ($GLOBALS['TL_HOOKS']['parseExtCss'] as $callback)
 			{
-				$arrCss = static::importStatic($callback[0])->$callback[1]($arrCss);
+				$arrCss = static::importStatic($callback[0])->{$callback[1]}($arrCss);
 			}
 		}
 

@@ -105,7 +105,7 @@ class ExtCssCombiner extends \Frontend
 			if (isset($GLOBALS['TL_HOOKS']['addCustomAssets']) && is_array($GLOBALS['TL_HOOKS']['addCustomAssets'])) {
 				foreach ($GLOBALS['TL_HOOKS']['addCustomAssets'] as $callback) {
 					$this->import($callback[0]);
-					$this->$callback[0]->$callback[1]($this->objLess, $this->arrData, $this);
+					$this->{$callback[0]}->{$callback[1]}($this->objLess, $this->arrData, $this);
 				}
 			}
 

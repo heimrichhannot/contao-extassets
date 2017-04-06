@@ -126,7 +126,7 @@ class ExtJs extends \Frontend
 		{
 			foreach ($GLOBALS['TL_HOOKS']['parseExtJs'] as $callback)
 			{
-				$arrJs = static::importStatic($callback[0])->$callback[1]($arrJs);
+				$arrJs = static::importStatic($callback[0])->{$callback[1]}($arrJs);
 			}
 		}
 

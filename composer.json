@@ -17,7 +17,9 @@
         "issues":"https://github.com/heimrichhannot/contao-extassets/issues"
     },
     "require": {
-        "contao/core": ">=3.4,<4-dev",
+        "php": "~5.4 || ~7.0",
+        "contao/core-bundle": "^3.5.1 || ~4.1",
+        "contao-community-alliance/composer-plugin": "~2.4 || ~3.0",
         "robloach/component-installer": "*",
         "contao-community-alliance/composer-installer": "*",
         "components/bootstrap": ">=3.3,<4-dev",
