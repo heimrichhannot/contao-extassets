@@ -449,7 +449,7 @@ class ExtCssCombiner extends \Frontend
 	{
 		switch ($strKey) {
 			case 'title':
-				return standardize(\String::restoreBasicEntities(implode('-', $this->getEach('title'))));
+				return standardize(\StringUtil::restoreBasicEntities(implode('-', $this->getEach('title'))));
 			case 'addBootstrapPrint':
 			case 'addFontAwesome':
 				return max($this->getEach($strKey));
