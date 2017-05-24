@@ -65,10 +65,15 @@ class ExtCssCombiner extends \Frontend
 
         $this->arrReturn = $arrReturn;
 
-        $this->objUserCssFile = new \File($this->getSrc($this->title . '.css'));;
+        $this->objUserCssFile = new \File($this->getSrc($this->title . '.css'));
 
-        // rewrite if group css is empty or created/updated recently
-        if ($this->objUserCssFile->size == 0 || $this->lastUpdate > $this->objUserCssFile->mtime)
+        if(!$this->objUserCssFile->exists())
+        {
+            $this->objUserCssFile->write('');
+            $this->objUserCssFile->close();
+        }
+
+        if($this->objUserCssFile->size == 0 || $this->lastUpdate > $this->objUserCssFile->mtime)
         {
             $this->rewrite          = true;
             $this->rewriteBootstrap = true;

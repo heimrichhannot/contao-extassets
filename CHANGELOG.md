@@ -1,6 +1,11 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [1.2.2] - 2017-05-24
+
+### Fixed
+- contao 4 file handling fixes
+
 ## [1.2.1] - 2017-05-24
 
 ### Fixed

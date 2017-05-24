@@ -83,6 +83,18 @@ class ExtJs extends \Frontend
 			$objGroup = new \File($strFile, file_exists(TL_ROOT . '/' . $strFile));
 			$objGroupMinified = new \File($strFileMinified, file_exists(TL_ROOT . '/' . $strFile));
 
+			if(!$objGroupMinified->exists())
+            {
+                $objGroupMinified->write('');
+                $objGroupMinified->close();
+            }
+
+            if(!$objGroup->exists())
+            {
+                $objGroup->write('');
+                $objGroup->close();
+            }
+
 			$rewrite = ($objJs->tstamp > $objGroup->mtime || $objGroup->size == 0 || ($cache && $objGroupMinified->size == 0));
 
 			while($objFiles->next())
