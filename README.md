@@ -2,7 +2,6 @@
 
 Create your own css & js groups and add them to your contao theme layouts.
 
-
 ## General features
 - Backend Module for external css
 - Backend Module for external js 
@@ -22,6 +21,42 @@ Create your own css & js groups and add them to your contao theme layouts.
 - bootstrap print.css support
 - Internet Explorer 6-9 - 4096 css-selector handling (Internet Explorer 6 - 9 has only a maximum of 4096 css-selectors possible per file. Extassets make usage of https://github.com/zweilove/css_splitter ans solve this problem by splitting aggregated files into parts.)
 - all files within $GLOBALS['TL_USER_CSS'] will be parsed within external css groups
+
+### Installation
+
+#### Contao 4.0
+
+1. Install via composer
+
+```
+composer require heimrichhannot/contao-extassets
+```
+
+2. Add the following to lines to the `$bundles` array in your `app/AppKernel.php` 
+
+```
+/**
+     * {@inheritdoc}
+     */
+    public function registerBundles()
+    {
+        $bundles = [
+            …
+            new ContaoModuleBundle('extassets', $this->getRootDir()),
+            new ContaoModuleBundle('haste_plus', $this->getRootDir()),
+        ];
+
+        …
+    }
+```
+
+3. Clear app chache
+ 
+```
+bin/console cache:clear -e prod
+```
+
+
 
 ### Hooks
 

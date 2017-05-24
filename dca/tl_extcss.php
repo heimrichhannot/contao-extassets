@@ -139,3 +139,5 @@ $GLOBALS['TL_DCA']['tl_extcss'] = array(
         ),
     ),
 );
+
+\HeimrichHannot\Haste\Dca\General::addDateAddedToDca('tl_extcss');

@@ -1,6 +1,11 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [1.2.0] - 2017-05-24
+
+### Added
+- contao 4.x compatibility
+
 ## [1.1.20] - 2017-05-09
 
 ### Fixed

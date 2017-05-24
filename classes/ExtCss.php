@@ -131,7 +131,7 @@ class ExtCss extends \Frontend
 		if($lastUpdate <= $objObserveModel->tstamp) return false;
 
 		$objCssFiles = ExtCssFileModel::findMultipleByPids(array($groupId));
-		
+
 		$arrOldFileNames = array();
 
 		if($objCssFiles !== null)
@@ -159,11 +159,11 @@ class ExtCss extends \Frontend
 
 			// remove variables from oberserve files
 			$arrDiff = array_diff($arrDiff, $arrVariables);
-			
+
 			// remove variables from oberserve files
 			$arrRemove = array_intersect($arrOldFileNames, $arrVariables);
 		}
-		
+
 
 		if(!empty($arrDiff))
 		{
@@ -176,7 +176,7 @@ class ExtCss extends \Frontend
 
 		// cleanup
 		$arrRemove = array_merge($arrRemove, array_diff($arrOldFileNames, $arrFileNames));
-		
+
 		if(!empty($arrRemove))
 		{
 			// add new files
@@ -188,6 +188,9 @@ class ExtCss extends \Frontend
 				static::removeCssFileFromGroup($path, $groupId);
 			}
 		}
+
+		$objObserveModel->tstamp = $lastUpdate;
+		$objObserveModel->save();
 
 		return true;
 	}
@@ -235,8 +238,6 @@ class ExtCss extends \Frontend
 
 		if (!in_array(strtolower($objFile->extension), array('css', 'less'))) return false;
 
-		$objFile->close();
-
 		$objFileModel = new ExtCssFileModel();
 		$objFileModel->pid = $groupId;
 		$objFileModel->tstamp = time();
@@ -247,7 +248,7 @@ class ExtCss extends \Frontend
 		$objFileModel->sorting = (intval($objNextSorting->sorting) + 64);
 		$objFileModel->src = $objFile->getModel()->uuid;
 		$objFileModel->save();
-		
+
 		return $objFileModel;
 	}
 

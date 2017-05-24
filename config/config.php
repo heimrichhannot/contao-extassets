@@ -16,18 +16,25 @@
  */
 define('CSSDIR', 'assets/css/');
 
-define('BOOTSTRAPDIR', 'assets/components/bootstrap/');
-define('BOOTSTRAPLESSDIR', 'assets/components/bootstrap/less/');
-define('BOOTSTRAPLESSCUSTOMDIR', 'assets/components/bootstrap/less/custom/');
-define('BOOTSTRAPJSDIR', 'assets/components/bootstrap/js/');
+$componentsDir = 'assets/components';
 
-define('FONTAWESOMEDIR', 'assets/components/font-awesome/');
+if (version_compare(VERSION . '.' . BUILD, '4.0.0', '>='))
+{
+    $componentsDir = 'assets';
+}
+
+define('BOOTSTRAPDIR', $componentsDir . '/bootstrap/');
+define('BOOTSTRAPLESSDIR', $componentsDir . '/bootstrap/less/');
+define('BOOTSTRAPLESSCUSTOMDIR', $componentsDir . '/bootstrap/less/custom/');
+define('BOOTSTRAPJSDIR', $componentsDir . '/bootstrap/js/');
+
+define('FONTAWESOMEDIR', $componentsDir . '/font-awesome/');
 define('FONTAWESOMECSSDIR', FONTAWESOMEDIR . 'css/');
 define('FONTAWESOMELESSDIR', FONTAWESOMEDIR . 'less/');
 define('FONTAWESOMELESSCUSTOMDIR', FONTAWESOMEDIR . 'less/custom/');
 define('FONTAWESOMEFONTDIR', FONTAWESOMEDIR . 'fonts/');
 
-define('ELEGANTICONSDIR', 'assets/components/elegant-icons/');
+define('ELEGANTICONSDIR', $componentsDir . '/elegant-icons/');
 define('ELEGANTICONSCSSDIR', ELEGANTICONSDIR . 'css/');
 define('ELEGANTICONSLESSDIR', ELEGANTICONSDIR . 'less/');
 define('ELEGANTICONSFONTDIR', ELEGANTICONSDIR . 'fonts/');
@@ -41,46 +48,44 @@ define('LESSCSSCACHEDIR', 'assets/css/lesscache/');
  * your own modules by adding them to the array.
  */
 
-$GLOBALS['BE_MOD']['design']['extcss'] = array
-(
-		'tables'       => array('tl_extcss', 'tl_extcss_file', 'tl_files'),
-		'icon'         => 'system/modules/extassets/assets/extcss/icon.png',
-);
+$GLOBALS['BE_MOD']['design']['extcss'] = [
+    'tables' => ['tl_extcss', 'tl_extcss_file', 'tl_files'],
+    'icon'   => 'system/modules/extassets/assets/extcss/icon.png',
+];
 
-$GLOBALS['BE_MOD']['design']['extjs'] = array
-(
-		'tables'       => array('tl_extjs', 'tl_extjs_file', 'tl_files'),
-		'icon'         => 'system/modules/extassets/assets/extjs/icon.png',
-);
+$GLOBALS['BE_MOD']['design']['extjs'] = [
+    'tables' => ['tl_extjs', 'tl_extjs_file', 'tl_files'],
+    'icon'   => 'system/modules/extassets/assets/extjs/icon.png',
+];
 
 /**
  * Mime types
  */
-$GLOBALS['TL_MIME']['less'] = array('text/css', 'iconCSS.gif');
+$GLOBALS['TL_MIME']['less'] = ['text/css', 'iconCSS.gif'];
 
 
 /**
  * Hooks
  */
-$GLOBALS['TL_HOOKS']['replaceDynamicScriptTags'][] = array('ExtAssets\ExtCss', 'hookReplaceDynamicScriptTags');
-$GLOBALS['TL_HOOKS']['replaceDynamicScriptTags'][] = array('ExtAssets\ExtJs', 'hookReplaceDynamicScriptTags');
-$GLOBALS['TL_HOOKS']['getPageLayout'][] = array('ExtAssets\ExtCss', 'hookGetPageLayout');
+$GLOBALS['TL_HOOKS']['replaceDynamicScriptTags'][] = ['ExtAssets\ExtCss', 'hookReplaceDynamicScriptTags'];
+$GLOBALS['TL_HOOKS']['replaceDynamicScriptTags'][] = ['ExtAssets\ExtJs', 'hookReplaceDynamicScriptTags'];
+$GLOBALS['TL_HOOKS']['getPageLayout'][]            = ['ExtAssets\ExtCss', 'hookGetPageLayout'];
 
 /**
  * Models
  */
-$GLOBALS['TL_MODELS']['tl_extcss'] = 'ExtAssets\ExtCssModel';
+$GLOBALS['TL_MODELS']['tl_extcss']      = 'ExtAssets\ExtCssModel';
 $GLOBALS['TL_MODELS']['tl_extcss_file'] = 'ExtAssets\ExtCssFileModel';
-$GLOBALS['TL_MODELS']['tl_extjs'] = 'ExtAssets\ExtJsModel';
-$GLOBALS['TL_MODELS']['tl_extjs_file'] = 'ExtAssets\ExtJsFileModel';
+$GLOBALS['TL_MODELS']['tl_extjs']       = 'ExtAssets\ExtJsModel';
+$GLOBALS['TL_MODELS']['tl_extjs_file']  = 'ExtAssets\ExtJsFileModel';
 
 /**
  * PurgeData
  */
-$GLOBALS['TL_PURGE']['folders']['less'] = array(
-	'affected'		=> array(BOOTSTRAPLESSCUSTOMDIR, FONTAWESOMELESSCUSTOMDIR, LESSCSSCACHEDIR, 'assets/css/'),
-	'callback'		=> array('ExtAssets\ExtAutomator', 'purgeLessCache'),
-);
+$GLOBALS['TL_PURGE']['folders']['less'] = [
+    'affected' => [BOOTSTRAPLESSCUSTOMDIR, FONTAWESOMELESSCUSTOMDIR, LESSCSSCACHEDIR, 'assets/css/'],
+    'callback' => ['ExtAssets\ExtAutomator', 'purgeLessCache'],
+];
 
 /**
  * FRONT END MODULES
