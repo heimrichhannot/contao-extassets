@@ -157,7 +157,7 @@ class tl_extcss_file extends Backend
 
         $dca = &$GLOBALS['TL_DCA']['tl_extcss_file'];
 
-        ExtCss::observeCssGroupFolder($dc->id);
+        \ExtAssets\ExtCss::observeCssGroupFolder($dc->id);
     }
 
     /**

@@ -17,6 +17,8 @@
 
 namespace ExtAssets;
 
+use Contao\Dbafs;
+
 require_once TL_ROOT . "/system/modules/extassets/classes/vendor/php-css-splitter/src/Splitter.php";
 
 /**
@@ -264,7 +266,14 @@ class ExtCss extends \Frontend
         $objNextSorting = \Database::getInstance()->prepare("SELECT MAX(sorting) AS sorting FROM tl_extcss_file WHERE pid=?")->execute($groupId);
 
         $objFileModel->sorting = (intval($objNextSorting->sorting) + 64);
-        $objFileModel->src     = $objFile->getModel()->uuid;
+
+        if (($objModel = $objFile->getModel()) === null)
+        {
+            $objModel = Dbafs::addResource($path);
+        }
+
+        $objFileModel->src = $objModel->uuid;
+
         $objFileModel->save();
 
         return $objFileModel;

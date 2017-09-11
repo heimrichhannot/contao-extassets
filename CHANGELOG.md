@@ -1,6 +1,11 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [1.2.3] - 2017-09-11
+
+### Fixed
+- empty model issue in ExtCss::addCssFileToGroup()
+
 ## [1.2.2] - 2017-05-24
 
 ### Fixed
