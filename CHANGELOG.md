@@ -1,6 +1,11 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [1.4.1] - 2018-03-15
+
+### Fixed
+- dropped `contao-community-alliance/composer-plugin` dependency
+
 ## [1.4.0] - 2018-02-27
 
 ### Changed
