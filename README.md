@@ -1,5 +1,7 @@
 # Contao Extassets
 
+> This bundle is outdated and not actively maintained anymore!
+
 Create your own css & js groups and add them to your contao theme layouts.
 
 ## General features
